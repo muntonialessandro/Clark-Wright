@@ -5,8 +5,6 @@ HEADERS += \
     classes/graph_routes.h \
     classes/client.h
 
-QMAKE_CXXFLAGS += -std=c++11
-
 SOURCES += \
     utils.cpp \
     main.cpp \

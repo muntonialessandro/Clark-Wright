@@ -16,7 +16,8 @@ int main(){
 
     //Prova Mergesort
     int i;
-    QVector<double> v = {4, 6, 1, 7, 2.2, 10, 5, 2.4, 11, 8};
+    QVector<double> v;
+    v << 4 << 6 << 1 << 7 << 2.2 << 10 << 5 << 2.4 << 11 << 8;
     QVector<double> res = mergesort(v);
     for (i=0; i<res.size(); i++) std::cout << res[i] << "; ";
     std::cout << std::endl;
