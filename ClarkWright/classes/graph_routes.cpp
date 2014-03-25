@@ -281,7 +281,7 @@ QList< QList<QPoint> > GraphRoutes::get_list_edges()
     index_client j;
     for (rid=this->get_first_route_id(); rid!=-1; rid=this->get_next_route_id(rid)){
         QList<QPoint> list_points;
-        for (j=0; routes[rid].get_n_nodes(); j++) {
+        for (j=0; j<routes[rid].get_n_nodes(); j++) {
             QPoint p = clients[routes[rid].get_client(j)].to_QPoint();
             list_points.append(p);
         }
