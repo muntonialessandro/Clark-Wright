@@ -17,7 +17,7 @@ Client::Client(){}
  * @param y
  * @param demand
  */
-Client::Client(client_id id, int x, int y, int demand)
+Client::Client(client_id id, double x, double y, double demand)
 {
     this->id = id;
     this->x = x;
@@ -57,7 +57,7 @@ client_id Client::get_id()
  * @param x
  * @param y
  */
-void Client::set_coordinates(int x, int y)
+void Client::set_coordinates(double x, double y)
 {
     this->x = x;
     this->y = y;
@@ -68,7 +68,7 @@ void Client::set_coordinates(int x, int y)
  *  Restituisce la coordinata x del cliente
  * @return
  */
-int Client::get_x()
+double Client::get_x()
 {
     return this->x;
 }
@@ -78,7 +78,7 @@ int Client::get_x()
  *  Restituisce la coordinata y del cliente
  * @return
  */
-int Client::get_y()
+double Client::get_y()
 {
     return this->y;
 }
@@ -88,7 +88,7 @@ int Client::get_y()
  *  Restituisce la quantità di merce richiesta dal cliente
  * @return
  */
-int Client::get_demand()
+double Client::get_demand()
 {
     return this->demand;
 }
@@ -108,7 +108,7 @@ route_id Client::get_route()
  *  Modifica la quantità di merce richiesta dal cliente
  * @param demand
  */
-void Client::set_demand(int demand)
+void Client::set_demand(double demand)
 {
     this->demand = demand;
 }
@@ -121,8 +121,8 @@ void Client::set_demand(int demand)
  */
 double Client::get_distance(Client c)
 {
-    int c_x = c.get_x();
-    int c_y = c.get_y();
+    double c_x = c.get_x();
+    double c_y = c.get_y();
     //distanza euclidea tra i due punti:
     double dist = pow((this->x - c_x),2) + pow((this->y - c_y),2);
     dist = sqrt(dist);
@@ -220,4 +220,12 @@ QPoint Client::to_QPoint()
 {
     QPoint p(this->x, this->y);
     return p;
+}
+
+Event Client::to_Event()
+{
+    bool dep;
+    if (this->id == 0) dep = true;
+    else dep = false;
+    return Event(this->id, this->x, this->y, dep, true);
 }

@@ -7,6 +7,7 @@
 #include <QPoint>
 #include <QPair>
 #include <QList>
+#include "event.h"
 
 typedef int client_id; //tipo utilizzato per indicare l'id di un cliente;
 typedef int route_id; //tipo utilizzato per indicare l'id di una route;
@@ -31,15 +32,15 @@ class Client
 {
 public:
     Client();
-    Client(client_id id, int x, int y, int demand);
+    Client(client_id id, double x, double y, double demand);
     void set_id(client_id id);
     client_id get_id();
-    void set_coordinates(int x, int y);
-    int get_x();
-    int get_y();
-    int get_demand();
+    void set_coordinates(double x, double y);
+    double get_x();
+    double get_y();
+    double get_demand();
     route_id get_route();
-    void set_demand(int demand);
+    void set_demand(double demand);
     double get_distance(Client c);
     void set_route(route_id rid);
     index_client get_position_in_route();
@@ -49,12 +50,13 @@ public:
     std::string to_string();
     QPair<QPoint, QString> to_point_label_pair();
     QPoint to_QPoint();
+    Event to_Event();
 
 private:
     client_id id;
-    int x;
-    int y;
-    int demand;
+    double x;
+    double y;
+    double demand;
     route_id rid;
     index_client position_in_route;
     bool alone;

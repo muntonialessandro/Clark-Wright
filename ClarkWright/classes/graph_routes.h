@@ -28,6 +28,7 @@ public:
     std::string to_string();
     QList< QPair<QPoint,QString> > get_list_point_label_pairs();
     QList< QList<QPoint> > get_list_edges();
+    QVector<Event> to_events_vector();
 
 private:
     QVector<Client> clients;

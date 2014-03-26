@@ -290,3 +290,13 @@ QList< QList<QPoint> > GraphRoutes::get_list_edges()
     return list_routes;
 }
 
+QVector<Event> GraphRoutes::to_events_vector()
+{
+    QVector<Event> qe;
+    int i;
+    for (i=0; i<this->clients.size(); i++){
+        qe.push_back(clients[i].to_Event());
+    }
+    return qe;
+}
+

@@ -13,7 +13,8 @@ HEADERS += \
     classes/graph_routes.h \
     classes/client.h\
     user_interface/mainwindow.h \
-    user_interface/user_interface.h
+    user_interface/user_interface.h \
+    classes/event.h
 
 SOURCES += \
     utils.cpp \
@@ -21,4 +22,5 @@ SOURCES += \
     classes/route.cpp \
     classes/graph_routes.cpp \
     classes/client.cpp \
-    user_interface/mainwindow.cpp
+    user_interface/mainwindow.cpp \
+    classes/event.cpp
