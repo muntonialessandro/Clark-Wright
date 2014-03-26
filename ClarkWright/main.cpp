@@ -2,6 +2,7 @@
 #include "timer.h"
 #include "utils.h"
 #include "io_file.h"
+#include "voronoi.h"
 #include <iostream>
 #include <QVector>
 
@@ -11,11 +12,17 @@ void esempi_di_utilizzo_per_algoritmo( void );
 
 int main(int argc, char *argv[]){
 
-    if(false) {     //MODALITA' TERMINALE = TRUE
+    if(true) {     //MODALITA' TERMINALE = TRUE
 
-        esempi_di_utilizzo_per_algoritmo();
+        //esempi_di_utilizzo_per_algoritmo();
 
-    }else{          //MODALITA' INTERFACCIA = false
+        int cap;
+        QVector<Client> clients;
+        clients = read_file("vrpnc1.txt", &cap);
+        voronoi(clients);
+
+    }
+    else {          //MODALITA' INTERFACCIA = false
 
         // Launch interface example
         QApplication a(argc, argv);     //crea l'applicazione per ..

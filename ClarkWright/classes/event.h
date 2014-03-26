@@ -3,6 +3,7 @@
 
 #include <QVector>
 #include <QLinkedList>
+#include <sstream>
 
 
 /**
@@ -19,6 +20,7 @@ public:
     bool is_deposit();
     bool is_site_event();
     int get_client_id();
+    std::string to_string();
 
 private:
     int client_id;

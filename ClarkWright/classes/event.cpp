@@ -39,3 +39,12 @@ int Event::get_client_id()
     return this->client_id;
 }
 
+std::string Event::to_string()
+{
+    std::stringstream ss;
+    ss << "Client ID: " << this->client_id << "; Coordinates: (" << this->x << "; " << this->y
+       << ");";
+    std::string s = ss.str();
+    return s;
+}
+
