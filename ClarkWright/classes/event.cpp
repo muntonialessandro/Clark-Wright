@@ -12,6 +12,7 @@ Event::Event(int client_id, double x, double y, bool deposit, bool event)
     this->deposit = deposit;
     this->event = event;
     this->circle_events.clear();
+    this->circle_event=-1;
 }
 
 double Event::get_x()
@@ -37,6 +38,16 @@ bool Event::is_site_event()
 int Event::get_client_id()
 {
     return this->client_id;
+}
+
+int Event::get_circle_event()
+{
+    return this->circle_event;
+}
+
+void Event::set_circle_event(int event_id)
+{
+    this->circle_event=event_id;
 }
 
 std::string Event::to_string()

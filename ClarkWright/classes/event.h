@@ -20,6 +20,8 @@ public:
     bool is_deposit();
     bool is_site_event();
     int get_client_id();
+    int get_circle_event();
+    void set_circle_event(int event_id);
     std::string to_string();
 
 private:
@@ -29,6 +31,7 @@ private:
     bool deposit; //true: è il deposito
     bool event; //true: SiteEvent, false: CircleEvent
     QVector<QLinkedList<Event>::const_iterator> circle_events;
+    int circle_event;
 };
 
 #endif // EVENT_H
