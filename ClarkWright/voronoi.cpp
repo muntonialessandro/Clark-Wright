@@ -13,6 +13,10 @@ QVector<Client> voronoi (QVector<Client> sites){
     return sites;
 }
 
+void hadnle_site_event(Event e, QLinkedList<Event>* Q, QVector<Event>* T){
+
+}
+
 QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2){
     QVector<Event> merge;
     int i=0 ,j=0; // indici: i scorre l'array v1, j scorre l'array v2

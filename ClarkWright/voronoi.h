@@ -6,6 +6,8 @@
 
 QVector<Client> voronoi (QVector<Client> sites);
 
+void hadnle_site_event(Event e, QLinkedList<Event>* Q, QVector<Event>* T);
+
 QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2);
 
 QVector<Event> mergesort_events(QVector<Event> &v);
