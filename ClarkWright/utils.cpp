@@ -11,13 +11,13 @@
  * @return          l'indice di n nell'array.
  *                  se n non è presente, restituisce -1.
  */
-int binary_search(double n, int first, int last, QVector<double> & v) {
+int binary_search_double(double n, int first, int last, QVector<double> & v) {
     int mid;
     if (first <= last){
         mid = (first + last) / 2;
-        if (v[mid] < n) return (binary_search (n, mid+1, last, v) );
+        if (v[mid] < n) return (binary_search_double (n, mid+1, last, v) );
         if (v[mid] == n) return mid;
-        if (v[mid] > n) return (binary_search (n, first, mid-1, v) );
+        if (v[mid] > n) return (binary_search_double (n, first, mid-1, v) );
     }
     return -1;
 }
@@ -34,13 +34,37 @@ int binary_search(double n, int first, int last, QVector<double> & v) {
  * @param v:        array su cui effettuare la ricerca
  * @return          l'indice del primo elemento >= a n.
  */
-int search_insert_index(double n, int first, int last, QVector<double> & v) {
+int search_insert_index_double(double n, int first, int last, QVector<double> & v) {
     int mid;
     if (first <= last){
         mid = (first + last) / 2;
-        if (v[mid] < n) return (search_insert_index (n, mid+1, last, v) );
+        if (v[mid] < n) return (search_insert_index_double (n, mid+1, last, v) );
         if (v[mid] == n) return mid;
-        if (v[mid] > n) return (search_insert_index (n, first, mid-1, v) );
+        if (v[mid] > n) return (search_insert_index_double (n, first, mid-1, v) );
+    }
+    return first;
+}
+
+int binary_search_int(int n, int first, int last, QVector<int> &v)
+{
+    int mid;
+    if (first <= last){
+        mid = (first + last) / 2;
+        if (v[mid] < n) return (binary_search_int (n, mid+1, last, v) );
+        if (v[mid] == n) return mid;
+        if (v[mid] > n) return (binary_search_int (n, first, mid-1, v) );
+    }
+    return -1;
+}
+
+int search_insert_index_int(int n, int first, int last, QVector<int> &v)
+{
+    int mid;
+    if (first <= last){
+        mid = (first + last) / 2;
+        if (v[mid] < n) return (search_insert_index_int (n, mid+1, last, v) );
+        if (v[mid] == n) return mid;
+        if (v[mid] > n) return (search_insert_index_int (n, first, mid-1, v) );
     }
     return first;
 }
@@ -94,57 +118,5 @@ QVector<double> mergesort(QVector<double> &v){
         return r;
     }
     else return v;
-
-}
-
-
-
-
-
-
-
-QVector<Client> read_file(QString filename, int* vehicle_capacity){
-    int n_clients, temp;
-    int x_deposit, y_deposit;
-    int x_client, y_client, demand;
-    int i;
-    QFile file(filename);
-    QVector<Client> clients;
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        std::cout << "Error Reading File " << filename.toStdString() << std::endl;
-        return clients;
-    }
-
-    QByteArray line = file.readLine();
-    char *tmp = line.data();
-    std::stringstream s1(tmp);
-    s1 >> n_clients >> *vehicle_capacity >> temp >> temp;
-
-    if( s1.fail() == true )
-    {
-         std::cout << "Error in line 0" << std::endl;
-         file.close();
-         return clients;
-    }
-
-    line = file.readLine();
-    tmp = line.data();
-    std::stringstream s2(tmp);
-    s2 >> x_deposit >> y_deposit;
-
-    Client c(0, x_deposit, y_deposit, 0);
-    clients.push_back(c);
-
-    for (i=0; i<n_clients; i++){
-        line = file.readLine();
-        tmp = line.data();
-        std::stringstream s(tmp);
-        s >> x_client >> y_client >> demand;
-        c = Client(i+1, x_client, y_client, demand);
-        clients.push_back(c);
-    }
-    file.close();
-
-    return clients;
 
 }

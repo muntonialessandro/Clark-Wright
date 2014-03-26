@@ -24,6 +24,7 @@ Client::Client(client_id id, double x, double y, double demand)
     this->y = y;
     this->demand = demand;
     this->alone = true;
+    this->neighbors.clear();
     if (id == 0) { // se è il deposito
         this->position_in_route = -1;
         this->rid = -1;
@@ -177,6 +178,17 @@ bool Client::is_alone()
 void Client::set_alone(bool a)
 {
     this->alone = a;
+}
+
+/**
+ * @brief Client::add_neighbor
+ *  aggiunge un nuovo vicino alla lista dei vicini del cliente.
+ * @param neighbor
+ */
+void Client::add_neighbor(client_id neighbor)
+{
+    int index = search_insert_index_int(neighbor, 0, this->neighbors.size()-1, this->neighbors);
+    this->neighbors.insert(index, neighbor);
 }
 
 /**

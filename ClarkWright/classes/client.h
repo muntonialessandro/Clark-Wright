@@ -8,6 +8,7 @@
 #include <QPair>
 #include <QList>
 #include "event.h"
+#include "utils.h"
 
 typedef int client_id; //tipo utilizzato per indicare l'id di un cliente;
 typedef int route_id; //tipo utilizzato per indicare l'id di una route;
@@ -27,6 +28,7 @@ typedef int index_client; //tipo utilizzato per indicare l'indice di posizione d
  *      - rid               : identifica la route a cui appartiene al cliente;
  *      - position_in_route : posizione del cliente nella route a cui appartiene;
  *      - alone             : indica se è l'unico nodo presente nella route, oltre il deposito (0).
+ *      - neighbors         : vettore degli id dei vicini del cliente (utilizzato per il CloserClarkWright)
  */
 class Client
 {
@@ -47,6 +49,7 @@ public:
     void set_position_in_route(index_client position);
     bool is_alone();
     void set_alone(bool a);
+    void add_neighbor(client_id neighbor);
     std::string to_string();
     QPair<QPoint, QString> to_point_label_pair();
     QPoint to_QPoint();
@@ -60,6 +63,7 @@ private:
     route_id rid;
     index_client position_in_route;
     bool alone;
+    QVector<client_id> neighbors;
 };
 
 #endif // CLIENT_H

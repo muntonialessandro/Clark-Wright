@@ -14,7 +14,9 @@ HEADERS += \
     classes/client.h\
     user_interface/mainwindow.h \
     user_interface/user_interface.h \
-    classes/event.h
+    classes/event.h \
+    voronoi.h \
+    io_file.h
 
 SOURCES += \
     utils.cpp \
@@ -23,4 +25,6 @@ SOURCES += \
     classes/graph_routes.cpp \
     classes/client.cpp \
     user_interface/mainwindow.cpp \
-    classes/event.cpp
+    classes/event.cpp \
+    voronoi.cpp \
+    io_file.cpp
