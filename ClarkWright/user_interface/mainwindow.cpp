@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "user_interface.h"
 
 /**
  * @brief MainWindow

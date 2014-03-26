@@ -13,7 +13,7 @@ HEADERS += \
     classes/graph_routes.h \
     classes/client.h\
     user_interface/mainwindow.h \
-    user_interface/ui_mainwindow.h
+    user_interface/user_interface.h
 
 SOURCES += \
     utils.cpp \
