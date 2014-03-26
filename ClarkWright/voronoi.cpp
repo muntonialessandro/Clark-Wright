@@ -5,9 +5,11 @@ QVector<Client> voronoi (QVector<Client> sites){
     QVector<Event> events;
     for (i=0; i<sites.size(); i++) events.push_back(sites[i].to_Event());
     QVector<Event> ordered_events = mergesort_events(events);
-    for (i=0; i<ordered_events.size(); i++){
-        std::cout << ordered_events[i].to_string() << std::endl;
-    }
+
+    QLinkedList<Event> Q;
+    for (i=0; i<ordered_events.size(); i++) Q.append(ordered_events[i]);
+    QVector<Event> T;
+
     return sites;
 }
 
@@ -65,4 +67,58 @@ QVector<Event> mergesort_events(QVector<Event> &v){
     }
     else return v;
 
+}
+
+/**
+ * @brief binary_search_events
+ *  Effettua una ricerca binaria di n sull'array ordinato v.
+ *  Restituisce -1 se n non è presente nell'array.
+ * @param n
+ * @param first
+ * @param last
+ * @param v
+ * @return
+ */
+int binary_search_events(Event n, int first, int last, QVector<Event> &v)
+{
+    int mid;
+    if (first <= last){
+        mid = (first + last) / 2;
+        if (v[mid].get_x() < n.get_x()) return (search_insert_index_events (n, mid+1, last, v) );
+        if (v[mid].get_x() == n.get_x()) {
+            if (v[mid].get_y() < n.get_y()) return (search_insert_index_events (n, mid+1, last, v) );
+            if (v[mid].get_y() == n.get_y()) return mid;
+            if (v[mid].get_y() > n.get_y()) return (search_insert_index_events (n, first, mid-1, v) );
+        }
+        if (v[mid].get_x() > n.get_x()) return (search_insert_index_events (n, first, mid-1, v) );
+    }
+    return -1;
+}
+
+
+/**
+ * @brief search_insert_index_events
+ *  Effettua una ricerca binaria di n sull'array ordinato v,
+ *  e restituisce l'indice del primo elemento nell'array
+ *  >= a n.
+ * @param n
+ * @param first
+ * @param last
+ * @param v
+ * @return
+ */
+int search_insert_index_events(Event n, int first, int last, QVector<Event> &v)
+{
+    int mid;
+    if (first <= last){
+        mid = (first + last) / 2;
+        if (v[mid].get_x() < n.get_x()) return (search_insert_index_events (n, mid+1, last, v) );
+        if (v[mid].get_x() == n.get_x()) {
+            if (v[mid].get_y() < n.get_y()) return (search_insert_index_events (n, mid+1, last, v) );
+            if (v[mid].get_y() == n.get_y()) return mid;
+            if (v[mid].get_y() > n.get_y()) return (search_insert_index_events (n, first, mid-1, v) );
+        }
+        if (v[mid].get_x() > n.get_x()) return (search_insert_index_events (n, first, mid-1, v) );
+    }
+    return first;
 }
