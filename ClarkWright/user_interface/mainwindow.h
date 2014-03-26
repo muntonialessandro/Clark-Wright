@@ -32,6 +32,9 @@ namespace Ui {
 class MainWindow;
 }
 
+typedef QList<QPoint> G_arrows_points_path;
+typedef QPair <QPoint,QString> G_node_and_label;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -41,17 +44,14 @@ public:
     QString APPNAME;
     QString APP_VERSION;
 
-
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    static int design_interface( int argc, char *argv[] );
-    void design_route( QList<QPoint> route );
-    void design_routes( QList< QList<QPoint> > routes );
-    void design_nodes( QList< QPair<QPoint,QString> > pointsList );
+    void G_draw_routes( QList< QList<QPoint> > routes );
+    void G_draw_nodes( QList< QPair<QPoint,QString> > pointsList );
+    int G_draw_interface(QApplication *a);
 
 private:
     Ui::MainWindow *ui;     // l'interfaccia con tutti i suoi oggetti
-    QWidget *window;        // finestra dell'interfaccia
     int pixelMultip;        // maggiore sara' questo numero, piu grande sara' la visualizzazione
     bool firstAperture;     // appena viene aperto il programma passa da true a false, dopo la fase di inizializzazione
     bool gridEnabled;       // memorizza se e' già attiva la griglia
@@ -79,6 +79,7 @@ private slots: // le varie funzioni che vengono chiamate quando si interagisce c
     void compute();
     void zoomInGraphButton();
     void zoomOutGraphButton();
+    void draw_route( QList<QPoint> route );
 
 };
 

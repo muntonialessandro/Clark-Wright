@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "user_interface.h"
 
+
 /**
  * @brief MainWindow
  *  Crea e inizializza l'interfaccia e i suoi parametri iniziali.
@@ -195,7 +196,7 @@ void MainWindow::open_file()
 {
 
 
-    QString filename = QFileDialog::getOpenFileName( NULL, "Apri il file con nodi e quantita'", "../../../" , "RO points (*.*)");
+    QString filename = QFileDialog::getOpenFileName( NULL, "Apri il file con nodi e quantita'", "./" , "RO points (*.*)");
 //    QString filename = "../../../vrpnc1.txt";     //LELLE
 
     if (!filename.isNull())
@@ -214,7 +215,7 @@ void MainWindow::open_file()
                                QString::number( nodes_list[i].get_demand() ) ) );
         }
 
-        design_nodes(client);
+        G_draw_nodes(client);
 
     }else{
         qDebug("The file is NULL.");
@@ -277,8 +278,8 @@ void MainWindow::compute()
 
     qDebug( "Size %d",clients.size() );
     GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
-    design_routes( state.get_list_edges() );
-    design_nodes( state.get_list_point_label_pairs() );
+    G_draw_routes( state.get_list_edges() );
+    G_draw_nodes( state.get_list_point_label_pairs() );
 }
 
 /**
@@ -310,7 +311,7 @@ void MainWindow::zoomInGraphButton()
  *      con punta nel secondo nodo, e così via ...
  * @param route la lista dei delle posizioni dei punti/nodi
  */
-void MainWindow::design_route( QList<QPoint> route )
+void MainWindow::draw_route( QList<QPoint> route )
 {
     if (route.size()<2) return;
 
@@ -324,12 +325,12 @@ void MainWindow::design_route( QList<QPoint> route )
  *  Disegna una lista di route
  * @param routes la lista di routes
  */
-void MainWindow::design_routes( QList< QList<QPoint> > routes )
+void MainWindow::G_draw_routes( QList< QList<QPoint> > routes )
 {
     if (routes.size()==0) return;
 
     for( int i=0; i<routes.size(); i++ ){
-        design_route( routes[i] );
+        draw_route( routes[i] );
     }
 }
 
@@ -338,7 +339,7 @@ void MainWindow::design_routes( QList< QList<QPoint> > routes )
  *  Disegna una lista di nodi con relativo label
  * @param pointsList la lista formata da coppie (posizione,label)
  */
-void MainWindow::design_nodes( QList< QPair<QPoint,QString> > pointsList )
+void MainWindow::G_draw_nodes( QList< QPair<QPoint,QString> > pointsList )
 {
 
     QPair<QPoint,QString> *p ;
@@ -355,9 +356,7 @@ void MainWindow::design_nodes( QList< QPair<QPoint,QString> > pointsList )
 
 
 
-int MainWindow::design_interface( int argc, char *argv[] ) {
-
-    QApplication a(argc, argv);
+int MainWindow::G_draw_interface( QApplication* a ) {
 
     qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 
@@ -460,6 +459,7 @@ int MainWindow::design_interface( int argc, char *argv[] ) {
 //    QList< QPair<QPoint,QString> > pointList;
 //    window.createGraph( pointList );
 
-    return a.exec();
+    return a->exec();
+
 }
 
