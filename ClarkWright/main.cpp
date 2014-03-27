@@ -18,7 +18,8 @@ int main(int argc, char *argv[]){
 
         int cap;
         QVector<Client> clients;
-        clients = read_file("vrpnc1.txt", &cap);
+        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+//        clients = read_file("vrpnc1.txt", &cap); // Ale
         voronoi(clients);
 
     }
