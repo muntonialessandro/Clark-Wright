@@ -19,6 +19,10 @@ int main(int argc, char *argv[]){
         int cap;
         QVector<Client> clients;
         clients = read_file("vrpnc1.txt", &cap);
+        /*clients.push_back(Client(0,0,3,1));
+        clients.push_back(Client(1,2,1,1));
+        clients.push_back(Client(2,3,0,1));
+        clients.push_back(Client(3,4,2,1));*/
         voronoi(clients);
 
     }

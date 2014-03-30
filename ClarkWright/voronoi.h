@@ -3,17 +3,27 @@
 
 #include "classes/event.h"
 #include "classes/client.h"
+#include <math.h>
+#include <QPoint>
 
 QVector<Client> voronoi (QVector<Client> sites);
 
-void hadnle_site_event(Event e, QLinkedList<Event>* Q, QVector<Event>* T);
+void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client> *sites, int *id_circle);
 
-QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2);
+int bin_search_parabola(Event e, int first, int last, QVector<Event> &T);
+
+QVector<double> calculate_parabola (Event focus, double directrix);
+
+QVector<double> find_intersections_parabolas (QVector<double> p1, QVector<double> p2);
+
+QVector<double> calculate_bisector(Event p1, Event p2);
+
+QPoint find_intersection_bisectors(Event p1, Event p2, Event p3);
+
+double distance(Event e, QPoint p);
 
 QVector<Event> mergesort_events(QVector<Event> &v);
 
-int binary_search_events(Event n, int first, int last, QVector<Event> &v);
-
-int search_insert_index_events(Event n, int first, int last, QVector<Event> &v);
+QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2);
 
 #endif // VORONOI_H
