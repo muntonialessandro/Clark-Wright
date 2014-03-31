@@ -44,6 +44,28 @@ QVector<Client> voronoi (QVector<Client> sites){
         j++;*/
     }
 
+    QLinkedListIterator<Event> Qiterator(Q);
+    Event actual_event;
+    // scorrere Q dal primo all'ultimo elemento
+    while ( Qiterator.hasNext() ) {
+        // per ogni elemento verificare se è un circle o un site event con le funzioni della classe event
+
+        actual_event = Qiterator.peekNext();
+        if ( actual_event.is_site_event() ) { // se è un site event verrà chiamata HandleSiteEvent......
+
+            // HandleSiteEvent
+
+        }else { // altrimenti cirle event verrà chiamata HandleCircleEvent......
+
+            // HandleCircleEvent
+        }
+
+        // passa al successivo
+        Qiterator.next();
+    }
+
+
+
     return sites;
 }
 
