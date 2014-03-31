@@ -146,6 +146,13 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
     }
 }
 
+/**
+ * @brief handle_circle_event Gestione di un Circle Event
+ * @param ie
+ * @param Q
+ * @param T
+ * @param id_circle
+ */
 void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, int *id_circle){
     
     Event e = *ie;
@@ -176,56 +183,59 @@ void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q,
         }
     }
     
+    // Se l'arco sinistro è in mezzo ad altri due archi, controllo se generano un circle event
     if (arco_sinistro > 0) {
         
-        QPoint vertex = find_intersection_bisectors((*T)[arco_sinistro-1], (*T)[arco_sinistro], (*T)[arco_sinistro+1]);
-        
-        if (vertex.y() < e.get_y()) {
-            
-            double dist = distance((*T)[arco_sinistro-1], vertex);
-            double x = vertex.x();
-            double y = vertex.y() - dist;
-            Event circle_event(*id_circle, x, y, false, false);
-            
-            QLinkedList<Event>::iterator iter = ie;
-            
-            while ((iter->get_y() < y || (iter->get_y() == y && iter->get_x() < x)) && Q->end() != iter) {
-                
-                iter++;
-            }
-            
-            Q->insert(iter, circle_event);
-            
-            (*T)[arco_sinistro].set_associate_circle_event(iter, *id_circle);
-            
-            (*id_circle)++;
-        }
+        check_new_circle_event(arco_sinistro, arco_sinistro - 1, &e, ie, Q, T, id_circle);
     }
     
+    // Se l'arco destro è in mezzo ad altri due archi, controllo se generano un circle event
     if (arco_destro < T->length() - 1) {
         
-        QPoint vertex = find_intersection_bisectors((*T)[arco_destro-1], (*T)[arco_destro], (*T)[arco_destro+1]);
+        check_new_circle_event(arco_destro, arco_destro + 1, &e, ie, Q, T, id_circle);
+    }
+}
+
+/**
+ * @brief check_new_circle_event Controlla se bisogna inserire un nuovo Circle Event
+ * @param arco
+ * @param arco_per_distanza
+ * @param e
+ * @param ie
+ * @param Q
+ * @param T
+ * @param id_circle
+ */
+void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, int *id_circle){
+    
+    // Si calcola la bisettrice tra i punti
+    QPoint vertex = find_intersection_bisectors((*T)[arco-1], (*T)[arco], (*T)[arco+1]);
+    
+    // Si controlla se l'ordinata del punto trovato è inferiore del corrente evento
+    if (vertex.y() < e->get_y()) {
         
-        if (vertex.y() < e.get_y()) {
+        double dist = distance((*T)[arco_per_distanza], vertex);
+        double x = vertex.x();
+        double y = vertex.y() - dist;
+        
+        // Creo un nuovo circle event
+        Event circle_event(*id_circle, x, y, false, false);
+        
+        QLinkedList<Event>::iterator iter = ie;
+        
+        // Controllo dove inserire il nuovo circle event nella coda degli eventi
+        while ((iter->get_y() < y || (iter->get_y() == y && iter->get_x() < x)) && Q->end() != iter) {
             
-            double dist = distance((*T)[arco_destro+1], vertex);
-            double x = vertex.x();
-            double y = vertex.y() - dist;
-            Event circle_event(*id_circle, x, y, false, false);
-            
-            QLinkedList<Event>::iterator iter = ie;
-            
-            while ((iter->get_y() < y || (iter->get_y() == y && iter->get_x() < x)) && Q->end() != iter) {
-                
-                iter++;
-            }
-            
-            Q->insert(iter, circle_event);
-            
-            (*T)[arco_destro].set_associate_circle_event(iter, *id_circle);
-            
-            (*id_circle)++;
+            iter++;
         }
+        
+        // Inserisco l'evento nella coda
+        Q->insert(iter, circle_event);
+        
+        // Associo il circle event al nodo in T
+        (*T)[arco].set_associate_circle_event(iter, *id_circle);
+        
+        (*id_circle)++;
     }
 }
 
