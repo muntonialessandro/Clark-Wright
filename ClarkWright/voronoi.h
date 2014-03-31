@@ -10,6 +10,8 @@ QVector<Client> voronoi (QVector<Client> sites);
 
 void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client> *sites, int *id_circle);
 
+void handle_cirlce_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, int *id_circle);
+
 int bin_search_parabola(Event e, int first, int last, QVector<Event> &T);
 
 QVector<double> calculate_parabola (Event focus, double directrix);

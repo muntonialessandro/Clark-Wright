@@ -146,6 +146,90 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
     }
 }
 
+void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, int *id_circle){
+    
+    Event e = *ie;
+    
+    int arco_sinistro, arco_destro;
+    
+    //Cerco in T gli elementi associati al circle event
+    for (int i = 0; i < T->length(); i++) {
+        
+        // Controllo se l'elemento di T è associato al circle event
+        if ((*T)[i].get_associate_circle_event_id() == e.get_client_id()) {
+            
+            // Ottengo i circle event associati all'elemento rimosso
+            QLinkedList<Event>::iterator iter = (*T)[i].get_associate_circle_event();
+            
+            // Cancello gli elementi da Q
+            while (iter != Q->end()) {
+                
+                Q->erase(iter);
+                iter++;
+            }
+            
+            arco_sinistro = i-1;
+            arco_destro = i;
+            
+            // Rimuovo l'elemento da T
+            T->remove(i);
+        }
+    }
+    
+    if (arco_sinistro > 0) {
+        
+        QPoint vertex = find_intersection_bisectors((*T)[arco_sinistro-1], (*T)[arco_sinistro], (*T)[arco_sinistro+1]);
+        
+        if (vertex.y() < e.get_y()) {
+            
+            double dist = distance((*T)[arco_sinistro-1], vertex);
+            double x = vertex.x();
+            double y = vertex.y() - dist;
+            Event circle_event(*id_circle, x, y, false, false);
+            
+            QLinkedList<Event>::iterator iter = ie;
+            
+            while ((iter->get_y() < y || (iter->get_y() == y && iter->get_x() < x)) && Q->end() != iter) {
+                
+                iter++;
+            }
+            
+            Q->insert(iter, circle_event);
+            
+            (*T)[arco_sinistro].set_associate_circle_event(iter, *id_circle);
+            
+            (*id_circle)++;
+        }
+    }
+    
+    if (arco_destro < T->length() - 1) {
+        
+        QPoint vertex = find_intersection_bisectors((*T)[arco_destro-1], (*T)[arco_destro], (*T)[arco_destro+1]);
+        
+        if (vertex.y() < e.get_y()) {
+            
+            double dist = distance((*T)[arco_destro+1], vertex);
+            double x = vertex.x();
+            double y = vertex.y() - dist;
+            Event circle_event(*id_circle, x, y, false, false);
+            
+            QLinkedList<Event>::iterator iter = ie;
+            
+            while ((iter->get_y() < y || (iter->get_y() == y && iter->get_x() < x)) && Q->end() != iter) {
+                
+                iter++;
+            }
+            
+            Q->insert(iter, circle_event);
+            
+            (*T)[arco_destro].set_associate_circle_event(iter, *id_circle);
+            
+            (*id_circle)++;
+        }
+    }
+}
+
+
 /**
  * @brief bin_search_parabola
  *  Effettua una ricerca binaria in T dell'arco di parabola immediatamente superiore
