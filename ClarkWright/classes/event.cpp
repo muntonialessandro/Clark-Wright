@@ -80,9 +80,9 @@ std::string Event::to_string()
 {
     std::stringstream ss;
     if (event){ // se è un site event
-        ss << "Client ID: " << this->client_id << "; Coordinates: (" << this->x << "; " << this->y;
-        if (this->has_circle_event) ss << "Associate Circle Event: " << this->associate_circle_event_id << "; ";
-        ss << ");";
+        ss << "Client ID: " << this->client_id << "; Coordinates: (" << this->x << "; " << this->y << ")";
+        if (this->has_circle_event) ss << "; Associate Circle Event: " << this->associate_circle_event_id;
+        ss << "; ";
     }
     else {
         ss << "Circle Event ID: " << this->client_id << "; Coordinates: (" << this->x << "; " << this->y << ");";

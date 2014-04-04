@@ -198,10 +198,13 @@ void Client::add_neighbor(client_id neighbor)
  */
 std::string Client::to_string()
 {
+    int i;
     std::stringstream ss;
     ss << "Client ID: " << this->id << "; Coordinates: (" << this->x << "; " << this->y
        << "); Demand: " << this->demand << "; RouteID: " << this->rid << "; Position: "
-       << this->position_in_route << "; Alone: " << this->alone << ".";
+       << this->position_in_route << "; Alone: " << this->alone << ";" << std::endl;
+    ss << "\tNeighbors: ";
+    for (i=0; i<this->neighbors.size(); i++) ss << this->neighbors[i] << "; ";
     std::string s = ss.str();
     return s;
 }

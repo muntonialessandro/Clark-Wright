@@ -16,15 +16,23 @@ int main(int argc, char *argv[]){
 
         //esempi_di_utilizzo_per_algoritmo();
 
+        Timer timer("C&W Algorithm");
+        timer.start();
+
         int cap;
         QVector<Client> clients;
-//      clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+//        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
         clients = read_file("vrpnc1.txt", &cap); // Ale
-        /*clients.push_back(Client(0,0,3,1));
-        clients.push_back(Client(1,2,1,1));
-        clients.push_back(Client(2,3,0,1));
-        clients.push_back(Client(3,4,2,1));*/
+        /*clients.push_back(Client(0,2,3,1));
+        clients.push_back(Client(1,5,1,1));
+        clients.push_back(Client(2,6,7,1));
+        clients.push_back(Client(3,6,4,1));
+        clients.push_back(Client(4,9,3,1));
+        clients.push_back(Client(5,10,6,1));
+        clients.push_back(Client(6,12,8,1));*/
         voronoi(clients);
+
+        timer.stop_and_print();
 
     }
     else {          //MODALITA' INTERFACCIA = false

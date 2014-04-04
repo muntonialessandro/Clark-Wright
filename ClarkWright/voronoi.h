@@ -5,26 +5,32 @@
 #include "classes/client.h"
 #include <math.h>
 #include <QPoint>
+#include <QVector3D>
+#include <QMatrix3x3>
 
-QVector<Client> voronoi (QVector<Client> sites);
+QVector<Client> voronoi (QVector<Client> &sites);
 
 void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client> *sites, int *id_circle);
 
-void handle_cirlce_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, int *id_circle);
+void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client>* sites, int *id_circle);
 
 void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, int *id_circle);
 
-int bin_search_parabola(Event e, int first, int last, QVector<Event> &T);
+bool is_under_beach_line (QPair<double, double> &vertex, double sweep_line, QVector<Event> &T, int i);
 
-QVector<double> calculate_parabola (Event focus, double directrix);
+bool are_allineate(Event &p1, Event &p2, Event &p3);
 
-QVector<double> find_intersections_parabolas (QVector<double> p1, QVector<double> p2);
+int bin_search_parabola(Event &e, int first, int last, QVector<Event> &T);
 
-QVector<double> calculate_bisector(Event p1, Event p2d);
+std::vector<double> calculate_parabola (Event &focus, double directrix);
 
-QPoint find_intersection_bisectors(Event p1, Event p2, Event p3);
+std::vector<double> find_intersections_parabolas (std::vector<double> &p1, std::vector<double> &p2);
 
-double distance(Event e, QPoint p);
+std::vector<double> calculate_bisector(Event &p1, Event &p2d);
+
+QPair<double, double> find_intersection_bisectors(Event &p1, Event &p2, Event &p3);
+
+double distance(Event &e, QPair<double, double> &p);
 
 QVector<Event> mergesort_events(QVector<Event> &v);
 

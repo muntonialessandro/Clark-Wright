@@ -6,7 +6,7 @@
  * @param sites
  * @return
  */
-QVector<Client> voronoi (QVector<Client> sites){
+QVector<Client> voronoi (QVector<Client> &sites){
     int i, k;
     QVector<Event> events;
     for (i=0; i<sites.size(); i++) events.push_back(sites[i].to_Event());
@@ -28,43 +28,30 @@ QVector<Client> voronoi (QVector<Client> sites){
     while (iterator != Q.end()){
         if ((*iterator).is_site_event())
             handle_site_event(iterator, &Q, &T, &sites, &i);
-        else ;
+        else
+            handle_circle_event(iterator, &Q, &T, &sites, &i);
 
-        iterator++;
+        //Stampa T ad ogni ciclo
+        /*std::cout << "Ciclo: " << j << ": Evento analizzato: \n";
+        std::cout << "\t" << (*iterator).to_string() << std::endl;
+        std::cout << "Ciclo: " << j << ": T: " << std::endl;
+        for (k=0; k < T.size(); k++) std::cout << "\t" << T[k].to_string() << std::endl;*/
 
+        //Stampa Q ad ogni ciclo
         /*std::cout << "Ciclo: " << j << ": Q: " << std::endl;
-        //for (k=0; k < T.size(); k++) std::cout << "\t" << T[k].to_string() << std::endl;
-
         QLinkedList<Event>::iterator iterator2 = Q.begin();
         while (iterator2 != Q.end()){
             std::cout << "\t" << (*iterator2).to_string() << std::endl;
             iterator2++;
-        }
+        }*/
 
-        j++;*/
+        iterator++;
+        j++;
     }
 
-    QLinkedListIterator<Event> Qiterator(Q);
-    Event actual_event;
-    // scorrere Q dal primo all'ultimo elemento
-    while ( Qiterator.hasNext() ) {
-        // per ogni elemento verificare se è un circle o un site event con le funzioni della classe event
-
-        actual_event = Qiterator.peekNext();
-        if ( actual_event.is_site_event() ) { // se è un site event verrà chiamata HandleSiteEvent......
-
-            // HandleSiteEvent
-
-        }else { // altrimenti cirle event verrà chiamata HandleCircleEvent......
-
-            // HandleCircleEvent
-        }
-
-        // passa al successivo
-        Qiterator.next();
+    for (i=0; i<sites.size(); i++){
+        std::cout << sites[i].to_string() << std::endl;
     }
-
-
 
     return sites;
 }
@@ -85,7 +72,6 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
         int i = bin_search_parabola(e, 0, T->size()-1, *T);
         // se l'arco trovato ha circle event associati, li elimino (dall'arco in T e dalla coda Q)
         if ((*T)[i].has_associate_circle_event()) {
-            std::cout << (*T)[i].get_associate_circle_event()->to_string() << std::endl;
             Q->erase((*T)[i].get_associate_circle_event());
             (*T)[i].remove_associate_circle_event();
         }
@@ -97,83 +83,34 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
         // inserisco due archi: a destra di i metto e, e a destra di e metto di nuovo i
         T->insert(i+1, e);
         T->insert(i+2, (*T)[i]);
-        // tripla per cui i+1 è arco sinistro
-        if (i+3 < (*T).size()) {
-            QLinkedList<Event>::iterator it = ie;
-            QPoint vertex = find_intersection_bisectors((*T)[i+1], (*T)[i+2], (*T)[i+3]);
-            if (vertex.y() < e.get_y()){ //se l'intersezione è sotto la sweep line
-                double dist = distance((*T)[i+1], vertex);
-                double x = vertex.x(); //coordinate del circle event
-                double y = vertex.y() - dist;
-                Event circle_event(*id_circle, x, y, false, false);
-                bool stop = true;
-                while (stop){ //cerco la posizione in Q in cui inserire l'evento
-                    if ((*it).get_y() < y) it++;
-                    else{
-                        if (((*it).get_y() == y) && ((*it).get_x() < x)) it++;
-                        else stop = false;
-                    }
-                }
-                it--;
-                Q->insert(it, circle_event); //inserisco l'evento
-                (*T)[i+2].set_associate_circle_event(it, *id_circle); //associo all'arco i+2 (centrale) il circle event
-                (*id_circle)++;
-            }
-        }
-        // tripla per cui i+1 è arco destro
-        if (i > 0) {
-            QLinkedList<Event>::iterator it = ie;
-            QPoint vertex = find_intersection_bisectors((*T)[i-1], (*T)[i], (*T)[i+1]);
-            if (vertex.y() < e.get_y()){ //se l'intersezione è sotto la sweep line
-                double dist = distance((*T)[i+1], vertex);
-                double x = vertex.x(); //coordinate circle event
-                double y = vertex.y() - dist;
-                Event circle_event(*id_circle, x, y, false, false);
-                bool stop = true;
-                while (stop){ //cerco la posizione in Q in cui inserire l'evento
-                    if ((*it).get_y() < y) it++;
-                    else{
-                        if (((*it).get_y() == y) && ((*it).get_x() < x)) it++;
-                        else stop = false;
-                    }
-                }
-                it--;
-                Q->insert(it, circle_event); //inserisco l'evento
-                (*T)[i].set_associate_circle_event(it, *id_circle); //associo all'arco i (centrale) il circle event
-                (*id_circle)++;
-            }
-        }
+
+        // controllo se la tripla per cui i+1 è arco sinistro genera un circle event
+        if (i+3 < (*T).size()) check_new_circle_event(i+2, i+1, &e, ie, Q, T, id_circle);
+
+        // controllo se la tripla per cui i+1 è arco destro genera un circle event
+        if (i > 0) check_new_circle_event(i, i+1, &e, ie, Q, T, id_circle);
     }
 }
 
 /**
- * @brief handle_circle_event Gestione di un Circle Event
+ * @brief handle_circle_event
+ *  Gestione di un Circle Event
  * @param ie
  * @param Q
  * @param T
  * @param id_circle
  */
-void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, int *id_circle){
+void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client>* sites, int *id_circle){
     
     Event e = *ie;
     
-    int arco_sinistro, arco_destro;
+    int arco_sinistro, arco_destro, i;
     
     //Cerco in T gli elementi associati al circle event
-    for (int i = 0; i < T->length(); i++) {
+    for (i = 0; i < T->size(); i++) {
         
         // Controllo se l'elemento di T è associato al circle event
         if ((*T)[i].get_associate_circle_event_id() == e.get_client_id()) {
-            
-            // Ottengo i circle event associati all'elemento rimosso
-            QLinkedList<Event>::iterator iter = (*T)[i].get_associate_circle_event();
-            
-            // Cancello gli elementi da Q
-            while (iter != Q->end()) {
-                
-                Q->erase(iter);
-                iter++;
-            }
             
             arco_sinistro = i-1;
             arco_destro = i;
@@ -182,22 +119,47 @@ void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q,
             T->remove(i);
         }
     }
+
+    // se l'arco trovato ha circle event associati, li elimino (dall'arco in T e dalla coda Q)
+    if ((*T)[arco_sinistro].has_associate_circle_event()) { //arco sinistro
+        Q->erase((*T)[arco_sinistro].get_associate_circle_event());
+        (*T)[arco_sinistro].remove_associate_circle_event();
+    }
+    if ((*T)[arco_destro].has_associate_circle_event()) { //arco destro
+        Q->erase((*T)[arco_destro].get_associate_circle_event());
+        (*T)[arco_destro].remove_associate_circle_event();
+    }
     
+    // il sito associato all'arco destro è vicino del sito associato all'arco sinistro, e viceversa
+    client_id client_left = (*T)[arco_sinistro].get_client_id();
+    client_id client_right = (*T)[arco_destro].get_client_id();
+    (*sites)[client_left].add_neighbor(client_right);
+    (*sites)[client_right].add_neighbor(client_left);
+
     // Se l'arco sinistro è in mezzo ad altri due archi, controllo se generano un circle event
     if (arco_sinistro > 0) {
-        
-        check_new_circle_event(arco_sinistro, arco_sinistro - 1, &e, ie, Q, T, id_circle);
+        if ((*T)[arco_sinistro].has_associate_circle_event()){ // Cancello l'eventuale circle event associato
+            QLinkedList<Event>::iterator iter = (*T)[arco_sinistro].get_associate_circle_event();
+            Q->erase(iter);
+            (*T)[arco_sinistro].remove_associate_circle_event();
+        }
+        check_new_circle_event(arco_sinistro, arco_sinistro, &e, ie, Q, T, id_circle);
     }
     
     // Se l'arco destro è in mezzo ad altri due archi, controllo se generano un circle event
-    if (arco_destro < T->length() - 1) {
-        
-        check_new_circle_event(arco_destro, arco_destro + 1, &e, ie, Q, T, id_circle);
+    if (arco_destro < T->size() - 1) {
+        if ((*T)[arco_destro].has_associate_circle_event()){ // Cancello l'eventuale circle event associato
+            QLinkedList<Event>::iterator iter = (*T)[arco_destro].get_associate_circle_event();
+            Q->erase(iter);
+            (*T)[arco_destro].remove_associate_circle_event();
+        }
+        check_new_circle_event(arco_destro, arco_destro, &e, ie, Q, T, id_circle);
     }
 }
 
 /**
- * @brief check_new_circle_event Controlla se bisogna inserire un nuovo Circle Event
+ * @brief check_new_circle_event
+ *  Controlla se bisogna inserire un nuovo Circle Event data una tripla di archi adiacenti
  * @param arco
  * @param arco_per_distanza
  * @param e
@@ -207,38 +169,92 @@ void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q,
  * @param id_circle
  */
 void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, int *id_circle){
-    
-    // Si calcola la bisettrice tra i punti
-    QPoint vertex = find_intersection_bisectors((*T)[arco-1], (*T)[arco], (*T)[arco+1]);
-    
-    // Si controlla se l'ordinata del punto trovato è inferiore del corrente evento
-    if (vertex.y() < e->get_y()) {
-        
-        double dist = distance((*T)[arco_per_distanza], vertex);
-        double x = vertex.x();
-        double y = vertex.y() - dist;
-        
-        // Creo un nuovo circle event
-        Event circle_event(*id_circle, x, y, false, false);
-        
-        QLinkedList<Event>::iterator iter = ie;
-        
-        // Controllo dove inserire il nuovo circle event nella coda degli eventi
-        while ((iter->get_y() < y || (iter->get_y() == y && iter->get_x() < x)) && Q->end() != iter) {
-            
-            iter++;
+    //Se i punti sono allineati, le bisettrici non si incontrno e non generano circle event
+    if (!are_allineate((*T)[arco-1], (*T)[arco], (*T)[arco+1])){
+        // Si calcola l'intersezione tra le bisettrici
+        QPair<double, double> vertex = find_intersection_bisectors((*T)[arco-1], (*T)[arco], (*T)[arco+1]);
+        double dist = distance((*T)[arco_per_distanza], vertex); //distanza tra l'intersezione e uno dei punti
+        double x = vertex.first; //coordinate del circle event
+        double y = vertex.second - dist;
+        //Se sto analizzando un circle event che genera un altro circle event con le stesse coordinate, lo scarto.
+        if (e->is_site_event() || y == e->get_y() || x == e->get_x()){
+            Event ev(-1, vertex.first, e->get_y(), false, false);
+            int i = bin_search_parabola(ev, 0, T->size()-1, *T); //cerco l'arco sotto il circle event
+            //Se il circle event non sta sotto uno dei tre archi coinvolti, lo scarto
+            if (i == (arco-1) || i == arco || i == (arco+1)){
+                //Se  il circle event non sta sotto la beach line, lo scarto
+                if (is_under_beach_line(vertex, e->get_y(), *T, i)){
+                    // Creo il nuovo circle event
+                    Event circle_event(*id_circle, x, y, false, false);
+
+                    QLinkedList<Event>::iterator iter = ie;
+
+                    bool stop = true;
+                    while (stop && (iter != Q->end())){ //cerco la posizione in Q in cui inserire l'evento
+                        if ((*iter).get_y() > y) iter++;
+                        else{
+                            if (((*iter).get_y() == y) && ((*iter).get_x() < x)) iter++;
+                            else stop = false;
+                        }
+                    }
+
+                    Q->insert(iter, circle_event); //inserisco l'evento
+                    iter--;
+
+                    // Associo il circle event al nodo in T
+                    (*T)[arco].set_associate_circle_event(iter, *id_circle);
+
+                    (*id_circle)++;
+                }
+            }
         }
-        
-        // Inserisco l'evento nella coda
-        Q->insert(iter, circle_event);
-        
-        // Associo il circle event al nodo in T
-        (*T)[arco].set_associate_circle_event(iter, *id_circle);
-        
-        (*id_circle)++;
     }
 }
 
+/**
+ * @brief is_under_beach_line
+ *  Controlla se il vertice sta sotto la parabola di indice i
+ *  (la parabola dovrebbe essere quella immediatamente sopra)
+ * @param vertex
+ * @param sweep_line
+ * @param T
+ * @param i
+ * @return
+ */
+bool is_under_beach_line (QPair<double, double> & vertex, double sweep_line, QVector<Event> &T, int i){
+    std::vector<double> parabola = calculate_parabola(T[i], sweep_line);
+    double beach_line = (parabola[0] * pow(vertex.first,2)) + (parabola[1] * vertex.first) + parabola[2];
+    if (vertex.second < beach_line) return true;
+    else return false;
+}
+
+/**
+ * @brief are_allineate
+ *  restituisce true se tre eventi sono allineati
+ * @param p1
+ * @param p2
+ * @param p3
+ * @return
+ */
+bool are_allineate(Event & p1, Event & p2, Event & p3){
+    double a[3][3];
+    double determinant = 0;
+    a[0][0] = p1.get_x();
+    a[0][1] = p1.get_y();
+    a[0][2] = 1;
+    a[1][0] = p2.get_x();
+    a[1][1] = p2.get_y();
+    a[1][2] = 1;
+    a[2][0] = p3.get_x();
+    a[2][1] = p3.get_y();
+    a[2][2] = 1;
+
+    determinant = (a[0][0] * (a[1][1] * a[2][2] - a[2][1] * a[1][2])
+                  -a[1][0] * (a[0][1] * a[2][2] - a[2][1] * a[0][2])
+                  +a[2][0] * (a[0][1] * a[1][2] - a[1][1] * a[0][2]));
+    if (determinant == 0) return true;
+    else return false;
+}
 
 /**
  * @brief bin_search_parabola
@@ -250,30 +266,31 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
  * @param T
  * @return
  */
-int bin_search_parabola(Event e, int first, int last, QVector<Event> &T){
+int bin_search_parabola(Event & e, int first, int last, QVector<Event> &T){
     if (first == last) return first;
     else {
         double intersection;
         int mid = (first + last) / 2;
-        QVector<double> p_left;
-        QVector<double> p_right;
-        QVector<double> intersections;
+        std::vector<double> p_left;
+        std::vector<double> p_right;
+        std::vector<double> intersections;
         if (T[mid].get_y() != e.get_y())
             p_left = calculate_parabola(T[mid], e.get_y());
         if (T[mid+1].get_y() != e.get_y())
             p_right = calculate_parabola(T[mid+1], e.get_y());
-        if (p_left.isEmpty() || p_right.isEmpty()){
-            if (p_left.isEmpty()){
+        if (p_left.empty() || p_right.empty()){
+            if (p_left.empty()){
                 intersections.push_back(T[mid].get_x());
                 intersections.push_back(T[mid].get_x());
             }
-            if (p_right.isEmpty()){
+            if (p_right.empty()){
                 intersections.push_back(T[mid+1].get_x());
                 intersections.push_back(T[mid+1].get_x());
             }
         }
         else intersections = find_intersections_parabolas(p_left, p_right);
-        if (intersections.isEmpty()) {
+
+        if (intersections.empty()) {
             std::cout << "Le parabole non hanno intersezioni: ?????" << std::endl;
             return -1;
         }
@@ -297,7 +314,7 @@ int bin_search_parabola(Event e, int first, int last, QVector<Event> &T){
             }
             if (e.get_x() == intersection){
                 std::cout << "Merda: evento sotto un breakpoint!" << std::endl;
-                return -1;
+                return mid;
             }
         }
     }
@@ -315,13 +332,13 @@ int bin_search_parabola(Event e, int first, int last, QVector<Event> &T){
  * @param directrix
  * @return
  */
-QVector<double> calculate_parabola (Event focus, double directrix){
+std::vector<double> calculate_parabola (Event & focus, double directrix){
     double fx = focus.get_x();
     double fy = focus.get_y();
-    QVector<double> parabola;
+    std::vector<double> parabola;
     double a = 1 / (2*fy - 2*directrix);
     parabola.push_back(a);
-    double b = - ((2 * fx) / (2*fy - 2*directrix));
+    double b = ((-2 * fx) / (2*fy - 2*directrix));
     parabola.push_back(b);
     double c = (pow(fx, 2) + pow(fy, 2) - pow(directrix, 2)) / (2*fy - 2*directrix);
     parabola.push_back(c);
@@ -336,8 +353,8 @@ QVector<double> calculate_parabola (Event focus, double directrix){
  * @param p2
  * @return
  */
-QVector<double> find_intersections_parabolas (QVector<double> p1, QVector<double> p2){
-    QVector<double> solutions;
+std::vector<double> find_intersections_parabolas (std::vector<double> &p1, std::vector<double> &p2){
+    std::vector<double> solutions;
     double a = p1[0] - p2[0];
     double b = p1[1] - p2[1];
     double c = p1[2] - p2[2];
@@ -360,21 +377,33 @@ QVector<double> find_intersections_parabolas (QVector<double> p1, QVector<double
  * @param p2
  * @return
  */
-QVector<double> calculate_bisector(Event p1, Event p2)
+std::vector<double> calculate_bisector(Event &p1, Event &p2)
 {
-    QVector<double> bisector;
+    std::vector<double> bisector;
     //Punto medio:
-    double xm = (p1.get_x() + p2.get_x()) / 2;
-    double ym = (p1.get_y() + p2.get_y()) / 2;
-    //coeff. angolare retta passante per p1 e p2
-    double rm = (p2.get_y() - p1.get_y()) / (p2.get_x() - p1.get_x());
-    //coeff. angolare retta bisettrice:
-    double m = -1 / rm;
-    bisector.push_back(m);
-    //q bisettrice:
-    double q = -m * xm + ym;
-    bisector.push_back(q);
-    return bisector;
+    double xm = (p1.get_x() + p2.get_x()) / 2.0;
+    double ym = (p1.get_y() + p2.get_y()) / 2.0;
+    //se i punti sono allineati orizzontalmente: bisettrice verticale, della forma x = n
+    if ((p2.get_y() - p1.get_y()) == 0)  {
+        bisector.push_back(xm);
+        return bisector;
+    }
+    else {
+        double rm;
+        double m;
+        // se i punti sono allineati verticalmente: bisettrice orizzontale, della forma y = 0x + q
+        if ((p2.get_x() - p1.get_x()) == 0) m = 0;
+        else {
+            rm = (p2.get_y() - p1.get_y()) / (p2.get_x() - p1.get_x());
+            m = -1.0 / rm;
+        }
+
+        bisector.push_back(m);
+        //q bisettrice:
+        double q = (-m) * xm + ym;
+        bisector.push_back(q);
+        return bisector;
+    }
 }
 
 /**
@@ -386,25 +415,52 @@ QVector<double> calculate_bisector(Event p1, Event p2)
  * @param p3
  * @return
  */
-QPoint find_intersection_bisectors(Event p1, Event p2, Event p3){
-    QVector<double> r1 = calculate_bisector(p1, p2);
-    QVector<double> r2 = calculate_bisector(p2, p3);
-    double x = (r2[1] - r1[1]) / (r1[0] - r2[0]);
-    double y = (r1[0] * x) + r1[1];
-    return QPoint(x,y);
+QPair<double, double> find_intersection_bisectors(Event &p1, Event &p2, Event &p3){
+    std::vector<double> r1 = calculate_bisector(p1, p2);
+    std::vector<double> r2 = calculate_bisector(p2, p3);
+    QPair<double, double> point;
+    if (r1.size() == 1 || r2.size() == 1){
+        if (r1.size() == 1){
+            point.first = r1[0];
+            point.second = r2[0] * r1[0] + r2[1];
+        }
+        else {
+            point.first = r2[0];
+            point.second = r1[0] * r2[0] + r1[1];
+        }
+    }
+    else {
+        double x = (r2[1] - r1[1]) / (r1[0] - r2[0]);
+        double y = (r1[0] * x) + r1[1];
+        point.first = x;
+        point.second = y;
+        return point;
+    }
 }
 
-double distance(Event e, QPoint p){
+/**
+ * @brief distance
+ *  Restituisce la distanza tra un evento e un vertice
+ * @param e
+ * @param p
+ * @return
+ */
+double distance(Event &e, QPair<double, double> &p){
     double e_x = e.get_x();
     double e_y = e.get_y();
-    double p_x = p.x();
-    double p_y = p.y();
+    double p_x = p.first;
+    double p_y = p.second;
     //distanza euclidea tra i due punti:
     double dist = pow((p_x - e_x),2) + pow((p_y - e_y),2);
     dist = sqrt(dist);
     return dist;
 }
 
+/**
+ * @brief mergesort_events
+ * @param v
+ * @return
+ */
 QVector<Event> mergesort_events(QVector<Event> &v){
     int size = v.size();
     if (size > 1) {
@@ -419,6 +475,13 @@ QVector<Event> mergesort_events(QVector<Event> &v){
 
 }
 
+/**
+ * @brief merge_events
+ *  Dati due vettori ordinati, li fonde
+ * @param v1
+ * @param v2
+ * @return
+ */
 QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2){
     QVector<Event> merge;
     int i=0 ,j=0; // indici: i scorre l'array v1, j scorre l'array v2
@@ -439,7 +502,7 @@ QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2){
                 }
                 else { // altrimenti
                     if (v1[i].get_y() == v2[j].get_y()){
-                        if (v1[i].get_x() <= v2[j].get_x()){
+                        if (v1[i].get_x() >= v2[j].get_x()){
                             merge.push_back(v1[i]); // inserisco v1[i] nell'array merge
                             if (v1[i].get_x() == v2[j].get_x()) j++;
                             i++; // incremento i

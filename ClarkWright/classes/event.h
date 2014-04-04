@@ -17,8 +17,6 @@
  *      - deposit: contiene true se il client associato al site event è il deposito;
  *      - event: contiene true se è un site event, false se è un circle event
  *      - circle_events:
- *      - position_in_Q: contiene il puntatore alla posizione dell'evento nella coda Q
- *        serve quando serve un riferimento diretto ad un evento trovato in T
  *      - has_circle_event: DA USARE SOLAMENTE IN T:
  *          contiene true se all'arco in T è associato un circle event in Q
  *      - associate_circle_event: DA USARE SOLAMENTE IN T:
@@ -29,6 +27,10 @@
  *          quando in Q troviamo un circle event, dobbiamo andare a cercare l'id del circle
  *          event in T (T[i].get_associate_circle_event_id()), in modo da identificare
  *          l'arco da eliminare).
+ *      - position_in_Q:
+ *          SE SITE EVENT: DA USARE SOLAMENTE IN T:
+ *              contiene il puntatore alla posizione dell'evento nella coda Q
+ *          SE CIRCLE EVENT: DA NON USARE
  */
 class Event
 {
@@ -56,8 +58,8 @@ private:
     bool event; //true: SiteEvent, false: CircleEvent
     bool has_circle_event; //true se all'arco è associato un circle event
     QLinkedList<Event>::iterator associate_circle_event;
-    QLinkedList<Event>::iterator position_in_Q;
     int associate_circle_event_id;
+    QLinkedList<Event>::iterator position_in_Q;
 };
 
 #endif // EVENT_H
