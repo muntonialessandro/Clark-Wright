@@ -76,10 +76,11 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
             (*T)[i].remove_associate_circle_event();
         }
         // il sito associato all'arco i è vicino del site event e, e viceversa
+        double dist = events_distance((*T)[i], e);
         client_id client_event = e.get_client_id();
         client_id client_neighbor = (*T)[i].get_client_id();
-        (*sites)[client_event].add_neighbor(client_neighbor);
-        (*sites)[client_neighbor].add_neighbor(client_event);
+        (*sites)[client_event].add_neighbor(client_neighbor, dist);
+        (*sites)[client_neighbor].add_neighbor(client_event, dist);
         // inserisco due archi: a destra di i metto e, e a destra di e metto di nuovo i
         T->insert(i+1, e);
         T->insert(i+2, (*T)[i]);
@@ -131,10 +132,11 @@ void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q,
     }
     
     // il sito associato all'arco destro è vicino del sito associato all'arco sinistro, e viceversa
+    double dist = events_distance((*T)[arco_sinistro], (*T)[arco_destro]);
     client_id client_left = (*T)[arco_sinistro].get_client_id();
     client_id client_right = (*T)[arco_destro].get_client_id();
-    (*sites)[client_left].add_neighbor(client_right);
-    (*sites)[client_right].add_neighbor(client_left);
+    (*sites)[client_left].add_neighbor(client_right, dist);
+    (*sites)[client_right].add_neighbor(client_left, dist);
 
     // Se l'arco sinistro è in mezzo ad altri due archi, controllo se generano un circle event
     if (arco_sinistro > 0) {
@@ -173,7 +175,7 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
     if (!are_allineate((*T)[arco-1], (*T)[arco], (*T)[arco+1])){
         // Si calcola l'intersezione tra le bisettrici
         QPair<double, double> vertex = find_intersection_bisectors((*T)[arco-1], (*T)[arco], (*T)[arco+1]);
-        double dist = distance((*T)[arco_per_distanza], vertex); //distanza tra l'intersezione e uno dei punti
+        double dist = vertex_distance((*T)[arco_per_distanza], vertex); //distanza tra l'intersezione e uno dei punti
         double x = vertex.first; //coordinate del circle event
         double y = vertex.second - dist;
         //Se sto analizzando un circle event che genera un altro circle event con le stesse coordinate, lo scarto.
@@ -445,7 +447,7 @@ QPair<double, double> find_intersection_bisectors(Event &p1, Event &p2, Event &p
  * @param p
  * @return
  */
-double distance(Event &e, QPair<double, double> &p){
+double vertex_distance(Event &e, QPair<double, double> &p){
     double e_x = e.get_x();
     double e_y = e.get_y();
     double p_x = p.first;
@@ -455,6 +457,19 @@ double distance(Event &e, QPair<double, double> &p){
     dist = sqrt(dist);
     return dist;
 }
+
+double events_distance(Event &e1, Event &e2)
+{
+    double e1_x = e1.get_x();
+    double e1_y = e1.get_y();
+    double e2_x = e2.get_x();
+    double e2_y = e2.get_x();
+    //distanza euclidea tra i due punti:
+    double dist = pow((e1_x - e2_x),2) + pow((e1_y - e2_y),2);
+    dist = sqrt(dist);
+    return dist;
+}
+
 
 /**
  * @brief mergesort_events

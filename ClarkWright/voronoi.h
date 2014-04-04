@@ -30,7 +30,9 @@ std::vector<double> calculate_bisector(Event &p1, Event &p2d);
 
 QPair<double, double> find_intersection_bisectors(Event &p1, Event &p2, Event &p3);
 
-double distance(Event &e, QPair<double, double> &p);
+double vertex_distance(Event &e, QPair<double, double> &p);
+
+double events_distance(Event &e1, Event &e2);
 
 QVector<Event> mergesort_events(QVector<Event> &v);
 

@@ -12,7 +12,7 @@ void esempi_di_utilizzo_per_algoritmo( void );
 
 int main(int argc, char *argv[]){
 
-    if(true) {     //MODALITA' TERMINALE = TRUE
+    if(false) {     //MODALITA' TERMINALE = TRUE
 
         //esempi_di_utilizzo_per_algoritmo();
 
