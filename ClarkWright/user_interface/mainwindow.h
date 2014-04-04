@@ -27,6 +27,7 @@
 #include <QLabel>
 #include <QSettings>
 #include <QTime>
+#include "voronoi.h"
 
 namespace Ui {
 class MainWindow;
