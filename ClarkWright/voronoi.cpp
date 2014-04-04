@@ -1,18 +1,17 @@
 #include "voronoi.h"
 
 QVector<Client> voronoi (QVector<Client> sites){
-
-    QVector<Event> events;  // list of events
-    QLinkedList<Event> Q;   // queue
-    QLinkedListIterator<Event> Qiterator(Q);
-    QVector<Event> T;       // tree, anche se viene usato come vettore e vi saranno i siti in sweep line attualmente
-    Event actual_event;     // l'evento che verrà analizzato attualmente
-
-    //
-    for (int i=0; i<sites.size(); i++) events.push_back(sites[i].to_Event());
+    int i;
+    QVector<Event> events;
+    for (i=0; i<sites.size(); i++) events.push_back(sites[i].to_Event());
     QVector<Event> ordered_events = mergesort_events(events);
-    for (int i=0; i<ordered_events.size(); i++) Q.append(ordered_events[i]);
 
+    QLinkedList<Event> Q;
+    for (i=0; i<ordered_events.size(); i++) Q.append(ordered_events[i]);
+    QVector<Event> T;
+
+    QLinkedListIterator<Event> Qiterator(Q);
+    Event actual_event;
     // scorrere Q dal primo all'ultimo elemento
     while ( Qiterator.hasNext() ) {
         // per ogni elemento verificare se è un circle o un site event con le funzioni della classe event
@@ -35,8 +34,6 @@ QVector<Client> voronoi (QVector<Client> sites){
 
     return sites;
 }
-
-
 
 QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2){
     QVector<Event> merge;
