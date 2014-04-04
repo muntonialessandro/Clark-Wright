@@ -21,8 +21,13 @@ int main(int argc, char *argv[]){
 
         int cap;
         QVector<Client> clients;
-//        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
-        clients = read_file("vrpnc1.txt", &cap); // Ale
+        #ifdef TARGET_OS_MAC 
+            clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+        #endif
+    
+        #ifdef __linux__
+            clients = read_file("vrpnc1.txt", &cap); // Ale
+        #endif
         /*clients.push_back(Client(0,2,3,1));
         clients.push_back(Client(1,5,1,1));
         clients.push_back(Client(2,6,7,1));
