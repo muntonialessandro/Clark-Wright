@@ -72,12 +72,12 @@ private:
     void addArrowTo(QPoint p1,QPoint p2);
 
 private slots: // le varie funzioni che vengono chiamate quando si interagisce con l'interfaccia
-    void handleButton();
+    void handle_button1();
     void zoomGraph( int i );
     void grid(bool on);
     void open_file();
     void reset(void);
-    void compute();
+    void handle_button2();
     void zoomInGraphButton();
     void zoomOutGraphButton();
     void draw_route( QList<QPoint> route );

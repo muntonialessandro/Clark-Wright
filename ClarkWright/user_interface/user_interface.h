@@ -69,7 +69,7 @@ public:
         zoomWidget->setLayout(zoomLayoutBox);
 
         button1 = new QPushButton("Button1");
-        button2 = new QPushButton("Compute_");
+        button2 = new QPushButton("Button2");
 
         button1->setDefault( false );
         button1->setAutoDefault( false ) ;

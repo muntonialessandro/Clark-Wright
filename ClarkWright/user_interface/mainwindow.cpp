@@ -28,8 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
     zoomGraph( ui->zoomSlider->value() );
 
     // connect Graph's button
-    QObject::connect( ui->button1, SIGNAL(released()), this, SLOT(handleButton()) );
-    QObject::connect( ui->button2, SIGNAL(released()), this, SLOT(compute()) );
+    QObject::connect( ui->button1, SIGNAL(released()), this, SLOT(handle_button1()) );
+    QObject::connect( ui->button2, SIGNAL(released()), this, SLOT(handle_button2()) );
     QObject::connect( ui->zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomGraph(int)) );
     QObject::connect( ui->check1, SIGNAL(clicked(bool)), this, SLOT(grid(bool)) );
 }
@@ -143,7 +143,7 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2)
  * @brief handleButton
  *  handle of button1
  */
-void MainWindow::handleButton()
+void MainWindow::handle_button1()
 {
     //    QList< QPair<QPoint,QString> > pointList;
     //    createGraph(pointList);
@@ -303,7 +303,7 @@ void MainWindow::reset(void)
  * @param nome descrizione
  * @return valoreRestituito descizione
  */
-void MainWindow::compute()
+void MainWindow::handle_button2()
 {
     qDebug("Compute()");
 
@@ -495,7 +495,7 @@ int MainWindow::G_draw_interface( QApplication* a ) {
     QObject::connect( &reset, SIGNAL(triggered()), &window, SLOT(reset()) );
     QObject::connect( &help, SIGNAL(triggered()), &instructions, SLOT(show()) );
     QObject::connect( &about, SIGNAL(triggered()), &credits, SLOT(show()) );
-    QObject::connect( &calc, SIGNAL(triggered()), &window, SLOT(compute()) );
+    QObject::connect( &calc, SIGNAL(triggered()), &window, SLOT(handle_button2()) );
     QObject::connect( &zoomIn, SIGNAL(triggered()), &window, SLOT(zoomInGraphButton()) );
     QObject::connect( &zoomOut, SIGNAL(triggered()), &window, SLOT(zoomOutGraphButton()) );
 
