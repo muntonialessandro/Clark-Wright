@@ -259,7 +259,7 @@ void MainWindow::open_file()
         for(int i=0; i<nodes_list.size(); i++){
             client.append( QPair<QPoint,QString>(
                                QPoint ( nodes_list[i].get_x(), nodes_list[i].get_y() ) ,
-                               QString::number( nodes_list[i].get_demand() ) ) );
+                               QString::number( nodes_list[i].get_id() ) ) );
         }
 
         G_draw_nodes(client);

@@ -49,7 +49,7 @@ public:
     void set_position_in_route(index_client position);
     bool is_alone();
     void set_alone(bool a);
-    void add_neighbor(client_id neighbor);
+    void add_neighbor(client_id neighbor, double distance);
     std::string to_string();
     QPair<QPoint, QString> to_point_label_pair();
     QPoint to_QPoint();
@@ -64,6 +64,7 @@ private:
     index_client position_in_route;
     bool alone;
     QVector<client_id> neighbors;
+    QVector<double> distances;
 };
 
 #endif // CLIENT_H

@@ -25,6 +25,7 @@ Client::Client(client_id id, double x, double y, double demand)
     this->demand = demand;
     this->alone = true;
     this->neighbors.clear();
+    this->distances.clear();
     if (id == 0) { // se è il deposito
         this->position_in_route = -1;
         this->rid = -1;
@@ -185,9 +186,10 @@ void Client::set_alone(bool a)
  *  aggiunge un nuovo vicino alla lista dei vicini del cliente.
  * @param neighbor
  */
-void Client::add_neighbor(client_id neighbor)
+void Client::add_neighbor(client_id neighbor, double distance)
 {
-    int index = search_insert_index_int(neighbor, 0, this->neighbors.size()-1, this->neighbors);
+    int index = search_insert_index_double(distance, 0, this->distances.size()-1, this->distances);
+    this->distances.insert(index, distance);
     this->neighbors.insert(index, neighbor);
 }
 
@@ -198,10 +200,13 @@ void Client::add_neighbor(client_id neighbor)
  */
 std::string Client::to_string()
 {
+    int i;
     std::stringstream ss;
     ss << "Client ID: " << this->id << "; Coordinates: (" << this->x << "; " << this->y
        << "); Demand: " << this->demand << "; RouteID: " << this->rid << "; Position: "
-       << this->position_in_route << "; Alone: " << this->alone << ".";
+       << this->position_in_route << "; Alone: " << this->alone << ";" << std::endl;
+    ss << "\tNeighbors: ";
+    for (i=0; i<this->neighbors.size(); i++) ss << this->neighbors[i] << "; ";
     std::string s = ss.str();
     return s;
 }
