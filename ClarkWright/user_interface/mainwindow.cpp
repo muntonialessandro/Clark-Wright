@@ -28,8 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
     zoomGraph( ui->zoomSlider->value() );
 
     // connect Graph's button
-    QObject::connect( ui->button1, SIGNAL(released()), this, SLOT(handleButton()) );
-    QObject::connect( ui->button2, SIGNAL(released()), this, SLOT(compute()) );
+    QObject::connect( ui->button1, SIGNAL(released()), this, SLOT(handle_button1()) );
+    QObject::connect( ui->button2, SIGNAL(released()), this, SLOT(handle_button2()) );
     QObject::connect( ui->zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomGraph(int)) );
     QObject::connect( ui->check1, SIGNAL(clicked(bool)), this, SLOT(grid(bool)) );
 }
@@ -143,10 +143,57 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2)
  * @brief handleButton
  *  handle of button1
  */
-void MainWindow::handleButton()
+void MainWindow::handle_button1()
 {
-//    QList< QPair<QPoint,QString> > pointList;
-//    createGraph(pointList);
+    //    QList< QPair<QPoint,QString> > pointList;
+    //    createGraph(pointList);
+
+        ui->userInfo->setText("Voronoi..");
+    //    //Prova GraphRoute
+    //    QVector<Client> clients;
+    //    Client d( 0, 20, 20, 0);
+    //    Client c1(1, 30, 30, 13);
+    //    Client c2(2, 10, 30, 20);
+    //    Client c3(3, 0, 10, 25);
+    //    Client c4(4, 20, 0, 5);
+    //    Client c5(5, 30, 10, 40);
+    //    clients.push_back(d);
+    //    clients.push_back(c1);
+    //    clients.push_back(c2);
+    //    clients.push_back(c3);
+    //    clients.push_back(c4);
+    //    clients.push_back(c5);
+
+    //    qDebug( "Size %d",clients.size() );
+    //    GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
+    //    G_draw_routes( state.get_list_edges() );
+    //    G_draw_nodes( state.get_list_point_label_pairs() );
+
+
+
+    //    Timer timer("C&W Algorithm");
+    //    timer.start();
+
+        int cap;
+        QVector<Client> clients;
+        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+    //        clients = read_file("vrpnc1.txt", &cap); // Ale
+
+        /*clients.push_back(Client(0,2,3,1));
+        clients.push_back(Client(1,5,1,1));
+        clients.push_back(Client(2,6,7,1));
+        clients.push_back(Client(3,6,4,1));
+        clients.push_back(Client(4,9,3,1));
+        clients.push_back(Client(5,10,6,1));
+        clients.push_back(Client(6,12,8,1));*/
+
+        QVector<Client> voronoi_points;
+        voronoi_points = voronoi( clients );
+
+        GraphRoutes state(voronoi_points);
+        G_draw_nodes( state.get_list_point_label_pairs() );
+
+    //    timer.stop_and_print();
 }
 
 /**
@@ -256,7 +303,7 @@ void MainWindow::reset(void)
  * @param nome descrizione
  * @return valoreRestituito descizione
  */
-void MainWindow::compute()
+void MainWindow::handle_button2()
 {
     qDebug("Compute()");
 
@@ -448,7 +495,7 @@ int MainWindow::G_draw_interface( QApplication* a ) {
     QObject::connect( &reset, SIGNAL(triggered()), &window, SLOT(reset()) );
     QObject::connect( &help, SIGNAL(triggered()), &instructions, SLOT(show()) );
     QObject::connect( &about, SIGNAL(triggered()), &credits, SLOT(show()) );
-    QObject::connect( &calc, SIGNAL(triggered()), &window, SLOT(compute()) );
+    QObject::connect( &calc, SIGNAL(triggered()), &window, SLOT(handle_button2()) );
     QObject::connect( &zoomIn, SIGNAL(triggered()), &window, SLOT(zoomInGraphButton()) );
     QObject::connect( &zoomOut, SIGNAL(triggered()), &window, SLOT(zoomOutGraphButton()) );
 
