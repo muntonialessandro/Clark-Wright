@@ -176,19 +176,17 @@ void MainWindow::handle_button1()
 
         int cap;
         QVector<Client> clients;
-        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
-    //        clients = read_file("vrpnc1.txt", &cap); // Ale
+        #ifdef TARGET_OS_MAC
+            clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+        #endif
 
-        /*clients.push_back(Client(0,2,3,1));
-        clients.push_back(Client(1,5,1,1));
-        clients.push_back(Client(2,6,7,1));
-        clients.push_back(Client(3,6,4,1));
-        clients.push_back(Client(4,9,3,1));
-        clients.push_back(Client(5,10,6,1));
-        clients.push_back(Client(6,12,8,1));*/
+        #ifdef __linux__
+            clients = read_file("vrprid.txt", &cap); // Ale
+        #endif
 
         QVector<Client> voronoi_points;
-        voronoi_points = voronoi( clients );
+        QVector<Saving> savings;
+        voronoi_points = voronoi( clients, &savings);
 
         GraphRoutes state(voronoi_points);
         G_draw_nodes( state.get_list_point_label_pairs() );

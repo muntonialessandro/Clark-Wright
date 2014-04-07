@@ -35,6 +35,8 @@ class Client
 public:
     Client();
     Client(client_id id, double x, double y, double demand);
+    bool operator ==(Client &other) const;
+    bool operator !=(Client &other) const;
     void set_id(client_id id);
     client_id get_id();
     void set_coordinates(double x, double y);

@@ -16,6 +16,16 @@ Event::Event(int client_id, double x, double y, bool deposit, bool event)
     this->has_circle_event = false;
 }
 
+bool Event::operator ==(Event &other) const
+{
+    if (other.get_client_id() == this->client_id) return true;
+}
+
+bool Event::operator !=(Event &other) const
+{
+    return !(*this == other);
+}
+
 double Event::get_x()
 {
     return this->x;
@@ -74,6 +84,16 @@ void Event::remove_associate_circle_event()
 void Event::set_position_in_Q(QLinkedList<Event>::iterator it)
 {
     this->position_in_Q = it;
+}
+
+void Event::add_generator(Event e1)
+{
+    this->generators.push_back(e1);
+}
+
+QVector<Event> Event::get_generators()
+{
+    return this->generators;
 }
 
 std::string Event::to_string()

@@ -31,12 +31,18 @@
  *          SE SITE EVENT: DA USARE SOLAMENTE IN T:
  *              contiene il puntatore alla posizione dell'evento nella coda Q
  *          SE CIRCLE EVENT: DA NON USARE
+ *      - generators:
+ *          SE SITE EVENT: DA NON USARE
+ *          SE CIRCLE EVENT:
+ *              da usare in Q: contiene i site event che hanno generato il circle event
  */
 class Event
 {
 public:
     Event();
     Event(int client_id, double x, double y, bool deposit, bool event);
+    bool operator ==(Event &other) const;
+    bool operator !=(Event &other) const;
     double get_x();
     double get_y();
     bool is_deposit();
@@ -48,6 +54,8 @@ public:
     void set_associate_circle_event(QLinkedList<Event>::iterator it, int circle_event_id);
     void remove_associate_circle_event();
     void set_position_in_Q(QLinkedList<Event>::iterator it);
+    void add_generator(Event e1);
+    QVector<Event> get_generators();
     std::string to_string();
 
 private:
@@ -60,6 +68,7 @@ private:
     QLinkedList<Event>::iterator associate_circle_event;
     int associate_circle_event_id;
     QLinkedList<Event>::iterator position_in_Q;
+    QVector<Event> generators;
 };
 
 #endif // EVENT_H

@@ -34,6 +34,33 @@ Client::Client(client_id id, double x, double y, double demand)
 }
 
 /**
+ * @brief Client::operator ==
+ *  Due clienti sono uguali se hanno:
+ *      - stesso id;
+ *      - stesse coordinate;
+ *      - stessa domanda;
+ * @param other
+ * @return true se i clienti sono uguali
+ */
+bool Client::operator ==(Client &other) const
+{
+    if (this->id == other.get_id() && this->x == other.get_x() && this->y == other.get_y()
+            && this->demand == other.get_demand()) return true;
+    else return false;
+}
+
+/**
+ * @brief Client::operator !=
+ *  Due clienti sono diversi quando non sono uguali!
+ * @param other
+ * @return true se i client sono diversi
+ */
+bool Client::operator !=(Client &other) const
+{
+    return !(*this == other);
+}
+
+/**
  * @brief Client::set_id
  *  Modifica l'id del cliente
  * @param id
@@ -207,6 +234,8 @@ std::string Client::to_string()
        << this->position_in_route << "; Alone: " << this->alone << ";" << std::endl;
     ss << "\tNeighbors: ";
     for (i=0; i<this->neighbors.size(); i++) ss << this->neighbors[i] << "; ";
+    ss << "\n\tDistances: ";
+    for (i=0; i<this->distances.size(); i++) ss << this->distances[i] << "; ";
     std::string s = ss.str();
     return s;
 }
