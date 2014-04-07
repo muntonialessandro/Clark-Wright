@@ -5,6 +5,7 @@
 #include "io_file.h"
 #include "classes/graph_routes.h"
 #include "classes/saving.h"
+#include "timer.h"
 #include <QWheelEvent>
 #include <QFileDialog>
 #include <QStackedLayout>

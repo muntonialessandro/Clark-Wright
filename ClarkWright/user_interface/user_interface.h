@@ -108,6 +108,7 @@ public:
                                      QPainter::TextAntialiasing |
                                      QPainter::HighQualityAntialiasing |
                                      QPainter::SmoothPixmapTransform);
+
         progressBarGraph = new QProgressBar;
         graphLayout = new QVBoxLayout;
         graphLayout->addWidget(graphicsView);
