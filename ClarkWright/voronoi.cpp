@@ -32,10 +32,11 @@ QVector<Client> voronoi (QVector<Client> &sites){
             handle_circle_event(iterator, &Q, &T, &sites, &i);
 
         //Stampa T ad ogni ciclo
-        /*std::cout << "Ciclo: " << j << ": Evento analizzato: \n";
+        std::cout << "Ciclo: " << j << ": Evento analizzato: \n";
         std::cout << "\t" << (*iterator).to_string() << std::endl;
         std::cout << "Ciclo: " << j << ": T: " << std::endl;
-        for (k=0; k < T.size(); k++) std::cout << "\t" << T[k].to_string() << std::endl;*/
+        for (k=0; k < T.size(); k++) std::cout << "\t" << T[k].to_string() << std::endl;
+
 
         //Stampa Q ad ogni ciclo
         /*std::cout << "Ciclo: " << j << ": Q: " << std::endl;
@@ -47,11 +48,30 @@ QVector<Client> voronoi (QVector<Client> &sites){
 
         iterator++;
         j++;
+
+
     }
 
     for (i=0; i<sites.size(); i++){
         std::cout << sites[i].to_string() << std::endl;
     }
+
+    //Tripla 1, 5, 6
+    //con sweepline y=3
+    //Problema intersezione bisettrici: posizione palesemente errata
+    //il vertice non sarà poi sotto uno dei tre archi
+
+    /*Event e1 = sites[1].to_Event();
+    Event e5 = sites[5].to_Event();
+    Event e6 = sites[6].to_Event();
+    std::vector<double> b15 = calculate_bisector(e1, e5);
+    std::cout << "Dim b15: " << b15.size() << std::endl;
+    std::cout << "b15: " << b15[0] << "*x + " << b15[1] << std::endl;
+    std::vector<double> b56 = calculate_bisector(e5, e6);
+    std::cout << "Dim b56: " << b56.size() << std::endl;
+    std::cout << "b56: " << b56[0] << std::endl;
+    QPair<double, double> inters = find_intersection_bisectors(e1, e5, e6);
+    std::cout << "Intersezione: (" << inters.first << "; " << inters.second << ")" << std::endl;*/
 
     return sites;
 }
@@ -179,7 +199,7 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
         double x = vertex.first; //coordinate del circle event
         double y = vertex.second - dist;
         //Se sto analizzando un circle event che genera un altro circle event con le stesse coordinate, lo scarto.
-        if (e->is_site_event() || y == e->get_y() || x == e->get_x()){
+        if (e->is_site_event() || (y != e->get_y() || x != e->get_x())){
             Event ev(-1, vertex.first, e->get_y(), false, false);
             int i = bin_search_parabola(ev, 0, T->size()-1, *T); //cerco l'arco sotto il circle event
             //Se il circle event non sta sotto uno dei tre archi coinvolti, lo scarto
@@ -362,10 +382,17 @@ std::vector<double> find_intersections_parabolas (std::vector<double> &p1, std::
     double c = p1[2] - p2[2];
     double delta = (pow(b,2) - 4*a*c);
     if (delta < 0) return solutions;
-    double s1 = (- b + sqrt(delta)) / (2 * a);
-    double s2 = (- b - sqrt(delta)) / (2 * a);
-    solutions.push_back(s1);
-    solutions.push_back(s2);
+    if (a == 0){
+        double s = -c / b;
+        solutions.push_back(s);
+        solutions.push_back(s);
+    }
+    else {
+        double s1 = (- b + sqrt(delta)) / (2 * a);
+        double s2 = (- b - sqrt(delta)) / (2 * a);
+        solutions.push_back(s1);
+        solutions.push_back(s2);
+    }
     return solutions;
 }
 
@@ -429,6 +456,7 @@ QPair<double, double> find_intersection_bisectors(Event &p1, Event &p2, Event &p
         else {
             point.first = r2[0];
             point.second = r1[0] * r2[0] + r1[1];
+            return point;
         }
     }
     else {
