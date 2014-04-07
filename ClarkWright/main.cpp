@@ -28,17 +28,10 @@ int main(int argc, char *argv[]){
         #ifdef __linux__
             clients = read_file("vrpnc1.txt", &cap); // Ale
         #endif
-        /*clients.push_back(Client(0,1,1,1));
-        clients.push_back(Client(1,2,6,1));
-        clients.push_back(Client(2,4,4,1));
-        clients.push_back(Client(3,9,2,1));
-        clients.push_back(Client(4,11,1,1));
-        clients.push_back(Client(5,12,5,1));
-        clients.push_back(Client(6,15,3,1));
-        clients.push_back(Client(7,9,5,1));
-        clients.push_back(Client(8,12,2,1));*/
         QVector<Saving> savings;
-        voronoi(clients, &savings);
+        clients = voronoi(clients, &savings);
+
+        //ALGORITMO
 
         timer.stop_and_print();
 
