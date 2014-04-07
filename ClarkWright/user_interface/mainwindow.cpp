@@ -65,6 +65,8 @@ void MainWindow::zoomGraph(int i)
  */
 void MainWindow::addNode(QPoint p, QString name)
 {
+    p.setY( -p.y() );
+
     // set how many pixel have a graph point
     p.setX( p.x() * pixelMultip );
     p.setY( p.y() * pixelMultip );
@@ -76,8 +78,17 @@ void MainWindow::addNode(QPoint p, QString name)
 
     // addEllipse(x,y,w,h,pen,brush)
     node = scene->addEllipse(p.x()-(diam/2),p.y()-(diam/2), diam,diam, outlinePen, internalBrush);
-    text = scene->addText( name, QFont("Helvetica", 8) );
-    text->setPos(p.x()-3,p.y()-4);
+
+//    //debug
+//    name = "(";
+//    name += QString::number( p.x() );
+//    name += ",";
+//    name += QString::number( p.y() );
+//    name += ")";
+
+
+    text = scene->addText( name, QFont("Helvetica", 7) );
+    text->setPos(p.x()-3,p.y()-11);
 
 }
 
@@ -88,6 +99,9 @@ void MainWindow::addNode(QPoint p, QString name)
  */
 void MainWindow::addArrowTo(QPoint p1, QPoint p2)
 {
+
+    p2.setY( -p2.y() );
+    p1.setY( -p1.y() );
 
     // set how many pixel have a graph point
     p1.setX( p1.x() * pixelMultip );
@@ -187,11 +201,21 @@ void MainWindow::handle_button1()
         clients.push_back(Client(5,10,6,1));
         clients.push_back(Client(6,12,8,1));*/
 
-        QVector<Client> voronoi_points;
-        voronoi_points = voronoi( clients );
+                                        //        voronoi( clients );
 
-        GraphRoutes state(voronoi_points);
-        G_draw_nodes( state.get_list_point_label_pairs() );
+                                        //        clients[0].get_neighbors();
+
+                                        ////        QList QList QPoint
+
+                                        //        QList< QList < QPoint > > lista_punti;
+
+                                        //        G_draw_routes( );
+
+
+
+//        GraphRoutes state(voronoi_points);
+//        G_draw_nodes( state.get_list_point_label_pairs() );
+
 
     //    timer.stop_and_print();
 }
@@ -218,10 +242,10 @@ void MainWindow::grid( bool on )
     if ( on ) {
         gridLines->clear();
         for( int i=0; i< ui->graphicsView->sceneRect().width(); i+=(10*pixelMultip) ) { // vertical lines
-            gridLines->append( scene->addLine(i,0, i,ui->graphicsView->sceneRect().height(), outlinePen) );
+            gridLines->append( scene->addLine(i,0, i, ui->graphicsView->sceneRect().height(), outlinePen) );
         }
-        for( int i=0; i< ui->graphicsView->sceneRect().height(); i+=(10*pixelMultip) ) { // horizontal lines
-            gridLines->append( scene->addLine(0,i, ui->graphicsView->sceneRect().height(),i, outlinePen) );
+        for( int i=0; i< (-ui->graphicsView->sceneRect().height()); i+=(10*pixelMultip) ) { // horizontal lines
+            gridLines->append( scene->addLine(0,-i, ui->graphicsView->sceneRect().width(),-i, outlinePen) );
         }
         gridEnabled = true;
     } else {
@@ -279,11 +303,21 @@ void MainWindow::reset(void)
 {
 //    if(!firstAperture) scene->clear();
 
-    scene = new QGraphicsScene(this);
+    scene = new QGraphicsScene;
     ui->graphicsView->setScene(scene);
-    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+//    ui->graphicsView->scale(1,-1);
+    ui->graphicsView->setSceneRect( 0,0, 400, -350 );
+
+    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
 //    ui->graphicsView->setAlignment( Qt::AlignCenter );
-    ui->graphicsView->setSceneRect( 0,0, 999, 999 );
+//    setCentralWidget( ui->graphicsView );
+
+//    QGraphicsScene *scene = new CustomScene;
+//    QGraphicsView *view = new QGraphicsView(this);
+//    scene->setSceneRect(-180, -90, 360, 180);
+//    view->setScene(scene);
+//    view->scale(1, -1);
+//    setCentralWidget(view);
 
     gridEnabled = false;
     gridLines = new QList<QGraphicsLineItem*>;
@@ -294,6 +328,14 @@ void MainWindow::reset(void)
 //        gridLines->clear();
     }
 
+
+//    addArrowTo(QPoint(0,0), QPoint(99,99));
+//    ui->graphicsView->scale(1, -1);
+
+//    QMatrix matrix;
+//    matrix.scale( 1, -1); // correct y axis -> flip
+
+//    ui->graphicsView->setMatrix(matrix);
 
 }
 
