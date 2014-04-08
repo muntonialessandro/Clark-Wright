@@ -19,6 +19,9 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
 
+#define MAX_X_GRAPHVIEW 600
+#define MAX_Y_GRAPHVIEW 600
+#define MAX_XY_LIKE_INFTY 9999
 
 QT_BEGIN_NAMESPACE
 
