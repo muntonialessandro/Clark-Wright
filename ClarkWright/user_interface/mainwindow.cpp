@@ -169,6 +169,7 @@ void MainWindow::zoomGraph(int i)
     matrix.scale( i/10., i/10.); // zoom factor ( example: 1.1 is 110%)
 
     ui->graphicsView->setMatrix(matrix);
+    G_move_graph_in_a_good_position();
 }
 
 /**
@@ -202,7 +203,7 @@ void MainWindow::addNode(QPoint p, QString name)
 
 
     text1 = scene->addText( name, QFont("Helvetica", 4) );
-    text1->setPos(p.x()-3,p.y()-11);
+    text1->setPos(p.x(),p.y()-7);
 
 //    QStringList query = name.split("(");
 //    text1 = scene->addText( query.value(0), QFont("Helvetica", 5) );
@@ -229,7 +230,7 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
     p2.setX( p2.x() * pixelMultip );
     p2.setY( p2.y() * pixelMultip );
 
-    arrowColor.setAlpha( 60 + 40.*(qrand()/RAND_MAX) );
+    arrowColor.setAlpha( 80 + 20.*(qrand()/RAND_MAX) );
 
     QBrush internalBrush( arrowColor );
     QPen outlinePen( arrowColor );
@@ -330,6 +331,9 @@ void MainWindow::handle_button1()
         G_draw_nodes( state.get_list_point_label_pairs() );
         std::cout << state.to_string() << std::endl;
 
+        G_move_graph_in_a_good_position();
+        G_show_result( QString::number( state.get_total_cost() ) );
+
 
 
 }
@@ -423,7 +427,7 @@ void MainWindow::reset(void)
     ui->graphicsView->setScene(scene);
 //    ui->graphicsView->scale(1,-1);
     ui->graphicsView->setSceneRect( 0,0, MAX_X_GRAPHVIEW, -MAX_Y_GRAPHVIEW );
-    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
+    G_move_graph_in_a_good_position();
 //    ui->graphicsView->setAlignment( Qt::AlignCenter );
 //    setCentralWidget( ui->graphicsView );
 
@@ -542,7 +546,7 @@ void MainWindow::G_draw_routes( QList< QList<QPoint> > routes )
     for( int i=0; i<routes.size(); i++ ){
         draw_route( routes[i] );
     }
-    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
+    G_move_graph_in_a_good_position();
 
 }
 
@@ -563,8 +567,30 @@ void MainWindow::G_draw_nodes( QList< QPair<QPoint,QString> > pointsList )
         addNode( p->first ,  p->second );
     }
     ui->progressBarGraph->setValue(100);
-    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
+    G_move_graph_in_a_good_position();
+}
+
+/**
+ * @brief Centra il grafo
+ *  Sposta il grafico per migliorare la visualizzazione
+ */
+void MainWindow::G_move_graph_in_a_good_position(void)
+{
+//    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
+//    QPoint p = QCursor::pos();
+//    QPoint pGraph = ui->graphicsView->pos();
+//    ui->graphicsView->centerOn( p.x()-pGraph.x() , p.y() - pGraph.y() );
+    ui->graphicsView->centerOn( 0, 0 );
+
 
 }
 
-
+/**
+ * @brief Mostra il risultato
+ *  Sposta il grafico per migliorare la visualizzazione
+ * @param str è la stringa che conterrà il risultato da mostrare all'utente
+ */
+void MainWindow::G_show_result( QString str )
+{
+    ui->userInfo->setText( str );
+}

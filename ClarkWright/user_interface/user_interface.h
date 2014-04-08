@@ -64,7 +64,7 @@ public:
 
         // Area SX - Tools
         zoomSlider = new QSlider(Qt::Horizontal);
-        zoomSlider->setRange(5,50);
+        zoomSlider->setRange(5,80);
         zoomSlider->setValue( 25 );
         zoomLayoutBox = new QHBoxLayout;
         zoomLayoutBox->addWidget(zoomSlider);

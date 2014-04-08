@@ -53,6 +53,8 @@ public:
     void G_draw_routes( QList< QList<QPoint> > routes );
     void G_draw_nodes( QList< QPair<QPoint,QString> > pointsList );
     int G_draw_interface(QApplication *a);
+    void G_move_graph_in_a_good_position( void );
+    void G_show_result(QString str);
 
 private:
     Ui::MainWindow *ui;     // l'interfaccia con tutti i suoi oggetti
