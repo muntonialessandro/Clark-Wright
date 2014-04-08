@@ -200,8 +200,15 @@ void MainWindow::addNode(QPoint p, QString name)
 //    name += QString::number( p.y() );
 //    name += ")";
 
-    text = scene->addText( name, QFont("Helvetica", 4) );
-    text->setPos(p.x()-3,p.y()-11);
+
+    text1 = scene->addText( name, QFont("Helvetica", 4) );
+    text1->setPos(p.x()-3,p.y()-11);
+
+//    QStringList query = name.split("(");
+//    text1 = scene->addText( query.value(0), QFont("Helvetica", 5) );
+//    text2 = scene->addText( query.value(1), QFont("Helvetica", 4) );
+//    text1->setPos(p.x()-3,p.y()-11);
+//    text2->setPos(p.x()-3,p.y()-11);
 
 }
 

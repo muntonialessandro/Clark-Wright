@@ -66,7 +66,8 @@ private:
     QGraphicsEllipseItem *node;
     QGraphicsRectItem *rectangle;
     QGraphicsLineItem *line;
-    QGraphicsTextItem *text;
+    QGraphicsTextItem *text1;
+    QGraphicsTextItem *text2;
     QGraphicsPolygonItem* poligon;
     QList<QGraphicsLineItem*> *gridLines;
 
