@@ -6,6 +6,7 @@
 #include "classes/graph_routes.h"
 #include "classes/saving.h"
 #include "timer.h"
+#include "closer_cw.h"
 #include <QWheelEvent>
 #include <QFileDialog>
 #include <QStackedLayout>
@@ -71,7 +72,7 @@ private:
 
     // funzioni per disegnare la scena
     void addNode(QPoint p, QString name);
-    void addArrowTo(QPoint p1,QPoint p2);
+    void addArrowTo(QPoint p1, QPoint p2, QColor arrowColor);
 
 private slots: // le varie funzioni che vengono chiamate quando si interagisce con l'interfaccia
     void handle_button1();

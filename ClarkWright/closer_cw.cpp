@@ -19,7 +19,8 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
         
         // se la capacità del mezzo lo permette, creo la route r_i tra di essi
         if (capacity + graph_route.get_client(second_client).get_demand() <= cap) {
-            
+            route_id r_second = graph_route.get_client(second_client).get_route();
+            graph_route.delete_route(r_second);
             graph_route.insert_client_in_route(graph_route.get_client(first_client).get_route(), second_client, first_client);
             capacity += graph_route.get_client(second_client).get_demand();
         }
@@ -46,7 +47,8 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                 if (saving_next > saving_previous && saving_next > 0) {
 
                     if (capacity + c2.get_demand() <= cap) {
-                        
+                        route_id r_c2 = graph_route.get_client(c2.get_id()).get_route();
+                        graph_route.delete_route(r_c2);
                         graph_route.insert_client_in_route(c1.get_route(), c2.get_id(), c1.get_id());
                         capacity += c2.get_demand();
                     }
@@ -55,7 +57,8 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                     client_id previous_client = graph_route.get_previous_client(c1.get_id());
                     
                     if (capacity + c2.get_demand() <= cap) {
-                        
+                        route_id r_c2 = graph_route.get_client(c2.get_id()).get_route();
+                        graph_route.delete_route(r_c2);
                         graph_route.insert_client_in_route(c1.get_route(), c2.get_id(), previous_client);
                         capacity += c2.get_demand();
                     }
@@ -71,7 +74,8 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                 if (saving_next > saving_previous && saving_next > 0) {
                     
                     if (capacity + c1.get_demand() <= cap) {
-                        
+                        route_id r_c1 = graph_route.get_client(c1.get_id()).get_route();
+                        graph_route.delete_route(r_c1);
                         graph_route.insert_client_in_route(c2.get_route(), c1.get_id(), c2.get_id());
                         capacity += c1.get_demand();
                     }
@@ -80,7 +84,8 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                     client_id previous_client = graph_route.get_previous_client(c2.get_id());
                     
                     if (capacity + c1.get_demand() <= cap) {
-                        
+                        route_id r_c1 = graph_route.get_client(c1.get_id()).get_route();
+                        graph_route.delete_route(r_c1);
                         graph_route.insert_client_in_route(c2.get_route(), c1.get_id(), previous_client);
                         capacity += c1.get_demand();
                     }
@@ -100,7 +105,8 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                 i--;
             }
         }
-    }
-    
+
+    }    
+
     return graph_route;
 }

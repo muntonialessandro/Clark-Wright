@@ -150,7 +150,7 @@ int MainWindow::G_draw_interface( QApplication* a ) {
 
 /**
  * @brief MainWindow
- *  distrugge l'interfaccia grafica
+ *  distrugge l'interfaccia grafica, sciusciagiogusu
  */
 MainWindow::~MainWindow()
 {
@@ -200,7 +200,7 @@ void MainWindow::addNode(QPoint p, QString name)
 //    name += QString::number( p.y() );
 //    name += ")";
 
-    text = scene->addText( name, QFont("Helvetica", 4) );
+    text = scene->addText( name, QFont("Helvetica", 7) );
     text->setPos(p.x()-3,p.y()-11);
 
 }
@@ -210,7 +210,7 @@ void MainWindow::addNode(QPoint p, QString name)
  *  Aggiunge una freccia che parte in un punto p1 e arriva in un punto p2 (con punta in p2)
  * @param p1,p2 sono le coordinate di partenza e arrivo della freccia
  */
-void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
+void MainWindow::addArrowTo(QPoint p1, QPoint p2)
 {
 
     p2.setY( -p2.y() );
@@ -222,8 +222,8 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
     p2.setX( p2.x() * pixelMultip );
     p2.setY( p2.y() * pixelMultip );
 
-    arrowColor.setAlpha( 60 + 40.*(qrand()/RAND_MAX) );
-
+    QColor arrowColor = QColor(200,200,200);
+    arrowColor.setAlpha( 50 + 100*(qrand()/RAND_MAX) );
     QBrush internalBrush( arrowColor );
     QPen outlinePen( arrowColor );
     outlinePen.setWidth(1);
@@ -244,6 +244,7 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
 
     // rotate arrow head
     qreal m = -1; // vertical line
+
     if ( ( p2.x() - p1.x() + 0. ) != 0 )
         m = ( p2.y() - p1.y() + 0. ) /
             ( p2.x() - p1.x() + 0. );
@@ -266,66 +267,6 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
 
 }
 
-/**
- * @brief handleButton
- *  handle of button1
- */
-void MainWindow::handle_button1()
-{
-    //    QList< QPair<QPoint,QString> > pointList;
-    //    createGraph(pointList);
-
-        ui->userInfo->setText("Voronoi..");
-    //    //Prova GraphRoute
-    //    QVector<Client> clients;
-    //    Client d( 0, 20, 20, 0);
-    //    Client c1(1, 30, 30, 13);
-    //    Client c2(2, 10, 30, 20);
-    //    Client c3(3, 0, 10, 25);
-    //    Client c4(4, 20, 0, 5);
-    //    Client c5(5, 30, 10, 40);
-    //    clients.push_back(d);
-    //    clients.push_back(c1);
-    //    clients.push_back(c2);
-    //    clients.push_back(c3);
-    //    clients.push_back(c4);
-    //    clients.push_back(c5);
-
-    //    qDebug( "Size %d",clients.size() );
-    //    GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
-    //    G_draw_routes( state.get_list_edges() );
-    //    G_draw_nodes( state.get_list_point_label_pairs() );
-
-        int cap;
-        QVector<Client> clients;
-        #ifdef TARGET_OS_MAC
-            clients = read_file("../../../vrpnc1.txt", &cap); // lelle
-        #endif
-
-        #ifdef __linux__
-            clients = read_file("vrpnc1.txt", &cap); // Ale
-        #endif
-
-        Timer timer("C&W Algorithm");
-        timer.start();
-
-        QVector<Client> voronoi_points;
-        QVector<Saving> savings;
-        voronoi_points = voronoi( clients, &savings);
-        //closer_cw(voronoi_points, savings, cap);
-
-        //ALGORITMO (Come Main)
-
-        timer.stop_and_print();
-
-        GraphRoutes state = closer_cw(voronoi_points, savings, cap);
-        G_draw_routes(state.get_list_edges());
-        G_draw_nodes( state.get_list_point_label_pairs() );
-        std::cout << state.to_string() << std::endl;
-
-
-
-}
 
 /**
  * @brief grid
@@ -390,10 +331,8 @@ void MainWindow::open_file()
         for(int i=0; i<nodes_list.size(); i++){
             client.append( QPair<QPoint,QString>(
                                QPoint ( nodes_list[i].get_x(), nodes_list[i].get_y() ) ,
-                               QString::number( nodes_list[i].get_id() ) + "(" + QString::number ( nodes_list[i].get_demand() ) + ")" ) );
+                               QString::number( nodes_list[i].get_id() ) ) );
         }
-
-
 
         G_draw_nodes(client);
 
@@ -445,6 +384,73 @@ void MainWindow::reset(void)
 
 //    ui->graphicsView->setMatrix(matrix);
 
+}
+
+/**
+ * @brief handleButton
+ *  handle of button1
+ */
+void MainWindow::handle_button1()
+{
+    //    QList< QPair<QPoint,QString> > pointList;
+    //    createGraph(pointList);
+
+        ui->userInfo->setText("Voronoi..");
+    //    //Prova GraphRoute
+    //    QVector<Client> clients;
+    //    Client d( 0, 20, 20, 0);
+    //    Client c1(1, 30, 30, 13);
+    //    Client c2(2, 10, 30, 20);
+    //    Client c3(3, 0, 10, 25);
+    //    Client c4(4, 20, 0, 5);
+    //    Client c5(5, 30, 10, 40);
+    //    clients.push_back(d);
+    //    clients.push_back(c1);
+    //    clients.push_back(c2);
+    //    clients.push_back(c3);
+    //    clients.push_back(c4);
+    //    clients.push_back(c5);
+
+    //    qDebug( "Size %d",clients.size() );
+    //    GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
+    //    G_draw_routes( state.get_list_edges() );
+    //    G_draw_nodes( state.get_list_point_label_pairs() );
+
+
+
+    //    Timer timer("C&W Algorithm");
+    //    timer.start();
+
+        int cap;
+        QVector<Client> clients;
+        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+    //        clients = read_file("vrpnc1.txt", &cap); // Ale
+
+        /*clients.push_back(Client(0,2,3,1));
+        clients.push_back(Client(1,5,1,1));
+        clients.push_back(Client(2,6,7,1));
+        clients.push_back(Client(3,6,4,1));
+        clients.push_back(Client(4,9,3,1));
+        clients.push_back(Client(5,10,6,1));
+        clients.push_back(Client(6,12,8,1));*/
+
+                                        //        voronoi( clients );
+
+                                        //        clients[0].get_neighbors();
+
+                                        ////        QList QList QPoint
+
+                                        //        QList< QList < QPoint > > lista_punti;
+
+                                        //        G_draw_routes( );
+
+
+
+//        GraphRoutes state(voronoi_points);
+//        G_draw_nodes( state.get_list_point_label_pairs() );
+
+
+    //    timer.stop_and_print();
 }
 
 /**
@@ -512,14 +518,8 @@ void MainWindow::draw_route( QList<QPoint> route )
 {
     if (route.size()<2) return;
 
-    int color1 = qrand() % 256;
-    int color2 = qrand() % 256;
-    int color3 = qrand() % 256;
-
-    QColor arrowColor = QColor(color1,color2,color3);
-
     for ( int i=1; i<route.size(); i++ ) {
-        addArrowTo( route[i-1] , route[i], arrowColor );
+        addArrowTo( route[i-1] , route[i] );
     }
 }
 
@@ -535,8 +535,6 @@ void MainWindow::G_draw_routes( QList< QList<QPoint> > routes )
     for( int i=0; i<routes.size(); i++ ){
         draw_route( routes[i] );
     }
-    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
-
 }
 
 /**
@@ -556,7 +554,6 @@ void MainWindow::G_draw_nodes( QList< QPair<QPoint,QString> > pointsList )
         addNode( p->first ,  p->second );
     }
     ui->progressBarGraph->setValue(100);
-    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
 
 }
 

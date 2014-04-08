@@ -35,120 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 /**
-* @brief Draw the interface
-*  Crea l'interfaccia
-*
-* @param a la QApplication dove deve essere disegnata l'interfaccia
-*
-*/
-int MainWindow::G_draw_interface( QApplication* a ) {
-
-    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
-
-    QWidget container;
-//    container.resize(800, 600);
-    container.setFocusPolicy ( Qt::NoFocus );
-
-    MainWindow window(&container);
-//    window.setGeometry(0,22,640, 680);
-
-
-    QMenuBar open_menu_bar(&container);
-    QMenu open_menu("&File", &container);
-
-    QAction open("&Open", &container);
-    open.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
-    open_menu.addAction(&open);
-
-    QAction reset("&Reset", &container);
-    reset.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-    open_menu.addAction(&reset);
-
-
-    /**** MENU COMPUTATION ****/
-    QMenu computation("Computation", &container);
-
-    QAction calc("&Computation", &container);
-    calc.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
-    computation.addAction(&calc);
-
-    QAction zoomIn("&Zoom +", &container);
-    zoomIn.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
-    computation.addAction(&zoomIn);
-
-    QAction zoomOut("&Zoom -", &container);
-    zoomOut.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Minus));
-    computation.addAction(&zoomOut);
-
-
-
-    /**** MENU HELP ****/
-    QMenu help_menu("&?", &container);
-
-    QAction help("&Help", &container);
-    help.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
-    help_menu.addAction(&help);
-
-    QAction about("&About", &container);
-    about.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_A));
-    help_menu.addAction(&about);
-
-    open_menu_bar.addMenu(&open_menu);
-    open_menu_bar.addMenu(&computation);
-    open_menu_bar.addMenu(&help_menu);
-
-
-    container.show();
-    container.showMaximized();
-
-
-    QDialog instructions( NULL );
-    instructions.setFixedSize(300,180);
-    instructions.setWindowTitle("Help");
-    QLabel instr_text("\nCtrl+ - Zoom+ \nCtrl- - Zoom- \n", &instructions);
-    instr_text.setTextFormat(Qt::AutoText);
-    instr_text.setWordWrap(true);
-    instructions.hide();
-
-    QDialog credits( NULL );
-    credits.setFixedSize(300,100);
-    credits.setWindowTitle("Credits");
-    QString txt;
-    txt.append( "\t" );
-    txt.append( window.APPNAME );
-    txt.append( " " );
-    txt.append( window.APP_VERSION );
-    txt.append( "\n\nA cura di BluBluSky.\n" );
-    QLabel cred_text(txt, &credits);
-
-    cred_text.setTextFormat(Qt::AutoText);
-    cred_text.setAlignment(Qt::AlignCenter);
-    cred_text.setWordWrap(true);
-    credits.hide();
-
-
-
-    // Connect button signal to appropriate slot
-    QObject::connect( &open, SIGNAL(triggered()), &window, SLOT(open_file()) );
-    QObject::connect( &reset, SIGNAL(triggered()), &window, SLOT(reset()) );
-    QObject::connect( &help, SIGNAL(triggered()), &instructions, SLOT(show()) );
-    QObject::connect( &about, SIGNAL(triggered()), &credits, SLOT(show()) );
-    QObject::connect( &calc, SIGNAL(triggered()), &window, SLOT(handle_button2()) );
-    QObject::connect( &zoomIn, SIGNAL(triggered()), &window, SLOT(zoomInGraphButton()) );
-    QObject::connect( &zoomOut, SIGNAL(triggered()), &window, SLOT(zoomOutGraphButton()) );
-
-
-    window.setWindowTitle( window.APPNAME );
-    window.setFocus();
-
-//    QList< QPair<QPoint,QString> > pointList;
-//    window.createGraph( pointList );
-
-    return a->exec();
-
-}
-
-/**
  * @brief MainWindow
  *  distrugge l'interfaccia grafica
  */
@@ -200,7 +86,8 @@ void MainWindow::addNode(QPoint p, QString name)
 //    name += QString::number( p.y() );
 //    name += ")";
 
-    text = scene->addText( name, QFont("Helvetica", 4) );
+
+    text = scene->addText( name, QFont("Helvetica", 7) );
     text->setPos(p.x()-3,p.y()-11);
 
 }
@@ -222,8 +109,7 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
     p2.setX( p2.x() * pixelMultip );
     p2.setY( p2.y() * pixelMultip );
 
-    arrowColor.setAlpha( 60 + 40.*(qrand()/RAND_MAX) );
-
+    //arrowColor.setAlpha( 50 + 100*(qrand()/RAND_MAX) );
     QBrush internalBrush( arrowColor );
     QPen outlinePen( arrowColor );
     outlinePen.setWidth(1);
@@ -236,7 +122,7 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
     QPolygonF triangle;
     triangle.append( QPointF(p2.x()-offs , p2.y()+offs) );
     triangle.append( QPointF(p2.x()      , p2.y())      );
-    triangle.append( QPointF(p2.x()      , p2.y()+offs) );
+    triangle.append( QPointF(p2.x()+offs , p2.y()+offs) );
     poligon = scene->addPolygon(triangle);
     poligon->setTransformOriginPoint(QPointF(p2.x()   , p2.y()) );
     poligon->setBrush(internalBrush);
@@ -390,10 +276,8 @@ void MainWindow::open_file()
         for(int i=0; i<nodes_list.size(); i++){
             client.append( QPair<QPoint,QString>(
                                QPoint ( nodes_list[i].get_x(), nodes_list[i].get_y() ) ,
-                               QString::number( nodes_list[i].get_id() ) + "(" + QString::number ( nodes_list[i].get_demand() ) + ")" ) );
+                               QString::number( nodes_list[i].get_id() ) ) );
         }
-
-
 
         G_draw_nodes(client);
 
@@ -415,7 +299,8 @@ void MainWindow::reset(void)
     scene = new QGraphicsScene;
     ui->graphicsView->setScene(scene);
 //    ui->graphicsView->scale(1,-1);
-    ui->graphicsView->setSceneRect( 0,0, MAX_X_GRAPHVIEW, -MAX_Y_GRAPHVIEW );
+    ui->graphicsView->setSceneRect( 0,0, 400, -350 );
+
     ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
 //    ui->graphicsView->setAlignment( Qt::AlignCenter );
 //    setCentralWidget( ui->graphicsView );
@@ -535,8 +420,6 @@ void MainWindow::G_draw_routes( QList< QList<QPoint> > routes )
     for( int i=0; i<routes.size(); i++ ){
         draw_route( routes[i] );
     }
-    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
-
 }
 
 /**
@@ -556,8 +439,116 @@ void MainWindow::G_draw_nodes( QList< QPair<QPoint,QString> > pointsList )
         addNode( p->first ,  p->second );
     }
     ui->progressBarGraph->setValue(100);
-    ui->graphicsView->setAlignment( Qt::AlignLeft | Qt::AlignBottom );
 
 }
 
+
+
+int MainWindow::G_draw_interface( QApplication* a ) {
+
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
+
+    QWidget container;
+//    container.resize(800, 600);
+    container.setFocusPolicy ( Qt::NoFocus );
+
+    MainWindow window(&container);
+//    window.setGeometry(0,22,640, 680);
+
+
+    QMenuBar open_menu_bar(&container);
+    QMenu open_menu("&File", &container);
+
+    QAction open("&Open", &container);
+    open.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+    open_menu.addAction(&open);
+
+    QAction reset("&Reset", &container);
+    reset.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    open_menu.addAction(&reset);
+
+
+    /**** MENU COMPUTATION ****/
+    QMenu computation("Computation", &container);
+
+    QAction calc("&Computation", &container);
+    calc.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    computation.addAction(&calc);
+
+    QAction zoomIn("&Zoom +", &container);
+    zoomIn.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
+    computation.addAction(&zoomIn);
+
+    QAction zoomOut("&Zoom -", &container);
+    zoomOut.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Minus));
+    computation.addAction(&zoomOut);
+
+
+
+    /**** MENU HELP ****/
+    QMenu help_menu("&?", &container);
+
+    QAction help("&Help", &container);
+    help.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
+    help_menu.addAction(&help);
+
+    QAction about("&About", &container);
+    about.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_A));
+    help_menu.addAction(&about);
+
+    open_menu_bar.addMenu(&open_menu);
+    open_menu_bar.addMenu(&computation);
+    open_menu_bar.addMenu(&help_menu);
+
+
+    container.show();
+    container.showMaximized();
+
+
+    QDialog instructions( NULL );
+    instructions.setFixedSize(300,180);
+    instructions.setWindowTitle("Help");
+    QLabel instr_text("\nCtrl+ - Zoom+ \nCtrl- - Zoom- \n", &instructions);
+    instr_text.setTextFormat(Qt::AutoText);
+    instr_text.setWordWrap(true);
+    instructions.hide();
+
+    QDialog credits( NULL );
+    credits.setFixedSize(300,100);
+    credits.setWindowTitle("Credits");
+    QString txt;
+    txt.append( "\t" );
+    txt.append( window.APPNAME );
+    txt.append( " " );
+    txt.append( window.APP_VERSION );
+    txt.append( "\n\nA cura di BluBluSky.\n" );
+    QLabel cred_text(txt, &credits);
+
+    cred_text.setTextFormat(Qt::AutoText);
+    cred_text.setAlignment(Qt::AlignCenter);
+    cred_text.setWordWrap(true);
+    credits.hide();
+
+
+
+    // Connect button signal to appropriate slot
+    QObject::connect( &open, SIGNAL(triggered()), &window, SLOT(open_file()) );
+    QObject::connect( &reset, SIGNAL(triggered()), &window, SLOT(reset()) );
+    QObject::connect( &help, SIGNAL(triggered()), &instructions, SLOT(show()) );
+    QObject::connect( &about, SIGNAL(triggered()), &credits, SLOT(show()) );
+    QObject::connect( &calc, SIGNAL(triggered()), &window, SLOT(handle_button2()) );
+    QObject::connect( &zoomIn, SIGNAL(triggered()), &window, SLOT(zoomInGraphButton()) );
+    QObject::connect( &zoomOut, SIGNAL(triggered()), &window, SLOT(zoomOutGraphButton()) );
+
+
+    window.setWindowTitle( window.APPNAME );
+    window.setFocus();
+
+//    QList< QPair<QPoint,QString> > pointList;
+//    window.createGraph( pointList );
+
+    return a->exec();
+
+}
 
