@@ -265,6 +265,11 @@ std::string GraphRoutes::to_string()
             s += "\n";
         }
     }
+    std::stringstream ss;
+
+    ss << "Total Cost: " << this->get_total_cost() << "\n";
+    std::string s1 = ss.str();
+    s += s1;
     return s;
 }
 
