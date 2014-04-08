@@ -61,13 +61,7 @@ QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings){
         savings->push_back(ss);
         sav.pop_back();
         (*savings)[i].setId(i); //salvo l'id
-        //id del gemello
-        if ((i % 2) == 0){
-            (*savings)[i].setTwinSaving_id(i+1);
-        }
-        else {
-            (*savings)[i].setTwinSaving_id(i-1);
-        }
+        (*savings)[i].setTwinSaving_id(-1);
     }
 
     //Stampa siti e i suoi vicini
@@ -112,10 +106,8 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
         if (!e.is_deposit() && !(*T)[i].is_deposit()){
             double saving = get_saving(e, (*T)[i], deposit);
             Saving s1(-1, e.get_client_id(), (*T)[i].get_client_id(), saving);
-            Saving s2(-1, (*T)[i].get_client_id(), e.get_client_id(), saving);
             int j = search_insert_index_saving(saving, 0, savings->size()-1, *savings);
             savings->insert(j, s1);
-            savings->insert(j+1, s2);
         }
         // inserisco due archi: a destra di i metto e, e a destra di e metto di nuovo i
         T->insert(i+1, e);
@@ -177,10 +169,8 @@ void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q,
     if (!(*T)[arco_sinistro].is_deposit() && !(*T)[arco_destro].is_deposit()){
         double saving = get_saving((*T)[arco_sinistro], (*T)[arco_destro], deposit);
         Saving s1(-1, (*T)[arco_sinistro].get_client_id(), (*T)[arco_destro].get_client_id(), saving);
-        Saving s2(-1, (*T)[arco_destro].get_client_id(), (*T)[arco_sinistro].get_client_id(), saving);
         int j = search_insert_index_saving(saving, 0, savings->size()-1, *savings);
         savings->insert(j, s1);
-        savings->insert(j+1, s2);
     }
 
     // Se l'arco sinistro è in mezzo ad altri due archi, controllo se generano un circle event
