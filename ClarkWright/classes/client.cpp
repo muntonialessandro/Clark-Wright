@@ -249,6 +249,7 @@ QPair<QPoint, QString> Client::to_point_label_pair()
 {
     std::stringstream ss;
     ss << this->id; //per trasformare id in stringa
+    ss << "(" << this->demand << ")";
     QPoint p(this->x, this->y);
     std::string s = ss.str(); //da stream a string
     QString qs;
