@@ -152,7 +152,15 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
 {
 //    route_id route = clients[previous_in_route].get_route(); //route in cui si farà l'inserimento
     if (!routes[rid].is_enabled()) return false; //se la route non è attiva
-    index_client previous = clients[previous_in_route].get_position_in_route(); //indice predecessore
+    index_client previous;
+    if (previous_in_route == 0) {
+        previous = 0;
+        clients[routes[rid].get_client(1)].set_alone(false);
+    }
+    else {
+        previous = clients[previous_in_route].get_position_in_route(); //indice predecessore
+        clients[routes[rid].get_client(previous)].set_alone(false);
+    }
     index_client next = previous+1; //indice in cui verrà inserito il client
     client_id nid = routes[rid].get_client(next); //id del client successivo
     double cost = routes[rid].get_cost(); //costo precedente all'inserimento
@@ -163,6 +171,7 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
     routes[rid].set_cost(cost);
     bool res = routes[rid].insert_client(client, previous); //inserisco il client dopo il predecessore
     clients[client].set_route(rid); //setto la nuova route a cui appartiene il client inserito
+    clients[client].set_alone(false);
     index_client i;
     //partendo dal client inserito, aggiorno le posizioni dei clienti nella route, tranne il deposito
     for (i=previous+1; i<routes[rid].get_route().size()-1; i++){
@@ -218,13 +227,17 @@ double GraphRoutes::get_saving_client_in_route(route_id rid, client_id c_insert,
     double d1 = (this->clients[c_insert].get_distance(clients[0]) * 2.0) + this->routes[rid].get_cost();
     //calcolo del costo della route modificata:
     double d2 = routes[rid].get_cost(); //costo della route attuale
-    index_client pid = clients[previous_client].get_position_in_route(); //posizione del precedente
+    double deleted;
+    double added;
+    index_client pid;
+    if (previous_client != 0) pid = clients[previous_client].get_position_in_route(); //posizione del precedente
+    else pid = 0;
     index_client nid = pid+1; //posizione del successivo (al nodo che verrà inserito)
     client_id next_client = routes[rid].get_client(nid); //id del successivo
     //costo rimosso con l'inserimento del nodo:
-    double deleted = clients[previous_client].get_distance(clients[next_client]);
+    deleted = clients[previous_client].get_distance(clients[next_client]);
     //costo aggiunto con l'inserimento del nodo:
-    double added = clients[previous_client].get_distance(clients[c_insert]) +
+    added = clients[previous_client].get_distance(clients[c_insert]) +
                    clients[c_insert].get_distance(clients[next_client]);
     double saving = d1 - (d2 - deleted + added);
     return saving;
@@ -304,7 +317,7 @@ QVector<Event> GraphRoutes::to_events_vector()
 client_id GraphRoutes::get_previous_client(client_id client)
 {
     index_client index = clients[client].get_position_in_route();
-    
-    return clients[index - 1].get_id();
+    route_id rid = clients[client].get_route();
+    return routes[rid].get_client(index-1);
 }
 

@@ -70,9 +70,9 @@ QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings){
     }*/
 
     //Stampa savings
-    for (i=0; i<savings->size(); i++){
+    /*for (i=0; i<savings->size(); i++){
         std::cout << (*savings)[i].toString() << std::endl;
-    }
+    }*/
 
     return sites;
 }

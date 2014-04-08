@@ -97,7 +97,7 @@ void MainWindow::addNode(QPoint p, QString name)
  *  Aggiunge una freccia che parte in un punto p1 e arriva in un punto p2 (con punta in p2)
  * @param p1,p2 sono le coordinate di partenza e arrivo della freccia
  */
-void MainWindow::addArrowTo(QPoint p1, QPoint p2)
+void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
 {
 
     p2.setY( -p2.y() );
@@ -109,8 +109,7 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2)
     p2.setX( p2.x() * pixelMultip );
     p2.setY( p2.y() * pixelMultip );
 
-    QColor arrowColor = QColor(200,200,200);
-    arrowColor.setAlpha( 50 + 100*(qrand()/RAND_MAX) );
+    //arrowColor.setAlpha( 50 + 100*(qrand()/RAND_MAX) );
     QBrush internalBrush( arrowColor );
     QPen outlinePen( arrowColor );
     outlinePen.setWidth(1);
@@ -199,13 +198,16 @@ void MainWindow::handle_button1()
         QVector<Client> voronoi_points;
         QVector<Saving> savings;
         voronoi_points = voronoi( clients, &savings);
+        //closer_cw(voronoi_points, savings, cap);
 
         //ALGORITMO (Come Main)
 
         timer.stop_and_print();
 
-        GraphRoutes state(voronoi_points);
+        GraphRoutes state = closer_cw(voronoi_points, savings, cap);
+        G_draw_routes(state.get_list_edges());
         G_draw_nodes( state.get_list_point_label_pairs() );
+        std::cout << state.to_string() << std::endl;
 
 
 
@@ -395,8 +397,14 @@ void MainWindow::draw_route( QList<QPoint> route )
 {
     if (route.size()<2) return;
 
+    int color1 = qrand() % 256;
+    int color2 = qrand() % 256;
+    int color3 = qrand() % 256;
+
+    QColor arrowColor = QColor(color1,color2,color3);
+
     for ( int i=1; i<route.size(); i++ ) {
-        addArrowTo( route[i-1] , route[i] );
+        addArrowTo( route[i-1] , route[i], arrowColor );
     }
 }
 
@@ -438,7 +446,8 @@ void MainWindow::G_draw_nodes( QList< QPair<QPoint,QString> > pointsList )
 
 int MainWindow::G_draw_interface( QApplication* a ) {
 
-    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
 
     QWidget container;
 //    container.resize(800, 600);
