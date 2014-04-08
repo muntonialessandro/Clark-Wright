@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "io_file.h"
 #include "voronoi.h"
+#include "closer_cw.h"
 #include <iostream>
 #include <QVector>
 
@@ -31,7 +32,9 @@ int main(int argc, char *argv[]){
         QVector<Saving> savings;
         clients = voronoi(clients, &savings);
 
-        //ALGORITMO
+        GraphRoutes graph_route = closer_cw(clients, savings, cap);
+        
+        std::cout << graph_route.to_string();
 
         timer.stop_and_print();
 
@@ -95,12 +98,12 @@ void esempi_di_utilizzo_per_algoritmo( void )
     std::cout << s1;
 
     state.remove_client_from_route(1); //rimuove 1 dalla sua route
-    state.insert_client_in_route(1, 2); //inserisce il nodo 1 dopo il nodo 2, nella route di 2
+//    state.insert_client_in_route(1, 2); //inserisce il nodo 1 dopo il nodo 2, nella route di 2
     state.delete_route(0); //la route di 1 era banale: la si elimina
     std::cout << state.to_string();
 
-    double saving = state.get_saving_client_in_route(1, 5, 1);
-    std::cout << saving << std::endl;
+//    double saving = state.get_saving_client_in_route(5, 1);
+//    std::cout << saving << std::endl;
 
     //Prova ciclo route attive
     state.delete_route(3); //non si dovrebbe fare, il nodo 4 ora non ha route!

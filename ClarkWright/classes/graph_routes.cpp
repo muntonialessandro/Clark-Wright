@@ -148,25 +148,25 @@ bool GraphRoutes::remove_client_from_route(client_id client)
  * @param previous_in_route
  * @param route
  */
-bool GraphRoutes::insert_client_in_route(client_id client, client_id previous_in_route)
+bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_id previous_in_route)
 {
-    route_id route = clients[previous_in_route].get_route(); //route in cui si farà l'inserimento
-    if (!routes[route].is_enabled()) return false; //se la route non è attiva
+//    route_id route = clients[previous_in_route].get_route(); //route in cui si farà l'inserimento
+    if (!routes[rid].is_enabled()) return false; //se la route non è attiva
     index_client previous = clients[previous_in_route].get_position_in_route(); //indice predecessore
     index_client next = previous+1; //indice in cui verrà inserito il client
-    client_id nid = routes[route].get_client(next); //id del client successivo
-    double cost = routes[route].get_cost(); //costo precedente all'inserimento
+    client_id nid = routes[rid].get_client(next); //id del client successivo
+    double cost = routes[rid].get_cost(); //costo precedente all'inserimento
     //aggiorno il costo: aggiungo i costi di pred-c e c-succ, e sottraggo il costo pred-succ
     cost = cost + clients[previous_in_route].get_distance(clients[client]) +
                   clients[client].get_distance(clients[nid]) -
                   clients[previous_in_route].get_distance(clients[nid]);
-    routes[route].set_cost(cost);
-    bool res = routes[route].insert_client(client, previous); //inserisco il client dopo il predecessore
-    clients[client].set_route(route); //setto la nuova route a cui appartiene il client inserito
+    routes[rid].set_cost(cost);
+    bool res = routes[rid].insert_client(client, previous); //inserisco il client dopo il predecessore
+    clients[client].set_route(rid); //setto la nuova route a cui appartiene il client inserito
     index_client i;
     //partendo dal client inserito, aggiorno le posizioni dei clienti nella route, tranne il deposito
-    for (i=previous+1; i<routes[route].get_route().size()-1; i++){
-        client = routes[route].get_client(i); //id del client da aggiornare
+    for (i=previous+1; i<routes[rid].get_route().size()-1; i++){
+        client = routes[rid].get_client(i); //id del client da aggiornare
         clients[client].set_position_in_route(i); //set della posizione
     }
     return res;
@@ -212,6 +212,7 @@ double GraphRoutes::get_standard_saving(client_id c1, client_id c2)
  */
 double GraphRoutes::get_saving_client_in_route(route_id rid, client_id c_insert, client_id previous_client)
 {
+//    route_id route = clients[previous_client].get_route(); //route in cui si farà l'inserimento
     if (!routes[rid].is_enabled()) return -1; //se la route non è attiva
     //costo della route + costo della route banale del client c_insert
     double d1 = (this->clients[c_insert].get_distance(clients[0]) * 2.0) + this->routes[rid].get_cost();
@@ -298,5 +299,12 @@ QVector<Event> GraphRoutes::to_events_vector()
         qe.push_back(clients[i].to_Event());
     }
     return qe;
+}
+
+client_id GraphRoutes::get_previous_client(client_id client)
+{
+    index_client index = clients[client].get_position_in_route();
+    
+    return clients[index - 1].get_id();
 }
 

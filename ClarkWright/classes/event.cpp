@@ -19,6 +19,7 @@ Event::Event(int client_id, double x, double y, bool deposit, bool event)
 bool Event::operator ==(Event &other) const
 {
     if (other.get_client_id() == this->client_id) return true;
+    return false;
 }
 
 bool Event::operator !=(Event &other) const

@@ -415,7 +415,7 @@ int bin_search_parabola(Event & e, int first, int last, QVector<Event> &T){
                 return bin_search_parabola(e, mid+1, last, T);
             }
             if (e.get_x() == intersection){
-                std::cout << "Evento sotto un breakpoint!" << std::endl;
+//                std::cout << "Evento sotto un breakpoint!" << std::endl;
                 return mid;
             }
         }

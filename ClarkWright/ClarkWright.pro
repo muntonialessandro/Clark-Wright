@@ -17,7 +17,8 @@ HEADERS += \
     classes/event.h \
     voronoi.h \
     io_file.h \
-    classes/saving.h
+    classes/saving.h \
+    closer_cw.h
 
 SOURCES += \
     utils.cpp \
@@ -29,4 +30,5 @@ SOURCES += \
     classes/event.cpp \
     voronoi.cpp \
     io_file.cpp \
-    classes/saving.cpp
+    classes/saving.cpp \
+    closer_cw.cpp
