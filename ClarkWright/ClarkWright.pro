@@ -16,7 +16,9 @@ HEADERS += \
     user_interface/user_interface.h \
     classes/event.h \
     voronoi.h \
-    io_file.h
+    io_file.h \
+    classes/saving.h \
+    closer_cw.h
 
 SOURCES += \
     utils.cpp \
@@ -27,4 +29,6 @@ SOURCES += \
     user_interface/mainwindow.cpp \
     classes/event.cpp \
     voronoi.cpp \
-    io_file.cpp
+    io_file.cpp \
+    classes/saving.cpp \
+    closer_cw.cpp

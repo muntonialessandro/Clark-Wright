@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "io_file.h"
 #include "voronoi.h"
+#include "closer_cw.h"
 #include <iostream>
 #include <QVector>
 
@@ -12,7 +13,7 @@ void esempi_di_utilizzo_per_algoritmo( void );
 
 int main(int argc, char *argv[]){
 
-    if(false) {     //MODALITA' TERMINALE = TRUE
+    if(true) {     //MODALITA' TERMINALE = TRUE
 
         //esempi_di_utilizzo_per_algoritmo();
 
@@ -28,20 +29,12 @@ int main(int argc, char *argv[]){
         #ifdef __linux__
             clients = read_file("vrpnc1.txt", &cap); // Ale
         #endif
-        /*clients.push_back(Client(0,1,2,1));
-        clients.push_back(Client(1,7,3,1));
-        clients.push_back(Client(2,9,2,1));
-        clients.push_back(Client(3,14,2,1));
-        clients.push_back(Client(4,3,4,1));
-        clients.push_back(Client(5,6,5,1));
-        clients.push_back(Client(6,10,5,1));
-        clients.push_back(Client(7,13,4,1));
-        clients.push_back(Client(8,15,6,1));
-        clients.push_back(Client(9,2,7,1));
-        clients.push_back(Client(10,5,9,1));
-        clients.push_back(Client(11,8,7,1));
-        clients.push_back(Client(12,12,8,1));*/
-        voronoi(clients);
+        QVector<Saving> savings;
+        clients = voronoi(clients, &savings);
+
+        GraphRoutes graph_route = closer_cw(clients, savings, cap);
+        
+        std::cout << graph_route.to_string();
 
         timer.stop_and_print();
 
@@ -105,12 +98,12 @@ void esempi_di_utilizzo_per_algoritmo( void )
     std::cout << s1;
 
     state.remove_client_from_route(1); //rimuove 1 dalla sua route
-    state.insert_client_in_route(1, 2); //inserisce il nodo 1 dopo il nodo 2, nella route di 2
+//    state.insert_client_in_route(1, 2); //inserisce il nodo 1 dopo il nodo 2, nella route di 2
     state.delete_route(0); //la route di 1 era banale: la si elimina
     std::cout << state.to_string();
 
-    double saving = state.get_saving_client_in_route(1, 5, 1);
-    std::cout << saving << std::endl;
+//    double saving = state.get_saving_client_in_route(5, 1);
+//    std::cout << saving << std::endl;
 
     //Prova ciclo route attive
     state.delete_route(3); //non si dovrebbe fare, il nodo 4 ora non ha route!

@@ -6,33 +6,30 @@
  * @param sites
  * @return
  */
-QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings){
+QVector<Client> voronoi (QVector<Client> &sites){
     int i, k;
     QVector<Event> events;
-    QVector<Saving> sav;
-    for (i=0; i<sites.size(); i++) events.push_back(sites[i].to_Event()); //converto in eventi
-    QVector<Event> ordered_events = mergesort_events(events); //ordino gli eventi
+    for (i=0; i<sites.size(); i++) events.push_back(sites[i].to_Event());
+    QVector<Event> ordered_events = mergesort_events(events);
 
-    Event deposit = sites[0].to_Event();
+    //for (i=0; i<ordered_events.size(); i++) std::cout << ordered_events[i].to_string() << std::endl;
 
     QLinkedList<Event> Q;
-    //la lista Q contiene gli eventi, dall'alto verso il basso, al contrario rispetto all'output del mergesort
     for (i=0; i<ordered_events.size(); i++) {
         Q.push_front(ordered_events[i]);
         QLinkedList<Event>::iterator iterator = Q.begin();
-        (*iterator).set_position_in_Q(iterator); //in ogni evento, salvo un puntatore all'elemento stesso in Q
+        (*iterator).set_position_in_Q(iterator);
     }
 
     //Da questo momento, i sarà utilizzata per gli id da associare ai circle event
     QVector<Event> T;
     int j = 0;
     QLinkedList<Event>::iterator iterator = Q.begin();
-    while (iterator != Q.end()){ //finché la lista non è vuota
+    while (iterator != Q.end()){
         if ((*iterator).is_site_event())
-            handle_site_event(iterator, &Q, &T, &sites, &i, deposit, &sav);
+            handle_site_event(iterator, &Q, &T, &sites, &i);
         else
-            handle_circle_event(iterator, &Q, &T, &sites, &i, deposit, &sav);
-
+            handle_circle_event(iterator, &Q, &T, &sites, &i);
 
         //Stampa T ad ogni ciclo
         /*std::cout << "Ciclo: " << j << ": Evento analizzato: \n";
@@ -40,38 +37,20 @@ QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings){
         std::cout << "Ciclo: " << j << ": T: " << std::endl;
         for (k=0; k < T.size(); k++) std::cout << "\t" << T[k].to_string() << std::endl;*/
 
-
         //Stampa Q ad ogni ciclo
         /*std::cout << "Ciclo: " << j << ": Q: " << std::endl;
         QLinkedList<Event>::iterator iterator2 = Q.begin();
         while (iterator2 != Q.end()){
             std::cout << "\t" << (*iterator2).to_string() << std::endl;
             iterator2++;
-        }
-        j++;*/
+        }*/
 
         iterator++;
-
-
-    }
-    savings->clear();
-    int dim = sav.size();
-    for (i=0; i<dim; i++){ //salvo savings, invertendo l'ordine (il maggiore è il più conveniente)
-        Saving ss = sav.last();
-        savings->push_back(ss);
-        sav.pop_back();
-        (*savings)[i].setId(i); //salvo l'id
-        (*savings)[i].setTwinSaving_id(-1);
+        j++;
     }
 
-    //Stampa siti e i suoi vicini
-    /*for (i=0; i<sites.size(); i++){
+    for (i=0; i<sites.size(); i++){
         std::cout << sites[i].to_string() << std::endl;
-    }*/
-
-    //Stampa savings
-    for (i=0; i<savings->size(); i++){
-        std::cout << (*savings)[i].toString() << std::endl;
     }
 
     return sites;
@@ -85,7 +64,7 @@ QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings){
  * @param T
  * @param sites
  */
-void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client>* sites, int* id_circle, Event &deposit, QVector<Saving>* savings){
+void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client>* sites, int* id_circle){
     Event e = *ie;
     if (T->size() == 0) T->push_back(e);
     else {
@@ -97,18 +76,10 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
             (*T)[i].remove_associate_circle_event();
         }
         // il sito associato all'arco i è vicino del site event e, e viceversa
-        double dist = events_distance((*T)[i], e);
         client_id client_event = e.get_client_id();
         client_id client_neighbor = (*T)[i].get_client_id();
-        (*sites)[client_event].add_neighbor(client_neighbor, dist);
-        (*sites)[client_neighbor].add_neighbor(client_event, dist);
-        // se il sito non è il deposito, inserisco anche il saving
-        if (!e.is_deposit() && !(*T)[i].is_deposit()){
-            double saving = get_saving(e, (*T)[i], deposit);
-            Saving s1(-1, e.get_client_id(), (*T)[i].get_client_id(), saving);
-            int j = search_insert_index_saving(saving, 0, savings->size()-1, *savings);
-            savings->insert(j, s1);
-        }
+        (*sites)[client_event].add_neighbor(client_neighbor);
+        (*sites)[client_neighbor].add_neighbor(client_event);
         // inserisco due archi: a destra di i metto e, e a destra di e metto di nuovo i
         T->insert(i+1, e);
         T->insert(i+2, (*T)[i]);
@@ -129,7 +100,7 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
  * @param T
  * @param id_circle
  */
-void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client>* sites, int *id_circle, Event &deposit, QVector<Saving>* savings){
+void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client>* sites, int *id_circle){
     
     Event e = *ie;
     
@@ -160,18 +131,10 @@ void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q,
     }
     
     // il sito associato all'arco destro è vicino del sito associato all'arco sinistro, e viceversa
-    double dist = events_distance((*T)[arco_sinistro], (*T)[arco_destro]);
     client_id client_left = (*T)[arco_sinistro].get_client_id();
     client_id client_right = (*T)[arco_destro].get_client_id();
-    (*sites)[client_left].add_neighbor(client_right, dist);
-    (*sites)[client_right].add_neighbor(client_left, dist);
-    // se il sito non è il deposito, inserisco anche il saving
-    if (!(*T)[arco_sinistro].is_deposit() && !(*T)[arco_destro].is_deposit()){
-        double saving = get_saving((*T)[arco_sinistro], (*T)[arco_destro], deposit);
-        Saving s1(-1, (*T)[arco_sinistro].get_client_id(), (*T)[arco_destro].get_client_id(), saving);
-        int j = search_insert_index_saving(saving, 0, savings->size()-1, *savings);
-        savings->insert(j, s1);
-    }
+    (*sites)[client_left].add_neighbor(client_right);
+    (*sites)[client_right].add_neighbor(client_left);
 
     // Se l'arco sinistro è in mezzo ad altri due archi, controllo se generano un circle event
     if (arco_sinistro > 0) {
@@ -210,50 +173,11 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
     if (!are_allineate((*T)[arco-1], (*T)[arco], (*T)[arco+1])){
         // Si calcola l'intersezione tra le bisettrici
         QPair<double, double> vertex = find_intersection_bisectors((*T)[arco-1], (*T)[arco], (*T)[arco+1]);
-        double dist = vertex_distance((*T)[arco_per_distanza], vertex); //distanza tra l'intersezione e uno dei punti
+        double dist = distance((*T)[arco_per_distanza], vertex); //distanza tra l'intersezione e uno dei punti
         double x = vertex.first; //coordinate del circle event
         double y = vertex.second - dist;
-
-        //epsilon dovuto a possibili errori di calcolo delle intersezioni
-        bool condizione = false;
-        double epsilon = 0.0000000000000050;
-        double diffx = absolute(x - e->get_x());
-        double diffy = absolute(y - e->get_y());
-        //se l'evento attuale è un site event, posso passare ai controlli di creazione del circle event
-        //altrimenti, devo controllare se il nuovo circle event ha le stesse coordinate del vecchio.
-        //se le coorsinate sono diverse, posso passare ai controlli di creazione del circle event,
-        //altrimenti devo fare ulteriori controlli.
-        if (e->is_site_event() || (diffx>epsilon || diffy>epsilon)){
-            condizione = true;
-        }
-        else { //circle event generato con stesse coordinate di quello analizzato:
-            //Teoricamente un circle event del genere non andrebbe creato, ma può capitare il caso
-            //in cui più di tre spigoli sono incidenti su un vertice.
-            //In questo caso, il circle event va creato se, tra gli archi generatori del nuovo circle event
-            //ce n'è almeno uno che ancora non ha contribuito alla creazione del vertice (in quanti, ad ogni passo,
-            //solo tre archi contribuiscono alla creazione di un vertice).
-            QVector<Event> generators = e->get_generators();
-            //se uno tra T[arco], T[arco+1] o T[arco-1] non risulta tra i generatori,
-            //è un vertice con più di tre spigoli, e uno non è ancora stato analizzato
-            //altrimenti, il circle event non è da creare
-            int new_generator = are_visited_generators(generators, *T, arco);
-            if (new_generator != -1){
-                Event circle_event(*id_circle, x, y, false, false);
-                for (int i=0; i<generators.size(); i++) circle_event.add_generator(generators[i]);
-                circle_event.add_generator((*T)[new_generator]);
-                QLinkedList<Event>::iterator iter = ie;
-                //inserisco l'evento in cima a Q: dovrà essere il primo circle event ad essere analizzato
-                iter ++;
-                Q->insert(iter, circle_event); //inserisco l'evento
-                iter--;
-                // Associo il circle event al nodo in T
-                (*T)[arco].set_associate_circle_event(iter, *id_circle);
-                (*id_circle)++;
-            }
-        }
-        //Caso standard: nuovo circle event generato da site event, oppure con coordinate diverse dal
-        //circle event attuale
-        if (condizione) {
+        //Se sto analizzando un circle event che genera un altro circle event con le stesse coordinate, lo scarto.
+        if (e->is_site_event() || y == e->get_y() || x == e->get_x()){
             Event ev(-1, vertex.first, e->get_y(), false, false);
             int i = bin_search_parabola(ev, 0, T->size()-1, *T); //cerco l'arco sotto il circle event
             //Se il circle event non sta sotto uno dei tre archi coinvolti, lo scarto
@@ -262,9 +186,7 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
                 if (is_under_beach_line(vertex, e->get_y(), *T, i)){
                     // Creo il nuovo circle event
                     Event circle_event(*id_circle, x, y, false, false);
-                    circle_event.add_generator((*T)[arco-1]);
-                    circle_event.add_generator((*T)[arco]);
-                    circle_event.add_generator((*T)[arco+1]);
+
                     QLinkedList<Event>::iterator iter = ie;
 
                     bool stop = true;
@@ -335,30 +257,6 @@ bool are_allineate(Event & p1, Event & p2, Event & p3){
 }
 
 /**
- * @brief are_visited_generators
- *  Restituisce -1 se tra i tre archi non vi sono nuovi generatori rispetto al vettore generators;
- *  Restituisce invece l'indice dell'arco in T se vi è un nuovo evento generatore per il circle event.
- * @param generators
- * @param T
- * @param arco
- * @return
- */
-int are_visited_generators(QVector<Event> generators, QVector<Event> & T, int arco)
-{
-    int i;
-    bool finded = false;
-    for (i=0; i<generators.size(); i++) if (generators[i] == T[arco-1]) finded = true;
-    if (finded == false) return arco-1;
-    finded = false;
-    for (i=0; i<generators.size(); i++) if (generators[i] == T[arco]) finded = true;
-    if (finded == false) return arco;
-    finded = false;
-    for (i=0; i<generators.size(); i++) if (generators[i] == T[arco+1]) finded = true;
-    if (finded == false) return arco+1;
-    return -1;
-}
-
-/**
  * @brief bin_search_parabola
  *  Effettua una ricerca binaria in T dell'arco di parabola immediatamente superiore
  *  all'evento e. Restituisce l'indice dell'arco trovato.
@@ -415,7 +313,7 @@ int bin_search_parabola(Event & e, int first, int last, QVector<Event> &T){
                 return bin_search_parabola(e, mid+1, last, T);
             }
             if (e.get_x() == intersection){
-//                std::cout << "Evento sotto un breakpoint!" << std::endl;
+                std::cout << "Merda: evento sotto un breakpoint!" << std::endl;
                 return mid;
             }
         }
@@ -462,17 +360,10 @@ std::vector<double> find_intersections_parabolas (std::vector<double> &p1, std::
     double c = p1[2] - p2[2];
     double delta = (pow(b,2) - 4*a*c);
     if (delta < 0) return solutions;
-    if (a == 0){
-        double s = -c / b;
-        solutions.push_back(s);
-        solutions.push_back(s);
-    }
-    else {
-        double s1 = (- b + sqrt(delta)) / (2 * a);
-        double s2 = (- b - sqrt(delta)) / (2 * a);
-        solutions.push_back(s1);
-        solutions.push_back(s2);
-    }
+    double s1 = (- b + sqrt(delta)) / (2 * a);
+    double s2 = (- b - sqrt(delta)) / (2 * a);
+    solutions.push_back(s1);
+    solutions.push_back(s2);
     return solutions;
 }
 
@@ -543,8 +434,8 @@ QPair<double, double> find_intersection_bisectors(Event &p1, Event &p2, Event &p
         double y = (r1[0] * x) + r1[1];
         point.first = x;
         point.second = y;
+        return point;
     }
-    return point;
 }
 
 /**
@@ -554,7 +445,7 @@ QPair<double, double> find_intersection_bisectors(Event &p1, Event &p2, Event &p
  * @param p
  * @return
  */
-double vertex_distance(Event &e, QPair<double, double> &p){
+double distance(Event &e, QPair<double, double> &p){
     double e_x = e.get_x();
     double e_y = e.get_y();
     double p_x = p.first;
@@ -564,59 +455,6 @@ double vertex_distance(Event &e, QPair<double, double> &p){
     dist = sqrt(dist);
     return dist;
 }
-
-double events_distance(Event &e1, Event &e2)
-{
-    double e1_x = e1.get_x();
-    double e1_y = e1.get_y();
-    double e2_x = e2.get_x();
-    double e2_y = e2.get_y();
-    //distanza euclidea tra i due punti:
-    double dist = pow((e1_x - e2_x),2) + pow((e1_y - e2_y),2);
-    dist = sqrt(dist);
-    return dist;
-}
-
-/**
- * @brief GraphRoutes::get_standard_saving
- *  Calcola e restituisce il saving tra i due client passati come parametri, ossia
- *  assumendo che si trovino entrambi nella loro route iniziale banale.
- * @param c1
- * @param c2
- * @return
- */
-double get_saving(Event &c1, Event &c2, Event &deposit)
-{
-    double d1 = (events_distance(c1, deposit) * 2.0) +
-                (events_distance(c2, deposit) * 2.0);
-    double d2 = (events_distance(deposit, c1)) +
-                (events_distance(c1, c2)) +
-                (events_distance(c2, deposit));
-    return d1-d2;
-}
-
-/**
- * @brief search_insert_index
- *  Effettua una ricerca binaria di n sull'array ordinato v,
- *  e restituisce l'indice del primo elemento nell'array
- *  >= a n.
- * @param n:        numero da cercare
- * @param first:    indice del primo elemento dell'array
- * @param last:     indice dell'ultimo elemento dell'array
- * @param v:        array su cui effettuare la ricerca
- * @return          l'indice del primo elemento >= a n.
- */
-int search_insert_index_saving(double n, int first, int last, QVector<Saving> & v) {
-    int mid;
-    if (first <= last){
-        mid = (first + last) / 2;
-        if (v[mid].getValue() < n) return (search_insert_index_saving (n, mid+1, last, v) );
-        if (v[mid].getValue() == n) return mid;
-        if (v[mid].getValue() > n) return (search_insert_index_saving (n, first, mid-1, v) );
-    }
-    return first;
-}
-
 
 /**
  * @brief mergesort_events

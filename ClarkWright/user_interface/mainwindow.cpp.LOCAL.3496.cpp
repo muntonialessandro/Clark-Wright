@@ -236,7 +236,7 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2)
     QPolygonF triangle;
     triangle.append( QPointF(p2.x()-offs , p2.y()+offs) );
     triangle.append( QPointF(p2.x()      , p2.y())      );
-    triangle.append( QPointF(p2.x()      , p2.y()+offs) );
+    triangle.append( QPointF(p2.x()+offs , p2.y()+offs) );
     poligon = scene->addPolygon(triangle);
     poligon->setTransformOriginPoint(QPointF(p2.x()   , p2.y()) );
     poligon->setBrush(internalBrush);

@@ -20,4 +20,6 @@ QVector<double> merge (QVector<double> &v1, QVector<double> &v2);
 
 QVector<double> mergesort(QVector<double> &v);
 
+double absolute (double num);
+
 #endif // UTILS_H

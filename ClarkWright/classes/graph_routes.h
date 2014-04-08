@@ -21,7 +21,7 @@ public:
     double get_total_cost();
     void delete_route(route_id rid);
     bool remove_client_from_route(client_id client);
-    bool insert_client_in_route(client_id client, client_id previous_in_route);
+    bool insert_client_in_route(route_id rid, client_id client, client_id previous_in_route);
     Client get_client(client_id cid);
     double get_standard_saving(client_id c1, client_id c2);
     double get_saving_client_in_route(route_id rid, client_id c_insert, client_id previous_client);
@@ -29,6 +29,7 @@ public:
     QList< QPair<QPoint,QString> > get_list_point_label_pairs();
     QList< QList<QPoint> > get_list_edges();
     QVector<Event> to_events_vector();
+    client_id get_previous_client(client_id client);
 
 private:
     QVector<Client> clients;
