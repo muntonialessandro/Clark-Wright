@@ -14,6 +14,52 @@ Saving::Saving(idSaving idActual, int idc1, int idc2, double value){
     this->enable = true;
 }
 
+bool Saving::operator ==(Saving &other) const
+{
+    if (this->value == other.getValue() && this->idc1 == other.getIdC1() && this->idc2 == other.getIdC2())
+        return true;
+    return false;
+}
+
+bool Saving::operator !=(Saving &other) const
+{
+    return !(*this == other);
+}
+
+bool Saving::operator <(Saving &other) const
+{
+    if (this->value < other.getValue()) return true;
+    if (this->value == other.getValue()){
+        if (this->idc1 < other.getIdC1()) return true;
+        if (this->idc1 == other.getIdC1()){
+            if (this->idc2 < other.getIdC2()) return true;
+        }
+    }
+    return false;
+}
+
+bool Saving::operator >(Saving &other) const
+{
+    if (this->value > other.getValue()) return true;
+    if (this->value == other.getValue()){
+        if (this->idc1 > other.getIdC1()) return true;
+        if (this->idc1 == other.getIdC1()){
+            if (this->idc2 > other.getIdC2()) return true;
+        }
+    }
+    return false;
+}
+
+bool Saving::operator <=(Saving &other) const
+{
+    return (*this == other || *this < other);
+}
+
+bool Saving::operator >=(Saving &other) const
+{
+    return (*this == other || *this > other);
+}
+
 idSaving Saving::getSaving_id(){
     return this->idActual;
 }

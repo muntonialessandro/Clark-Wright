@@ -280,6 +280,70 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
 }
 
 /**
+ * @brief handleButton
+ *  handle of button1
+ */
+void MainWindow::handle_button1()
+{
+    //    QList< QPair<QPoint,QString> > pointList;
+    //    createGraph(pointList);
+
+        ui->userInfo->setText("Voronoi..");
+    //    //Prova GraphRoute
+    //    QVector<Client> clients;
+    //    Client d( 0, 20, 20, 0);
+    //    Client c1(1, 30, 30, 13);
+    //    Client c2(2, 10, 30, 20);
+    //    Client c3(3, 0, 10, 25);
+    //    Client c4(4, 20, 0, 5);
+    //    Client c5(5, 30, 10, 40);
+    //    clients.push_back(d);
+    //    clients.push_back(c1);
+    //    clients.push_back(c2);
+    //    clients.push_back(c3);
+    //    clients.push_back(c4);
+    //    clients.push_back(c5);
+
+    //    qDebug( "Size %d",clients.size() );
+    //    GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
+    //    G_draw_routes( state.get_list_edges() );
+    //    G_draw_nodes( state.get_list_point_label_pairs() );
+
+        int cap;
+        QVector<Client> clients;
+        #ifdef TARGET_OS_MAC
+            clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+        #endif
+
+        #ifdef __linux__
+            clients = read_file("vrpnc1.txt", &cap); // Ale
+        #endif
+
+        Timer timer("C&W Algorithm");
+        timer.start();
+
+        QVector<Client> voronoi_points;
+        QVector<Saving> savings;
+        voronoi_points = voronoi( clients, &savings);
+        //closer_cw(voronoi_points, savings, cap);
+
+        //ALGORITMO (Come Main)
+
+        timer.stop_and_print();
+
+        GraphRoutes state = closer_cw(voronoi_points, savings, cap);
+        G_draw_routes(state.get_list_edges());
+        G_draw_nodes( state.get_list_point_label_pairs() );
+        std::cout << state.to_string() << std::endl;
+
+        G_move_graph_in_a_good_position();
+        G_show_result( QString::number( state.get_total_cost() ) );
+
+
+
+}
+
+/**
  * @brief grid
  *  Draw the grid
  * @param on true se deve essere attivata la visualizzazione della grigia, false altrimenti

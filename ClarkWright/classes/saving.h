@@ -12,6 +12,12 @@ class Saving
 public:
     Saving();
     Saving(idSaving idActual, int idc1, int idc2, double value);
+    bool operator ==(Saving &other) const;
+    bool operator !=(Saving &other) const;
+    bool operator <(Saving &other) const;
+    bool operator >(Saving &other) const;
+    bool operator <=(Saving &other) const;
+    bool operator >=(Saving &other) const;
     idSaving getSaving_id();
     idSaving getTwinSaving_id();
     void setTwinSaving_id(int idTwin);
@@ -21,8 +27,6 @@ public:
     bool getEnable();
     void setId(idSaving id);
     std::string toString();
-
-
 
 private:
     idSaving idActual;  // id Saving

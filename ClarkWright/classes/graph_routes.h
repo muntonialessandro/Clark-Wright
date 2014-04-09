@@ -23,6 +23,7 @@ public:
     bool remove_client_from_route(client_id client);
     bool insert_client_in_route(route_id rid, client_id client, client_id previous_in_route);
     Client get_client(client_id cid);
+    int get_total_goods(route_id rid);
     double get_standard_saving(client_id c1, client_id c2);
     double get_saving_client_in_route(route_id rid, client_id c_insert, client_id previous_client);
     std::string to_string();
@@ -30,6 +31,7 @@ public:
     QList< QList<QPoint> > get_list_edges();
     QVector<Event> to_events_vector();
     client_id get_previous_client(client_id client);
+    client_id get_next_client(client_id client, route_id rid);
 
 private:
     QVector<Client> clients;

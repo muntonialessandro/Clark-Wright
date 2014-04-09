@@ -12,9 +12,10 @@ GraphRoutes::GraphRoutes(QVector<Client> clients)
 {
     int i;
     this->clients = clients;
+    this->clients[0].set_alone(false);
     this->n_routes = 0;
     for (i=1; i<this->clients.size(); i++){ //inizializzazione route (una per ogni cliente, tranne deposito)
-        Route r(i-1, i, (this->clients[0].get_distance(this->clients[i]) * 2.0));
+        Route r(i-1, this->clients[i], (this->clients[0].get_distance(this->clients[i]) * 2.0));
         this->routes.push_back(r); //inserisco la route
         this->clients[i].set_route(i-1); //salvo nel cliente la route a cui appartiene
         this->n_routes++; //incremento numero routes
@@ -128,6 +129,7 @@ bool GraphRoutes::remove_client_from_route(client_id client)
                   clients[client].get_distance(clients[nid]) +
                   clients[pid].get_distance(clients[nid]);
     routes[rid].set_cost(cost);
+    routes[rid].add_goods(-(clients[client].get_demand()));
     bool res = routes[rid].remove_client(i); //rimuovo il client dalla route
     clients[client].set_route(-1); //il client non sta più in nessuna route
     clients[client].set_position_in_route(-1); //il client non ha posizione in una route
@@ -169,7 +171,7 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
                   clients[client].get_distance(clients[nid]) -
                   clients[previous_in_route].get_distance(clients[nid]);
     routes[rid].set_cost(cost);
-    bool res = routes[rid].insert_client(client, previous); //inserisco il client dopo il predecessore
+    bool res = routes[rid].insert_client(client, previous, clients[client].get_demand()); //inserisco il client dopo il predecessore
     clients[client].set_route(rid); //setto la nuova route a cui appartiene il client inserito
     clients[client].set_alone(false);
     index_client i;
@@ -190,6 +192,11 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
 Client GraphRoutes::get_client(client_id cid)
 {
     return clients[cid];
+}
+
+int GraphRoutes::get_total_goods(route_id rid)
+{
+    return routes[rid].get_goods();
 }
 
 /**
@@ -261,7 +268,7 @@ std::string GraphRoutes::to_string()
     for (i=0; i<routes.size(); i++){
         if (routes[i].is_enabled()){
             s += "\t";
-            s += routes[i].to_string();
+            s += routes[i].to_string(); 
             s += "\n";
         }
     }
@@ -324,5 +331,11 @@ client_id GraphRoutes::get_previous_client(client_id client)
     index_client index = clients[client].get_position_in_route();
     route_id rid = clients[client].get_route();
     return routes[rid].get_client(index-1);
+}
+
+client_id GraphRoutes::get_next_client(client_id client, route_id rid)
+{
+    index_client index = clients[client].get_position_in_route();
+    return routes[rid].get_client(index+1);
 }
 
