@@ -19,6 +19,9 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
 
+#define MAX_X_GRAPHVIEW 600
+#define MAX_Y_GRAPHVIEW 600
+#define MAX_XY_LIKE_INFTY 9999
 
 QT_BEGIN_NAMESPACE
 
@@ -61,8 +64,8 @@ public:
 
         // Area SX - Tools
         zoomSlider = new QSlider(Qt::Horizontal);
-        zoomSlider->setRange(5,50);
-        zoomSlider->setValue( 20 );
+        zoomSlider->setRange(5,80);
+        zoomSlider->setValue( 25 );
         zoomLayoutBox = new QHBoxLayout;
         zoomLayoutBox->addWidget(zoomSlider);
         zoomWidget = new QWidget;
