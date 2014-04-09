@@ -22,6 +22,7 @@
 #define MAX_X_GRAPHVIEW 600
 #define MAX_Y_GRAPHVIEW 600
 #define MAX_XY_LIKE_INFTY 9999
+#define N_ALL_BUTTONS 6
 
 QT_BEGIN_NAMESPACE
 
@@ -36,8 +37,7 @@ public:
     QWidget *zoomWidget;
     QHBoxLayout *zoomLayoutBox;
     QSlider *zoomSlider;
-    QPushButton *button1;
-    QPushButton *button2;
+    QList<QPushButton*> button;
     QGroupBox *groupBox;
     QCheckBox *check1;
     QCheckBox *check2;
@@ -46,6 +46,7 @@ public:
     QVBoxLayout *rightToolsLayout;
     QWidget *rightTools;
     QLabel *userInfo;
+    QLabel *zoomLabel;
 
     // Graph Area
     QGraphicsView *graphicsView;
@@ -63,6 +64,7 @@ public:
 
 
         // Area SX - Tools
+        zoomLabel = new QLabel;
         zoomSlider = new QSlider(Qt::Horizontal);
         zoomSlider->setRange(5,80);
         zoomSlider->setValue( 25 );
@@ -71,13 +73,13 @@ public:
         zoomWidget = new QWidget;
         zoomWidget->setLayout(zoomLayoutBox);
 
-        button1 = new QPushButton("Button1");
-        button2 = new QPushButton("Button2");
-
-        button1->setDefault( false );
-        button1->setAutoDefault( false ) ;
-        button2->setDefault( false );
-        button2->setAutoDefault( false ) ;
+        QString name;
+        for ( int i=0; i<N_ALL_BUTTONS; i++ ) {
+            name = "Button" + QString::number( i );
+            button.push_back( new QPushButton(name) );
+            button.last()->setDefault( false );
+            button.last()->setAutoDefault( false ) ;
+        }
 
 
         groupBox = new QGroupBox(QGroupBox::tr("Settings"));
@@ -97,8 +99,9 @@ public:
         userInfo->setText("Info");
         rightToolsLayout = new QVBoxLayout;
         rightToolsLayout->addWidget(zoomWidget);
-        rightToolsLayout->addWidget(button1);
-        rightToolsLayout->addWidget(button2);
+        for ( int i=0; i<button.size(); i++ ) {
+            rightToolsLayout->addWidget( (button[i]) );
+        }
         rightToolsLayout->addWidget(groupBox);
         rightToolsLayout->addWidget(userInfo);
         rightTools = new QWidget;

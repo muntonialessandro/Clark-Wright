@@ -28,8 +28,13 @@ MainWindow::MainWindow(QWidget *parent)
     zoomGraph( ui->zoomSlider->value() );
 
     // connect Graph's button
-    QObject::connect( ui->button1, SIGNAL(released()), this, SLOT(handle_button1()) );
-    QObject::connect( ui->button2, SIGNAL(released()), this, SLOT(handle_button2()) );
+    QObject::connect( ui->button[0], SIGNAL(released()), this, SLOT(handle_button0()) );
+    QObject::connect( ui->button[1], SIGNAL(released()), this, SLOT(handle_button1()) );
+    QObject::connect( ui->button[2], SIGNAL(released()), this, SLOT(handle_button2()) );
+    QObject::connect( ui->button[3], SIGNAL(released()), this, SLOT(handle_button3()) );
+    QObject::connect( ui->button[4], SIGNAL(released()), this, SLOT(handle_button4()) );
+    QObject::connect( ui->button[5], SIGNAL(released()), this, SLOT(handle_button5()) );
+
     QObject::connect( ui->zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomGraph(int)) );
     QObject::connect( ui->check1, SIGNAL(clicked(bool)), this, SLOT(grid(bool)) );
 }
@@ -275,70 +280,6 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
 }
 
 /**
- * @brief handleButton
- *  handle of button1
- */
-void MainWindow::handle_button1()
-{
-    //    QList< QPair<QPoint,QString> > pointList;
-    //    createGraph(pointList);
-
-        ui->userInfo->setText("Voronoi in azione.. attendere!");
-    //    //Prova GraphRoute
-    //    QVector<Client> clients;
-    //    Client d( 0, 20, 20, 0);
-    //    Client c1(1, 30, 30, 13);
-    //    Client c2(2, 10, 30, 20);
-    //    Client c3(3, 0, 10, 25);
-    //    Client c4(4, 20, 0, 5);
-    //    Client c5(5, 30, 10, 40);
-    //    clients.push_back(d);
-    //    clients.push_back(c1);
-    //    clients.push_back(c2);
-    //    clients.push_back(c3);
-    //    clients.push_back(c4);
-    //    clients.push_back(c5);
-
-    //    qDebug( "Size %d",clients.size() );
-    //    GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
-    //    G_draw_routes( state.get_list_edges() );
-    //    G_draw_nodes( state.get_list_point_label_pairs() );
-
-        int cap;
-        QVector<Client> clients;
-        #ifdef TARGET_OS_MAC
-            clients = read_file("../../../vrpnc1.txt", &cap); // lelle
-        #endif
-
-        #ifdef __linux__
-            clients = read_file("vrpnc1.txt", &cap); // Ale
-        #endif
-
-        Timer timer("C&W Algorithm");
-        timer.start();
-
-        QVector<Client> voronoi_points;
-        QVector<Saving> savings;
-        voronoi_points = voronoi( clients, &savings);
-        //closer_cw(voronoi_points, savings, cap);
-
-        //ALGORITMO (Come Main)
-
-        timer.stop_and_print();
-
-        GraphRoutes state = closer_cw(voronoi_points, savings, cap);
-        G_draw_routes(state.get_list_edges());
-        G_draw_nodes( state.get_list_point_label_pairs() );
-        std::cout << state.to_string() << std::endl;
-
-        G_move_graph_in_a_good_position();
-        G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
-
-
-
-}
-
-/**
  * @brief grid
  *  Draw the grid
  * @param on true se deve essere attivata la visualizzazione della grigia, false altrimenti
@@ -458,13 +399,77 @@ void MainWindow::reset(void)
 
 }
 
+
 /**
- * @brief aaaa
- *  descrizione
- * @param nome descrizione
- * @return valoreRestituito descizione
+ * @brief handleButtons
+ *  handle of buttons
  */
-void MainWindow::handle_button2()
+void MainWindow::handle_button0()
+{
+    //    QList< QPair<QPoint,QString> > pointList;
+    //    createGraph(pointList);
+
+        ui->userInfo->setText("Voronoi in azione.. attendere!");
+    //    //Prova GraphRoute
+    //    QVector<Client> clients;
+    //    Client d( 0, 20, 20, 0);
+    //    Client c1(1, 30, 30, 13);
+    //    Client c2(2, 10, 30, 20);
+    //    Client c3(3, 0, 10, 25);
+    //    Client c4(4, 20, 0, 5);
+    //    Client c5(5, 30, 10, 40);
+    //    clients.push_back(d);
+    //    clients.push_back(c1);
+    //    clients.push_back(c2);
+    //    clients.push_back(c3);
+    //    clients.push_back(c4);
+    //    clients.push_back(c5);
+
+    //    qDebug( "Size %d",clients.size() );
+    //    GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
+    //    G_draw_routes( state.get_list_edges() );
+    //    G_draw_nodes( state.get_list_point_label_pairs() );
+
+        int cap;
+        QVector<Client> clients;
+        #ifdef TARGET_OS_MAC
+            clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+        #endif
+
+        #ifdef __linux__
+            clients = read_file("vrpnc1.txt", &cap); // Ale
+        #endif
+
+        Timer timer("C&W Algorithm");
+        timer.start();
+
+        QVector<Client> voronoi_points;
+        QVector<Saving> savings;
+        voronoi_points = voronoi( clients, &savings);
+        //closer_cw(voronoi_points, savings, cap);
+
+        //ALGORITMO (Come Main)
+
+        timer.stop_and_print();
+
+        GraphRoutes state = closer_cw(voronoi_points, savings, cap);
+        G_draw_routes(state.get_list_edges());
+        G_draw_nodes( state.get_list_point_label_pairs() );
+        std::cout << state.to_string() << std::endl;
+
+        G_move_graph_in_a_good_position();
+        G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
+
+
+
+}
+
+
+/**
+ * @brief handleButtons
+ *  handle of buttons
+ */
+void MainWindow::handle_button1()
 {
     qDebug("Compute()");
 
@@ -488,6 +493,65 @@ void MainWindow::handle_button2()
     GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
     G_draw_routes( state.get_list_edges() );
     G_draw_nodes( state.get_list_point_label_pairs() );
+
+}
+
+/**
+ * @brief handleButtons
+ *  handle of buttons
+ */
+void MainWindow::handle_button2()
+{
+    //info all'utente
+    ui->userInfo->setText("Button 2 premuto");
+
+    // aggiorna l'utente sullo stato finale
+    G_show_result( "Beh, qui abbiamo finito! 2" );
+}
+
+/**
+ * @brief handleButtons
+ *  handle of buttons
+ */
+void MainWindow::handle_button3()
+{
+
+    //info all'utente
+    ui->userInfo->setText("Button 3 premuto");
+
+    // aggiorna l'utente sullo stato finale
+    G_show_result( "Beh, qui abbiamo finito! 3" );
+
+}
+
+/**
+ * @brief handleButtons
+ *  handle of buttons
+ */
+void MainWindow::handle_button4()
+{
+
+    //info all'utente
+    ui->userInfo->setText("Button 4 premuto");
+
+    // aggiorna l'utente sullo stato finale
+    G_show_result( "Beh, qui abbiamo finito! 4" );
+
+}
+
+/**
+ * @brief handleButtons
+ *  handle of buttons
+ */
+void MainWindow::handle_button5()
+{
+
+    //info all'utente
+    ui->userInfo->setText("Button 5 premuto");
+
+    // aggiorna l'utente sullo stato finale
+    G_show_result( "Beh, qui abbiamo finito! 5" );
+
 }
 
 /**
