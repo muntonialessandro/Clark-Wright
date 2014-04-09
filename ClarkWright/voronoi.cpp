@@ -7,7 +7,7 @@
  * @return
  */
 QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings){
-    int i, k;
+    int i/*, k*/;
     QVector<Event> events;
     QVector<Saving> sav;
     for (i=0; i<sites.size(); i++) events.push_back(sites[i].to_Event()); //converto in eventi
@@ -439,6 +439,7 @@ int bin_search_parabola(Event & e, int first, int last, QVector<Event> &T){
             }
         }
     }
+    return -1; //non si verificherà mai
 
 }
 

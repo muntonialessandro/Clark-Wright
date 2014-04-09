@@ -195,7 +195,7 @@ Client GraphRoutes::get_client(client_id cid)
 
 int GraphRoutes::get_total_goods(route_id rid)
 {
-    routes[rid].get_goods();
+    return routes[rid].get_goods();
 }
 
 /**
