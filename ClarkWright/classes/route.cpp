@@ -88,7 +88,7 @@ bool Route::insert_client(client_id id, index_client previous_client, int demand
         else
             this->clients_route.insert(previous_client+1, id); //inserisco DOPO il precedente
         this->n_nodes++; //nella route vi è un cliente in più
-        this->cost += demand;
+        this->goods += demand;
         return true;
     }
     return false;

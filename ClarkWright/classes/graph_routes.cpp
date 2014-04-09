@@ -170,7 +170,6 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
                   clients[client].get_distance(clients[nid]) -
                   clients[previous_in_route].get_distance(clients[nid]);
     routes[rid].set_cost(cost);
-    //routes[rid].add_goods(clients[client].get_demand());
     bool res = routes[rid].insert_client(client, previous, clients[client].get_demand()); //inserisco il client dopo il predecessore
     clients[client].set_route(rid); //setto la nuova route a cui appartiene il client inserito
     clients[client].set_alone(false);
