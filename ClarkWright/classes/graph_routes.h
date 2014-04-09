@@ -31,6 +31,7 @@ public:
     QList< QList<QPoint> > get_list_edges();
     QVector<Event> to_events_vector();
     client_id get_previous_client(client_id client);
+    client_id get_next_client(client_id client, route_id rid);
 
 private:
     QVector<Client> clients;

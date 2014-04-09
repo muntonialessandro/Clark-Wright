@@ -52,6 +52,7 @@ public:
     bool is_alone();
     void set_alone(bool a);
     void add_neighbor(client_id neighbor, double distance);
+    QVector<client_id> get_neighbors();
     std::string to_string();
     QPair<QPoint, QString> to_point_label_pair();
     QPoint to_QPoint();

@@ -12,6 +12,7 @@ GraphRoutes::GraphRoutes(QVector<Client> clients)
 {
     int i;
     this->clients = clients;
+    this->clients[0].set_alone(false);
     this->n_routes = 0;
     for (i=1; i<this->clients.size(); i++){ //inizializzazione route (una per ogni cliente, tranne deposito)
         Route r(i-1, this->clients[i], (this->clients[0].get_distance(this->clients[i]) * 2.0));
@@ -330,5 +331,11 @@ client_id GraphRoutes::get_previous_client(client_id client)
     index_client index = clients[client].get_position_in_route();
     route_id rid = clients[client].get_route();
     return routes[rid].get_client(index-1);
+}
+
+client_id GraphRoutes::get_next_client(client_id client, route_id rid)
+{
+    index_client index = clients[client].get_position_in_route();
+    return routes[rid].get_client(index+1);
 }
 

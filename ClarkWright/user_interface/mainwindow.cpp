@@ -311,7 +311,7 @@ void MainWindow::handle_button1()
         #endif
 
         #ifdef __linux__
-            clients = read_file("vrpnc1.txt", &cap); // Ale
+            clients = read_file("vrpnc7.txt", &cap); // Ale
         #endif
 
         Timer timer("C&W Algorithm");
@@ -326,7 +326,7 @@ void MainWindow::handle_button1()
 
         timer.stop_and_print();
 
-        GraphRoutes state = closer_cw(voronoi_points, savings, cap);
+        GraphRoutes state = best_closer_cw(voronoi_points, savings, cap);
         G_draw_routes(state.get_list_edges());
         G_draw_nodes( state.get_list_point_label_pairs() );
         std::cout << state.to_string() << std::endl;
