@@ -19,7 +19,7 @@ QVector<Client> read_file(QString filename, int* vehicle_capacity){
 
     if( s1.fail() == true )
     {
-         std::cout << "Error in line 0" << std::endl;
+         std::cout << "Error in line 0 (file non trovato)" << std::endl;
          file.close();
          return clients;
     }

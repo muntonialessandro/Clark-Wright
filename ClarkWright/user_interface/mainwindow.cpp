@@ -164,7 +164,7 @@ MainWindow::~MainWindow()
  */
 void MainWindow::zoomGraph(int i)
 {
-    ui->userInfo->setText( QString::number(i) );
+    ui->userInfo->setText( "Zoom: " + QString::number(i) );
     QMatrix matrix;
     matrix.scale( i/10., i/10.); // zoom factor ( example: 1.1 is 110%)
 
@@ -283,7 +283,7 @@ void MainWindow::handle_button1()
     //    QList< QPair<QPoint,QString> > pointList;
     //    createGraph(pointList);
 
-        ui->userInfo->setText("Voronoi..");
+        ui->userInfo->setText("Voronoi in azione.. attendere!");
     //    //Prova GraphRoute
     //    QVector<Client> clients;
     //    Client d( 0, 20, 20, 0);
@@ -332,7 +332,7 @@ void MainWindow::handle_button1()
         std::cout << state.to_string() << std::endl;
 
         G_move_graph_in_a_good_position();
-        G_show_result( QString::number( state.get_total_cost() ) );
+        G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 
 
 
