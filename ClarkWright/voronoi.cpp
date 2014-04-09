@@ -47,8 +47,8 @@ QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings){
         while (iterator2 != Q.end()){
             std::cout << "\t" << (*iterator2).to_string() << std::endl;
             iterator2++;
-        }
-        j++;*/
+        }*/
+        j++;
 
         iterator++;
 
@@ -88,6 +88,11 @@ QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings){
 void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client>* sites, int* id_circle, Event &deposit, QVector<Saving>* savings){
     Event e = *ie;
     if (T->size() == 0) T->push_back(e);
+    else if ((*T)[0].get_y() == e.get_y()) {
+        int i = 0;
+        while (i < T->size() && e.get_x() > (*T)[i].get_x()) i++;
+        T->insert(i, e);
+    }
     else {
         // cerco in T l'arco di parabola i immediatamente sopra il site event e
         int i = bin_search_parabola(e, 0, T->size()-1, *T);
@@ -216,7 +221,7 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
 
         //epsilon dovuto a possibili errori di calcolo delle intersezioni
         bool condizione = false;
-        double epsilon = 0.0000000000000050;
+        double epsilon = 0.0000000000000500;
         double diffx = absolute(x - e->get_x());
         double diffy = absolute(y - e->get_y());
         //se l'evento attuale è un site event, posso passare ai controlli di creazione del circle event
@@ -258,8 +263,11 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
             int i = bin_search_parabola(ev, 0, T->size()-1, *T); //cerco l'arco sotto il circle event
             //Se il circle event non sta sotto uno dei tre archi coinvolti, lo scarto
             if (i == (arco-1) || i == arco || i == (arco+1)){
+                condizione = false;
+                //Caso sfigato da considerare: un site event che genera un circle event nella stessa posizione del site event stesso
+                if (diffx < epsilon && diffy < epsilon) condizione = true;
                 //Se  il circle event non sta sotto la beach line, lo scarto
-                if (is_under_beach_line(vertex, e->get_y(), *T, i)){
+                if (condizione || is_under_beach_line(vertex, e->get_y(), *T, i)){
                     // Creo il nuovo circle event
                     Event circle_event(*id_circle, x, y, false, false);
                     circle_event.add_generator((*T)[arco-1]);
@@ -267,22 +275,33 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
                     circle_event.add_generator((*T)[arco+1]);
                     QLinkedList<Event>::iterator iter = ie;
 
-                    bool stop = true;
-                    while (stop && (iter != Q->end())){ //cerco la posizione in Q in cui inserire l'evento
-                        if ((*iter).get_y() > y) iter++;
-                        else{
-                            if (((*iter).get_y() == y) && ((*iter).get_x() < x)) iter++;
-                            else stop = false;
-                        }
+                    if (condizione){ //il circle event sarà il primo da analizzare
+                        //inserisco l'evento in cima a Q: dovrà essere il primo circle event ad essere analizzato
+                        iter ++;
+                        Q->insert(iter, circle_event); //inserisco l'evento
+                        iter--;
+                        // Associo il circle event al nodo in T
+                        (*T)[arco].set_associate_circle_event(iter, *id_circle);
+                        (*id_circle)++;
                     }
+                    else {
+                        bool stop = true;
+                        while (stop && (iter != Q->end())){ //cerco la posizione in Q in cui inserire l'evento
+                            if ((*iter).get_y() > y) iter++;
+                            else{
+                                if (((*iter).get_y() == y) && ((*iter).get_x() < x)) iter++;
+                                else stop = false;
+                            }
+                        }
 
-                    Q->insert(iter, circle_event); //inserisco l'evento
-                    iter--;
+                        Q->insert(iter, circle_event); //inserisco l'evento
+                        iter--;
 
-                    // Associo il circle event al nodo in T
-                    (*T)[arco].set_associate_circle_event(iter, *id_circle);
+                        // Associo il circle event al nodo in T
+                        (*T)[arco].set_associate_circle_event(iter, *id_circle);
 
-                    (*id_circle)++;
+                        (*id_circle)++;
+                    }
                 }
             }
         }
@@ -302,7 +321,7 @@ void check_new_circle_event(int arco, int arco_per_distanza, Event *e, QLinkedLi
 bool is_under_beach_line (QPair<double, double> & vertex, double sweep_line, QVector<Event> &T, int i){
     std::vector<double> parabola = calculate_parabola(T[i], sweep_line);
     double beach_line = (parabola[0] * pow(vertex.first,2)) + (parabola[1] * vertex.first) + parabola[2];
-    if (vertex.second < beach_line) return true;
+    if (vertex.second <= beach_line) return true;
     else return false;
 }
 
