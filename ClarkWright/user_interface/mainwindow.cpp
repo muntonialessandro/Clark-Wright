@@ -581,8 +581,6 @@ void MainWindow::G_move_graph_in_a_good_position(void)
 //    QPoint pGraph = ui->graphicsView->pos();
 //    ui->graphicsView->centerOn( p.x()-pGraph.x() , p.y() - pGraph.y() );
     ui->graphicsView->centerOn( 0, 0 );
-
-
 }
 
 /**
