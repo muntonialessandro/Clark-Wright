@@ -13,6 +13,7 @@ Route::Route()
     this->id = -1;
     this->enabled = false;
     this->n_nodes = 2;
+    this->goods = 0;
 }
 
 /**
@@ -20,22 +21,23 @@ Route::Route()
  *  Costruttore: crea una route iniziale nella rete del tipo deposito-cliente-deposito, richiedendo in
  *  ingresso:
  *      - id della route;
- *      - id dell'unico cliente presente nella route (oltre il deposito);
+ *      - l'unico cliente presente nella route (oltre il deposito);
  *      - costo della route
  *  La route viene abilitata automaticamente.
  * @param id
  * @param client
  * @param cost
  */
-Route::Route(int id, index_client client, double cost)
+Route::Route(int id, Client client, double cost)
 {
     this->clients_route.push_back(0);
-    this->clients_route.push_back(client);
+    this->clients_route.push_back(client.get_id());
     this->clients_route.push_back(0);
     this->cost = cost;
     this->id = id;
     this->enabled = true;
     this->n_nodes = 3;
+    this->goods = client.get_demand();
 }
 
 /**
@@ -77,7 +79,7 @@ double Route::get_cost()
  * @param previous_client
  * @return true se l'inserimento è andato a buon fine, false altrimenti
  */
-bool Route::insert_client(client_id id, index_client previous_client)
+bool Route::insert_client(client_id id, index_client previous_client, int demand)
 {
     // se l'indice del cliente precedente all'inserimento rientra nel range dei nodi nella route
     if (previous_client < this->clients_route.size()){
@@ -86,6 +88,7 @@ bool Route::insert_client(client_id id, index_client previous_client)
         else
             this->clients_route.insert(previous_client+1, id); //inserisco DOPO il precedente
         this->n_nodes++; //nella route vi è un cliente in più
+        this->cost += demand;
         return true;
     }
     return false;
@@ -165,6 +168,16 @@ bool Route::is_enabled()
     return this->enabled;
 }
 
+int Route::get_goods()
+{
+    return this->goods;
+}
+
+void Route::add_goods(int demand)
+{
+    this->goods += demand;
+}
+
 /**
  * @brief Route::to_string
  *  Restituisce una stringa contenente i dati della route;
@@ -180,7 +193,7 @@ std::string Route::to_string()
         for (i=0; i<this->clients_route.size(); i++){
             ss << this->clients_route[i] << " ";
         }
-        ss << "];";
+        ss << "]; Goods: " << this->goods << ";";
     }
     std::string s = ss.str();
     return s;

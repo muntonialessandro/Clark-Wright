@@ -20,11 +20,11 @@ class Route
 {
 public:
     Route();
-    Route(int id, client_id client, double cost);
+    Route(int id, Client client, double cost);
     QVector<client_id> get_route();
     int get_n_nodes();
     double get_cost();
-    bool insert_client(client_id id, index_client previous_client);
+    bool insert_client(client_id id, index_client previous_client, int demand);
     bool remove_client(index_client i);
     void set_cost(double cost);
     void set_id(route_id id);
@@ -32,6 +32,8 @@ public:
     void enable();
     void disable();
     bool is_enabled();
+    int get_goods();
+    void add_goods(int demand);
     std::string to_string();
 
 
@@ -42,6 +44,7 @@ private:
     QVector<client_id> clients_route;
     bool enabled;
     int n_nodes;
+    int goods;
 };
 
 #endif // ROUTE_H
