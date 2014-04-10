@@ -28,6 +28,7 @@ public:
     bool remove_client(index_client i);
     void set_cost(double cost);
     void set_id(route_id id);
+    void set_client(index_client i, client_id c);
     client_id get_client(index_client i);
     void enable();
     void disable();

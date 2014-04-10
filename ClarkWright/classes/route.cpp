@@ -130,6 +130,11 @@ void Route::set_id(route_id id)
     this->id = id;
 }
 
+void Route::set_client(index_client i, client_id c)
+{
+    this->clients_route[i] = c;
+}
+
 /**
  * @brief Route::get_client
  *  Restituice l'id del cliente in posizione i nella route

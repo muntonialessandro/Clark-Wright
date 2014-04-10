@@ -19,13 +19,18 @@ public:
     route_id get_next_route_id(route_id rid);
     double get_cost_route(route_id rid);
     double get_total_cost();
+    int get_goods_route(route_id rid);
     void delete_route(route_id rid);
     bool remove_client_from_route(client_id client);
     bool insert_client_in_route(route_id rid, client_id client, client_id previous_in_route);
+    bool swap_clients(client_id c1, client_id c2);
+    int get_n_clients();
     Client get_client(client_id cid);
+    QVector<Client> get_clients();
     int get_total_goods(route_id rid);
     double get_standard_saving(client_id c1, client_id c2);
     double get_saving_client_in_route(route_id rid, client_id c_insert, client_id previous_client);
+    double get_swap_saving(client_id c1, client_id c2);
     std::string to_string();
     QList< QPair<QPoint,QString> > get_list_point_label_pairs();
     QList< QList<QPoint> > get_list_edges();

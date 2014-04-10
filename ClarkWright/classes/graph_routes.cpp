@@ -85,11 +85,17 @@ double GraphRoutes::get_cost_route(route_id rid)
  */
 double GraphRoutes::get_total_cost()
 {
-    int i, cost = 0;
+    int i;
+    double cost = 0;
     for (i=0; i<routes.size(); i++){
         if (routes[i].is_enabled()) cost += routes[i].get_cost();
     }
     return cost;
+}
+
+int GraphRoutes::get_goods_route(route_id rid)
+{
+    return routes[rid].get_goods();
 }
 
 /**
@@ -183,6 +189,49 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
     return res;
 }
 
+bool GraphRoutes::swap_clients(client_id c1, client_id c2)
+{
+    route_id rid1 = clients[c1].get_route();
+    route_id rid2 = clients[c2].get_route();
+    double cost1 = routes[rid1].get_cost();
+    double cost2 = routes[rid2].get_cost();
+    index_client ic1 = clients[c1].get_position_in_route();
+    index_client ic2 = clients[c2].get_position_in_route();
+    index_client ip1 = ic1 - 1;
+    index_client in1 = ic1 + 1;
+    index_client ip2 = ic2 - 1;
+    index_client in2 = ic2 + 1;
+    //Guadagno nell'inserire c2 in r1
+    double dc2 = clients[routes[rid1].get_client(ip1)].get_distance(clients[c2]); //distanza inserimento c2
+    dc2 += clients[c2].get_distance(clients[routes[rid1].get_client(in1)]);
+    dc2 -= clients[routes[rid1].get_client(ip1)].get_distance(clients[c1]); //distanza cancellazione c1
+    dc2 -= clients[c1].get_distance(clients[routes[rid1].get_client(in1)]);
+    //Guadagno nell'inserire c1 in r2
+    double dc1 = clients[routes[rid2].get_client(ip2)].get_distance(clients[c1]); //distanza inserimento c1
+    dc1 += clients[c1].get_distance(clients[routes[rid2].get_client(in2)]);
+    dc1 -= clients[routes[rid2].get_client(ip2)].get_distance(clients[c2]); //distanza cancellazione c2
+    dc2 -= clients[c2].get_distance(clients[routes[rid2].get_client(in2)]);
+    double new_cost1 = cost1 + dc2;
+    double new_cost2 = cost2 + dc1;
+    int new_goods1 = clients[c2].get_demand() - clients[c1].get_demand();
+    int new_goods2 = clients[c1].get_demand() - clients[c2].get_demand();
+    routes[rid1].set_client(ic1, c2);
+    routes[rid1].set_cost(new_cost1);
+    routes[rid1].add_goods(new_goods1);
+    clients[c2].set_route(rid1);
+    clients[c2].set_position_in_route(ic1);
+    routes[rid2].set_client(ic2, c1);
+    routes[rid2].set_cost(new_cost2);
+    routes[rid2].add_goods(new_goods2);
+    clients[c1].set_route(rid2);
+    clients[c1].set_position_in_route(ic2);
+}
+
+int GraphRoutes::get_n_clients()
+{
+    return this->n_clients;
+}
+
 /**
  * @brief GraphRoutes::get_client
  *  Restituisce l'oggetto Client che ha id uguale al parametro;
@@ -192,6 +241,11 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
 Client GraphRoutes::get_client(client_id cid)
 {
     return clients[cid];
+}
+
+QVector<Client> GraphRoutes::get_clients()
+{
+    return this->clients;
 }
 
 int GraphRoutes::get_total_goods(route_id rid)
@@ -248,6 +302,33 @@ double GraphRoutes::get_saving_client_in_route(route_id rid, client_id c_insert,
                    clients[c_insert].get_distance(clients[next_client]);
     double saving = d1 - (d2 - deleted + added);
     return saving;
+}
+
+double GraphRoutes::get_swap_saving(client_id c1, client_id c2)
+{
+    route_id rid1 = clients[c1].get_route();
+    route_id rid2 = clients[c2].get_route();
+    double cost1 = routes[rid1].get_cost();
+    double cost2 = routes[rid2].get_cost();
+    double d1 = cost1 + cost2;
+    index_client ic1 = clients[c1].get_position_in_route();
+    index_client ic2 = clients[c2].get_position_in_route();
+    index_client ip1 = ic1 - 1;
+    index_client in1 = ic1 + 1;
+    index_client ip2 = ic2 - 1;
+    index_client in2 = ic2 + 1;
+    //Guadagno nell'inserire c2 in r1
+    double dc2 = clients[routes[rid1].get_client(ip1)].get_distance(clients[c2]); //distanza inserimento c2
+    dc2 += clients[c2].get_distance(clients[routes[rid1].get_client(in1)]);
+    dc2 -= clients[routes[rid1].get_client(ip1)].get_distance(clients[c1]); //distanza cancellazione c1
+    dc2 -= clients[c1].get_distance(clients[routes[rid1].get_client(in1)]);
+    //Guadagno nell'inserire c1 in r2
+    double dc1 = clients[routes[rid2].get_client(ip2)].get_distance(clients[c1]); //distanza inserimento c1
+    dc1 += clients[c1].get_distance(clients[routes[rid2].get_client(in2)]);
+    dc1 -= clients[routes[rid2].get_client(ip2)].get_distance(clients[c2]); //distanza cancellazione c2
+    dc2 -= clients[c2].get_distance(clients[routes[rid2].get_client(in2)]);
+    double d2 = (cost1 + dc2) + (cost2 + dc1);
+    return d1 - d2;
 }
 
 /**

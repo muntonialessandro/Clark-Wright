@@ -56,6 +56,9 @@ public:
     void set_position_in_Q(QLinkedList<Event>::iterator it);
     void add_generator(Event e1);
     QVector<Event> get_generators();
+    QVector<int> get_overlying();
+    bool has_overlying();
+    void add_overlying(int id);
     std::string to_string();
 
 private:
@@ -69,6 +72,7 @@ private:
     int associate_circle_event_id;
     QLinkedList<Event>::iterator position_in_Q;
     QVector<Event> generators;
+    QVector<int> overlying;
 };
 
 #endif // EVENT_H

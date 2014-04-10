@@ -97,6 +97,21 @@ QVector<Event> Event::get_generators()
     return this->generators;
 }
 
+QVector<int> Event::get_overlying()
+{
+    return this->overlying;
+}
+
+bool Event::has_overlying()
+{
+    return !(this->overlying.empty());
+}
+
+void Event::add_overlying(int id)
+{
+    this->overlying.push_back(id);
+}
+
 std::string Event::to_string()
 {
     std::stringstream ss;

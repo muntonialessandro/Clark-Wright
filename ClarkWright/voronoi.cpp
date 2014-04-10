@@ -107,12 +107,39 @@ void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, Q
         client_id client_neighbor = (*T)[i].get_client_id();
         (*sites)[client_event].add_neighbor(client_neighbor, dist);
         (*sites)[client_neighbor].add_neighbor(client_event, dist);
+        if (e.has_overlying()){
+            QVector<client_id> overlying = e.get_overlying();
+            for (int j=0; j<overlying.size(); j++){
+                (*sites)[client_neighbor].add_neighbor(overlying[j], dist);
+                (*sites)[overlying[j]].add_neighbor(client_neighbor, dist);
+                (*sites)[client_event].add_neighbor(overlying[j], 0);
+                (*sites)[overlying[j]].add_neighbor(client_event, 0);
+                for (int k=j+1; k<overlying.size(); k++){
+                    (*sites)[overlying[k]].add_neighbor(overlying[j], 0);
+                    (*sites)[overlying[j]].add_neighbor(overlying[k], 0);
+                }
+            }
+        }
         // se il sito non è il deposito, inserisco anche il saving
         if (!e.is_deposit() && !(*T)[i].is_deposit()){
             double saving = get_saving(e, (*T)[i], deposit);
             Saving s1(-1, e.get_client_id(), (*T)[i].get_client_id(), saving);
-            int j = search_insert_index_saving(saving, 0, savings->size()-1, *savings);
-            savings->insert(j, s1);
+            int in = search_insert_index_saving(saving, 0, savings->size()-1, *savings);
+            savings->insert(in, s1);
+            if (e.has_overlying()){
+                QVector<client_id> overlying = e.get_overlying();
+                for (int j=0; j<overlying.size(); j++){
+                    Saving s2(-1, overlying[j], (*T)[i].get_client_id(), saving);
+                    savings->insert(in, s2);
+                    Event ee(overlying[j], (*sites)[overlying[j]].get_x(), (*sites)[overlying[j]].get_y(),false, false);
+                    double saving2 = get_saving(e, ee, deposit);
+                    int in2 = search_insert_index_saving(saving2, 0, savings->size()-1, *savings);
+                    for (int k=j+1; k<overlying.size(); k++){
+                        Saving s3(-1, overlying[j], overlying[k], saving2);
+                        savings->insert(in2, s3);
+                    }
+                }
+            }
         }
         // inserisco due archi: a destra di i metto e, e a destra di e metto di nuovo i
         T->insert(i+1, e);
@@ -170,12 +197,40 @@ void handle_circle_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q,
     client_id client_right = (*T)[arco_destro].get_client_id();
     (*sites)[client_left].add_neighbor(client_right, dist);
     (*sites)[client_right].add_neighbor(client_left, dist);
+    if ((*T)[arco_sinistro].has_overlying()){
+        QVector<client_id> overlying = (*T)[arco_sinistro].get_overlying();
+        for (int j=0; j<overlying.size(); j++){
+            (*sites)[overlying[j]].add_neighbor(client_right, dist);
+            (*sites)[client_right].add_neighbor(overlying[j], dist);
+        }
+    }
+    if ((*T)[arco_destro].has_overlying()){
+        QVector<client_id> overlying = (*T)[arco_destro].get_overlying();
+        for (int j=0; j<overlying.size(); j++){
+            (*sites)[overlying[j]].add_neighbor(client_left, dist);
+            (*sites)[client_left].add_neighbor(overlying[j], dist);
+        }
+    }
     // se il sito non è il deposito, inserisco anche il saving
     if (!(*T)[arco_sinistro].is_deposit() && !(*T)[arco_destro].is_deposit()){
         double saving = get_saving((*T)[arco_sinistro], (*T)[arco_destro], deposit);
         Saving s1(-1, (*T)[arco_sinistro].get_client_id(), (*T)[arco_destro].get_client_id(), saving);
-        int j = search_insert_index_saving(saving, 0, savings->size()-1, *savings);
-        savings->insert(j, s1);
+        int in = search_insert_index_saving(saving, 0, savings->size()-1, *savings);
+        savings->insert(in, s1);
+        if ((*T)[arco_sinistro].has_overlying()){
+            QVector<client_id> overlying = (*T)[arco_sinistro].get_overlying();
+            for (int j=0; j<overlying.size(); j++){
+                Saving s2(-1, overlying[j], (*T)[arco_destro].get_client_id(), saving);
+                savings->insert(in, s2);
+            }
+        }
+        if ((*T)[arco_destro].has_overlying()){
+            QVector<client_id> overlying = (*T)[arco_destro].get_overlying();
+            for (int j=0; j<overlying.size(); j++){
+                Saving s2(-1, overlying[j], (*T)[arco_sinistro].get_client_id(), saving);
+                savings->insert(in, s2);
+            }
+        }
     }
 
     // Se l'arco sinistro è in mezzo ad altri due archi, controllo se generano un circle event
@@ -686,7 +741,10 @@ QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2){
                     if (v1[i].get_y() == v2[j].get_y()){
                         if (v1[i].get_x() >= v2[j].get_x()){
                             merge.push_back(v1[i]); // inserisco v1[i] nell'array merge
-                            if (v1[i].get_x() == v2[j].get_x()) j++;
+                            if (v1[i].get_x() == v2[j].get_x()) {
+                                merge[merge.size()-1].add_overlying(v2[j].get_client_id());
+                                j++;
+                            }
                             i++; // incremento i
                         }
                         else {

@@ -101,7 +101,7 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
     return graph_route;
 }
 
-GraphRoutes best_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap) {
+GraphRoutes second_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap) {
 
     GraphRoutes graph_route(sites);
 
@@ -180,6 +180,35 @@ void update_savings(Client c_route, Client c_next, GraphRoutes &graph_route, QVe
             Saving s(-1, c_route.get_id(), c_neighbor.get_id(), value);
             int index = search_insert_index_saving(s, 0, route_savings->size()-1, *route_savings);
             if (index >= 0) route_savings->insert(index, s);
+        }
+    }
+}
+
+void swap_post_processing(GraphRoutes *graph_routes, int cap){
+    for (client_id i=1; i<graph_routes->get_n_clients(); i++){
+        Client c = graph_routes->get_client(i);
+        QVector<client_id> neighbors = c.get_neighbors();
+        double saving = 0;
+        double best_saving = 0;
+        client_id best_neighbor;
+        for (int j=0; j<neighbors.size(); j++){
+            Client neighbor = graph_routes->get_client(neighbors[j]);
+            if (neighbors[j]!=0 && c.get_route() != neighbor.get_route()){
+                int r1_goods = graph_routes->get_goods_route(c.get_route());
+                r1_goods = r1_goods - c.get_demand() + neighbor.get_demand();
+                int r2_goods = graph_routes->get_goods_route(neighbor.get_route());
+                r2_goods = r2_goods - neighbor.get_demand() + c.get_demand();
+                if (r1_goods < cap && r2_goods < cap){
+                    saving = graph_routes->get_swap_saving(i, neighbors[j]);
+                    if (saving > best_saving) {
+                        best_neighbor = neighbors[j];
+                        best_saving = saving;
+                    }
+                }
+            }
+        }
+        if (best_saving > 0){
+            graph_routes->swap_clients(i, best_neighbor);
         }
     }
 }
