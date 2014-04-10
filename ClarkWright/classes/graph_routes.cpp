@@ -225,6 +225,28 @@ bool GraphRoutes::swap_clients(client_id c1, client_id c2)
     routes[rid2].add_goods(new_goods2);
     clients[c1].set_route(rid2);
     clients[c1].set_position_in_route(ic2);
+    return true;
+}
+
+bool GraphRoutes::swap_consecutive_clients_in_route(client_id c1, client_id c2)
+{
+    route_id rid = clients[c1].get_route();
+    index_client ic1 = clients[c1].get_position_in_route();
+    index_client ic2 = clients[c2].get_position_in_route();
+    index_client ip1 = ic1 - 1;
+    index_client in2 = ic2 + 1;
+    double cost = routes[rid].get_cost();
+    cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
+           + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
+    cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
+           + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
+    routes[rid].set_cost(cost);
+    routes[rid].set_client(ic1, c2);
+    clients[c2].set_position_in_route(ic1);
+    routes[rid].set_client(ic2, c1);
+    clients[c1].set_position_in_route(ic2);
+    return true;
+
 }
 
 int GraphRoutes::get_n_clients()
@@ -329,6 +351,20 @@ double GraphRoutes::get_swap_saving(client_id c1, client_id c2)
     dc2 -= clients[c2].get_distance(clients[routes[rid2].get_client(in2)]);
     double d2 = (cost1 + dc2) + (cost2 + dc1);
     return d1 - d2;
+}
+
+double GraphRoutes::get_swap_saving_consecutive_in_route(client_id c1, client_id c2)
+{
+    route_id rid = clients[c1].get_route();
+    index_client ic1 = clients[c1].get_position_in_route();
+    index_client ic2 = clients[c2].get_position_in_route();
+    index_client ip1 = ic1 - 1;
+    index_client in2 = ic2 + 1;
+    double saved =  clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
+                  + clients[c2].get_distance(clients[routes[rid].get_client(in2)]);
+    saved -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
+            + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
+    return saved;
 }
 
 /**

@@ -24,6 +24,7 @@ public:
     bool remove_client_from_route(client_id client);
     bool insert_client_in_route(route_id rid, client_id client, client_id previous_in_route);
     bool swap_clients(client_id c1, client_id c2);
+    bool swap_consecutive_clients_in_route(client_id c1, client_id c2);
     int get_n_clients();
     Client get_client(client_id cid);
     QVector<Client> get_clients();
@@ -31,6 +32,7 @@ public:
     double get_standard_saving(client_id c1, client_id c2);
     double get_saving_client_in_route(route_id rid, client_id c_insert, client_id previous_client);
     double get_swap_saving(client_id c1, client_id c2);
+    double get_swap_saving_consecutive_in_route(client_id c1, client_id c2);
     std::string to_string();
     QList< QPair<QPoint,QString> > get_list_point_label_pairs();
     QList< QList<QPoint> > get_list_edges();
