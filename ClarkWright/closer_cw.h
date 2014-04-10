@@ -11,4 +11,6 @@ void update_savings(Client c_route, Client c_next, GraphRoutes &graph_route, QVe
 
 void swap_post_processing(GraphRoutes *graph_routes, int cap);
 
+void second_post_processing(GraphRoutes *graph_routes);
+
 int search_insert_index_saving(Saving s, int first, int last, QVector<Saving> & v);
