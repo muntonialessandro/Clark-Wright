@@ -221,14 +221,12 @@ void second_post_processing(GraphRoutes *graph_routes){
         tot_cost = new_cost;
         for (rid=graph_routes->get_first_route_id(); rid!=-1; rid=graph_routes->get_next_route_id(rid)){
             QVector<client_id> route = graph_routes->get_route(rid);
-            for (int i=1; i<route.size()-4; i++){
-                if (graph_routes->get_swap_saving_consecutive_in_route(route[i], route[i+1]) > 0){
-                    graph_routes->swap_consecutive_clients_in_route(route[i], route[i+1]);
-                    route = graph_routes->get_route(rid);
-                }
-                if (graph_routes->get_swap_saving_consecutive_in_route(route[i+1], route[i+2]) > 0){
-                    graph_routes->swap_consecutive_clients_in_route(route[i+1], route[i+2]);
-                    route = graph_routes->get_route(rid);
+            for (int j = route.size()-2; j>2; j--){
+                for (int i=1; i<route.size()-j; i++){
+                    if (graph_routes->get_swap_saving_consecutive_in_route(route[i], route[i+j-1]) > 0){
+                        graph_routes->swap_consecutive_clients_in_route(route[i], route[i+j-1]);
+                        route = graph_routes->get_route(rid);
+                    }
                 }
             }
         }
