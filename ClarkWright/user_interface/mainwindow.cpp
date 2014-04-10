@@ -521,6 +521,34 @@ void MainWindow::handle_button3()
     //info all'utente
     ui->userInfo->setText("Button 3 premuto");
 
+    int cap;
+    QVector<Client> clients;
+    #ifdef TARGET_OS_MAC
+        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+    #endif
+
+    #ifdef __linux__
+        clients = read_file("vrpnc4.txt", &cap); // Ale
+    #endif
+
+    Timer timer("C&W Algorithm");
+    timer.start();
+
+    QVector<Client> voronoi_points;
+    QVector<Saving> savings;
+    voronoi_points = voronoi( clients, &savings);
+
+
+    GraphRoutes state = lelle_closer_cw(voronoi_points, savings, cap);
+    swap_post_processing(&state, cap);
+    timer.stop_and_print();
+    G_draw_routes(state.get_list_edges());
+    G_draw_nodes( state.get_list_point_label_pairs() );
+    std::cout << state.to_string() << std::endl;
+
+    G_move_graph_in_a_good_position();
+    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
+
     // aggiorna l'utente sullo stato finale
     G_show_result( "Beh, qui abbiamo finito! 3" );
 
