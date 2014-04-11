@@ -46,6 +46,8 @@ QVector<Client> read_file(QString filename, int* vehicle_capacity){
 
 }
 
+
+
 bool write_results_in_file(GraphRoutes* routes){
 
     if( routes->get_first_route_id() == (-1) ) {
