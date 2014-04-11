@@ -528,7 +528,7 @@ void MainWindow::handle_button3()
     #endif
 
     #ifdef __linux__
-        clients = read_file("vrpnc11.txt", &cap); // Ale
+        clients = read_file("vrpnc14.txt", &cap); // Ale
     #endif
 
     Timer timer("C&W Algorithm");

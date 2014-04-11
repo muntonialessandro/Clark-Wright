@@ -238,7 +238,7 @@ bool GraphRoutes::swap_consecutive_clients_in_route(client_id c1, client_id c2)
     index_client ip2 = ic1 - 1;
     index_client in2 = ic2 + 1;
     double cost = routes[rid].get_cost();
-    if (in1 == ip2) {
+    if (in1 == ic2) {
         cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
                + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
         cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
@@ -407,7 +407,7 @@ double GraphRoutes::get_swap_saving_consecutive_in_route(client_id c1, client_id
     index_client in2 = ic2 + 1;
     double old_cost = routes[rid].get_cost();
     double cost = routes[rid].get_cost();
-    if (in1 == ip2) {
+    if (in1 == ic2) {
         cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
                + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
         cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
