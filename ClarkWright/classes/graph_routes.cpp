@@ -41,6 +41,9 @@ QVector<client_id> GraphRoutes::get_route(route_id rid)
  */
 route_id GraphRoutes::get_first_route_id()
 {
+
+    if (routes.isEmpty()) return -1;
+
     int i=0;
     while (!routes[i].is_enabled()) { //quando trovo ula prossima route enabled, mi fermo
         i++;

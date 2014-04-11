@@ -69,6 +69,10 @@ int MainWindow::G_draw_interface( QApplication* a ) {
     reset.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     open_menu.addAction(&reset);
 
+    QAction save("&Save", &container);
+    save.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+    open_menu.addAction(&save);
+
 
     /**** MENU COMPUTATION ****/
     QMenu computation("Computation", &container);
@@ -136,6 +140,7 @@ int MainWindow::G_draw_interface( QApplication* a ) {
     // Connect button signal to appropriate slot
     QObject::connect( &open, SIGNAL(triggered()), &window, SLOT(open_file()) );
     QObject::connect( &reset, SIGNAL(triggered()), &window, SLOT(reset()) );
+    QObject::connect( &save, SIGNAL(triggered()), &window, SLOT(save()) );
     QObject::connect( &help, SIGNAL(triggered()), &instructions, SLOT(show()) );
     QObject::connect( &about, SIGNAL(triggered()), &credits, SLOT(show()) );
     QObject::connect( &calc, SIGNAL(triggered()), &window, SLOT(handle_button2()) );
@@ -403,6 +408,17 @@ void MainWindow::reset(void)
 
 
 /**
+ * @brief save
+ *  Salva il risultato in un file
+ * ATTENZIONE: PRIMA DI UTILIZZARLA è NECESSARIO SETTARE L'ATTRIBUTO groutes DELLA CLASSE
+ *
+ */
+void MainWindow::save(void)
+{
+    write_results_in_file( &(this->groutes) );
+}
+
+/**
  * @brief handleButtons
  *  handle of buttons
  */
@@ -509,6 +525,9 @@ void MainWindow::handle_button2()
     std::cout << state.to_string() << std::endl;
 
     G_move_graph_in_a_good_position();
+
+    set_graph_routes_for_save( &state );
+
     G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 }
 
@@ -688,4 +707,15 @@ void MainWindow::G_move_graph_in_a_good_position(void)
 void MainWindow::G_show_result( QString str )
 {
     ui->userInfo->setText( str );
+}
+
+
+/**
+ * @brief Rendi disponibile graph routes per salvare i dati
+ *
+ * @param gr è il grafo delle rotte da salvare
+ */
+void MainWindow::set_graph_routes_for_save(GraphRoutes *gr)
+{
+    this->groutes = *gr;
 }

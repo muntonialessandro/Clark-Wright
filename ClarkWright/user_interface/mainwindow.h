@@ -55,6 +55,7 @@ public:
     int G_draw_interface(QApplication *a);
     void G_move_graph_in_a_good_position( void );
     void G_show_result(QString str);
+    void set_graph_routes_for_save( GraphRoutes *gr );
 
 private:
     Ui::MainWindow *ui;     // l'interfaccia con tutti i suoi oggetti
@@ -62,6 +63,7 @@ private:
     bool firstAperture;     // appena viene aperto il programma passa da true a false, dopo la fase di inizializzazione
     bool gridEnabled;       // memorizza se e' già attiva la griglia
     QVector<Client> nodes_list; //la lista dei nodi cliente
+    GraphRoutes groutes;
 
     // vari oggetti della scena
     QGraphicsScene *scene;
@@ -88,6 +90,7 @@ private slots: // le varie funzioni che vengono chiamate quando si interagisce c
     void grid(bool on);
     void open_file();
     void reset(void);
+    void save(void);  // ATTENZIONE: PRIMA DI UTILIZZARLA è NECESSARIO SETTARE L'ATTRIBUTO groutes DELLA CLASSE
     void zoomInGraphButton();
     void zoomOutGraphButton();
     void draw_route( QList<QPoint> route );
