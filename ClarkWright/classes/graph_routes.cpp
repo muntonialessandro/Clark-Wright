@@ -140,7 +140,7 @@ bool GraphRoutes::remove_client_from_route(client_id client)
     clients[client].set_route(-1); //il client non sta più in nessuna route
     clients[client].set_position_in_route(-1); //il client non ha posizione in una route
     //aggiorno le posizioni dei client dal successore in poi, tranne il deposito alla fine
-    for (; i<routes[rid].get_route().size()-1; i++) {
+    for (i=1; i<routes[rid].get_route().size()-1; i++) {
         client = routes[rid].get_client(i); //id del client
         clients[client].set_position_in_route(i); //set della nuova posizione nella route
     }
@@ -182,7 +182,7 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
     clients[client].set_alone(false);
     index_client i;
     //partendo dal client inserito, aggiorno le posizioni dei clienti nella route, tranne il deposito
-    for (i=previous+1; i<routes[rid].get_route().size()-1; i++){
+    for (i=1; i<routes[rid].get_route().size()-1; i++){
         client = routes[rid].get_client(i); //id del client da aggiornare
         clients[client].set_position_in_route(i); //set della posizione
     }
