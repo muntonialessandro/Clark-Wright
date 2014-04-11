@@ -184,31 +184,86 @@ void update_savings(Client c_route, Client c_next, GraphRoutes &graph_route, QVe
     }
 }
 
-void swap_post_processing(GraphRoutes *graph_routes, int cap){
-    for (client_id i=1; i<graph_routes->get_n_clients(); i++){
-        Client c = graph_routes->get_client(i);
-        QVector<client_id> neighbors = c.get_neighbors();
-        double saving = 0;
-        double best_saving = 0;
-        client_id best_neighbor;
-        for (int j=0; j<neighbors.size(); j++){
-            Client neighbor = graph_routes->get_client(neighbors[j]);
-            if (neighbors[j]!=0 && c.get_route() != neighbor.get_route()){
-                int r1_goods = graph_routes->get_goods_route(c.get_route());
-                r1_goods = r1_goods - c.get_demand() + neighbor.get_demand();
-                int r2_goods = graph_routes->get_goods_route(neighbor.get_route());
-                r2_goods = r2_goods - neighbor.get_demand() + c.get_demand();
-                if (r1_goods < cap && r2_goods < cap){
-                    saving = graph_routes->get_swap_saving(i, neighbors[j]);
-                    if (saving > best_saving) {
-                        best_neighbor = neighbors[j];
-                        best_saving = saving;
+void transfer_clients_post_processing(GraphRoutes *graph_routes,  int cap){
+    QVector<int> ordered_goods;
+    QVector<route_id> associate_routes;
+    QVector<route_id> routes;
+    route_id rid;
+    int goods, in;
+    for (rid=graph_routes->get_first_route_id(); rid!=-1; rid=graph_routes->get_next_route_id(rid)) routes.push_back(rid);
+    for (int i=0; i<routes.size(); i++){
+        goods = graph_routes->get_goods_route(routes[i]);
+        in = search_insert_index_int(goods, 0, ordered_goods.size()-1, ordered_goods);
+        ordered_goods.insert(in, goods);
+        associate_routes.insert(in, routes[i]);
+    }
+    int i=0;
+    while (i != ordered_goods.size()){
+        //creo la lista di nodi dell'i-esima route
+        //creo la lista ordinata di tutti i vicini che non appartengono all'i-esima route
+        QVector<client_id> route = graph_routes->get_route(associate_routes[i]);
+        QVector<Saving> route_savings;
+        int route_goods = graph_routes->get_goods_route(associate_routes[i]);
+        for (int j = 0; j< route.size()-1; j++){
+            update_savings_post_processing(graph_routes->get_client(route[j]), graph_routes->get_client(route[j+1]), *graph_routes, &route_savings, cap);
+        }
+        //dal più conveniente al meno conveniente, valuto se inserirli nella route
+        while (route_savings.size()){
+            Saving as = route_savings.last();
+            route_savings.pop_back();
+            Client c_alone = graph_routes->get_client(as.getIdC2());
+            Client c_next = graph_routes->get_client(graph_routes->get_next_client(as.getIdC1(), associate_routes[i]));
+            if (as.getValue() >= 0 && graph_routes->get_total_goods(associate_routes[i]) + c_alone.get_demand() <= cap){
+                route_id rr = c_alone.get_route();
+                graph_routes->remove_client_from_route(c_alone.get_id());
+                if (graph_routes->get_n_clients_in_route(rr) < 3) {
+                    graph_routes->delete_route(rr);
+                    for (int i=0; i<associate_routes.size(); i++){
+                        if (associate_routes[i]==rr){
+                            associate_routes.remove(i);
+                            ordered_goods.remove(i);
+                        }
                     }
                 }
+                graph_routes->insert_client_in_route(associate_routes[i], as.getIdC2(), as.getIdC1());
+                for (int i=0; i<route_savings.size(); i++) {
+                    if (route_savings[i].getIdC1() == as.getIdC1()) route_savings.remove(i);
+                }
+                //Vicini as.IdC1 + vicini c_alone
+                update_savings(graph_routes->get_client(as.getIdC1()), c_alone, *graph_routes, &route_savings);
+                update_savings(c_alone, c_next, *graph_routes, &route_savings);
             }
         }
-        if (best_saving > 0){
-            graph_routes->swap_clients(i, best_neighbor);
+        //se il totale dei beni è cambiato modifico la posizione della route nell'array ordinato per beni, e azzero i
+        //altrimenti, incremento i
+        int new_route_goods = graph_routes->get_goods_route(associate_routes[i]);
+        if(new_route_goods > route_goods){
+            route_id rid = associate_routes[i];
+            associate_routes.remove(i);
+            ordered_goods.remove(i);
+            in = search_insert_index_int(new_route_goods, 0, ordered_goods.size()-1, ordered_goods);
+            ordered_goods.insert(in, new_route_goods);
+            associate_routes.insert(in, rid);
+            i=0;
+        }
+        else i++;
+    }
+}
+
+void update_savings_post_processing(Client c_route, Client c_next, GraphRoutes &graph_route, QVector<Saving>* route_savings, int cap){
+    QVector<client_id> neighbors = c_route.get_neighbors();
+    neighbors += c_next.get_neighbors(); //vicini del nodo attuale e del successivo
+    route_id rid;
+    if (c_route.get_id() != 0) rid = c_route.get_route();
+    else rid = c_next.get_route();
+    int actual_goods = graph_route.get_goods_route(rid);
+    for (int j = 0; j<neighbors.size(); j++){
+        Client c_neighbor = graph_route.get_client(neighbors[j]);
+        if (c_neighbor.get_route() != rid && (c_neighbor.get_demand() + actual_goods) < cap && c_neighbor.get_id() != 0){
+            double value = graph_route.get_saving_transfer_client(neighbors[j], c_neighbor.get_route(), rid, c_route.get_id());
+            Saving s(-1, c_route.get_id(), c_neighbor.get_id(), value);
+            int index = search_insert_index_saving(s, 0, route_savings->size()-1, *route_savings);
+            if (index >= 0) route_savings->insert(index, s);
         }
     }
 }

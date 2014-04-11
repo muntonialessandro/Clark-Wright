@@ -26,11 +26,13 @@ public:
     bool swap_clients(client_id c1, client_id c2);
     bool swap_consecutive_clients_in_route(client_id c1, client_id c2);
     int get_n_clients();
+    int get_n_clients_in_route(route_id rid);
     Client get_client(client_id cid);
     QVector<Client> get_clients();
     int get_total_goods(route_id rid);
     double get_standard_saving(client_id c1, client_id c2);
     double get_saving_client_in_route(route_id rid, client_id c_insert, client_id previous_client);
+    double get_saving_transfer_client(client_id id, route_id from_route, route_id to_route, client_id previous_client);
     double get_swap_saving(client_id c1, client_id c2);
     double get_swap_saving_consecutive_in_route(client_id c1, client_id c2);
     std::string to_string();

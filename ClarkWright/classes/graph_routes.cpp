@@ -268,6 +268,11 @@ int GraphRoutes::get_n_clients()
     return this->n_clients;
 }
 
+int GraphRoutes::get_n_clients_in_route(route_id rid)
+{
+    return routes[rid].get_n_nodes();
+}
+
 /**
  * @brief GraphRoutes::get_client
  *  Restituisce l'oggetto Client che ha id uguale al parametro;
@@ -338,6 +343,30 @@ double GraphRoutes::get_saving_client_in_route(route_id rid, client_id c_insert,
                    clients[c_insert].get_distance(clients[next_client]);
     double saving = d1 - (d2 - deleted + added);
     return saving;
+}
+
+double GraphRoutes::get_saving_transfer_client(client_id id, route_id from_route, route_id to_route, client_id previous_client)
+{
+    index_client cidf = clients[id].get_position_in_route();
+    index_client pidf = cidf - 1, nidf = cidf + 1;
+    client_id previous_client_from = routes[from_route].get_client(pidf);
+    client_id next_client_from = routes[from_route].get_client(nidf);
+    double d1 = routes[from_route].get_cost() + routes[to_route].get_cost();
+    double new_cost_from_route = routes[from_route].get_cost();
+    new_cost_from_route = new_cost_from_route -
+                  clients[previous_client_from].get_distance(clients[id]) -
+                  clients[id].get_distance(clients[next_client_from]) +
+                  clients[previous_client_from].get_distance(clients[next_client_from]);
+    index_client pidt = clients[previous_client].get_position_in_route();
+    index_client nidt = pidt +1;
+    client_id next_client_to = routes[to_route].get_client(nidt);
+    double new_cost_to_route = routes[to_route].get_cost();
+    new_cost_to_route = new_cost_to_route -
+                  clients[previous_client].get_distance(clients[next_client_to]) +
+                  clients[previous_client].get_distance(clients[id]) +
+                  clients[id].get_distance(clients[next_client_to]);
+    double d2 = new_cost_from_route + new_cost_to_route;
+    return d1 - d2;
 }
 
 double GraphRoutes::get_swap_saving(client_id c1, client_id c2)
