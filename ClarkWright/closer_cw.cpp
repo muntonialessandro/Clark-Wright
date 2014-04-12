@@ -268,6 +268,7 @@ void transfer_clients_post_processing(GraphRoutes *graph_routes,  int cap){
         associate_routes.insert(in, routes[i]);
     }
     int i=0;
+    int cycle_counter = 0;
     while (i != ordered_goods.size()){
         //creo la lista di nodi dell'i-esima route
         //creo la lista ordinata di tutti i vicini che non appartengono all'i-esima route
@@ -281,27 +282,30 @@ void transfer_clients_post_processing(GraphRoutes *graph_routes,  int cap){
         while (route_savings.size()){
             Saving as = route_savings.last();
             route_savings.pop_back();
-            Client c_alone = graph_routes->get_client(as.getIdC2());
+            Client c_new = graph_routes->get_client(as.getIdC2());
             Client c_next = graph_routes->get_client(graph_routes->get_next_client(as.getIdC1(), associate_routes[i]));
-            if (as.getValue() >= 0 && graph_routes->get_total_goods(associate_routes[i]) + c_alone.get_demand() <= cap){
-                route_id rr = c_alone.get_route();
-                graph_routes->remove_client_from_route(c_alone.get_id());
+            if (as.getValue() > 0 && graph_routes->get_total_goods(associate_routes[i]) + c_new.get_demand() <= cap){
+                route_id rr = c_new.get_route();
+                graph_routes->remove_client_from_route(as.getIdC2());
                 if (graph_routes->get_n_clients_in_route(rr) < 3) {
                     graph_routes->delete_route(rr);
-                    for (int i=0; i<associate_routes.size(); i++){
-                        if (associate_routes[i]==rr){
-                            associate_routes.remove(i);
-                            ordered_goods.remove(i);
+                    for (int j=0; j<associate_routes.size(); j++){
+                        if (associate_routes[j]==rr){
+                            associate_routes.remove(j);
+                            ordered_goods.remove(j);
                         }
                     }
                 }
                 graph_routes->insert_client_in_route(associate_routes[i], as.getIdC2(), as.getIdC1());
-                for (int i=0; i<route_savings.size(); i++) {
-                    if (route_savings[i].getIdC1() == as.getIdC1()) route_savings.remove(i);
+                for (int j=0; j<route_savings.size(); j++) {
+                    if (route_savings[j].getIdC1() == as.getIdC1()) {
+                        route_savings.remove(j);
+                        j--;
+                    }
                 }
                 //Vicini as.IdC1 + vicini c_alone
-                update_savings(graph_routes->get_client(as.getIdC1()), c_alone, *graph_routes, &route_savings);
-                update_savings(c_alone, c_next, *graph_routes, &route_savings);
+                update_savings_post_processing(graph_routes->get_client(as.getIdC1()), graph_routes->get_client(as.getIdC2()), *graph_routes, &route_savings, cap);
+                update_savings_post_processing(graph_routes->get_client(as.getIdC2()), c_next, *graph_routes, &route_savings, cap);
             }
         }
         //se il totale dei beni è cambiato modifico la posizione della route nell'array ordinato per beni, e azzero i
@@ -314,9 +318,14 @@ void transfer_clients_post_processing(GraphRoutes *graph_routes,  int cap){
             in = search_insert_index_int(new_route_goods, 0, ordered_goods.size()-1, ordered_goods);
             ordered_goods.insert(in, new_route_goods);
             associate_routes.insert(in, rid);
-            i=0;
+            if (cycle_counter > (ordered_goods.size() * 4)) {
+                i++;
+                cycle_counter = 0;
+            }
+            else i = 0;
         }
         else i++;
+        cycle_counter++;
     }
 }
 
@@ -346,10 +355,10 @@ void second_post_processing(GraphRoutes *graph_routes){
         tot_cost = new_cost;
         for (rid=graph_routes->get_first_route_id(); rid!=-1; rid=graph_routes->get_next_route_id(rid)){
             QVector<client_id> route = graph_routes->get_route(rid);
-            for (int j = route.size()-2; j>2; j--){
+            for (int j = route.size()-2; j>1; j--){
                 for (int i=1; i<route.size()-j; i++){
-                    if (graph_routes->get_swap_saving_consecutive_in_route(route[i], route[i+j-1]) > 0){
-                        graph_routes->swap_consecutive_clients_in_route(route[i], route[i+j-1]);
+                    if (graph_routes->get_swap_saving_in_route(route[i], route[i+j-1]) > 0){
+                        graph_routes->swap_clients_in_route(route[i], route[i+j-1]);
                         route = graph_routes->get_route(rid);
                     }
                 }

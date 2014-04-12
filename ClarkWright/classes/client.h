@@ -28,7 +28,8 @@ typedef int index_client; //tipo utilizzato per indicare l'indice di posizione d
  *      - rid               : identifica la route a cui appartiene al cliente;
  *      - position_in_route : posizione del cliente nella route a cui appartiene;
  *      - alone             : indica se è l'unico nodo presente nella route, oltre il deposito (0).
- *      - neighbors         : vettore degli id dei vicini del cliente (utilizzato per il CloserClarkWright)
+ *      - neighbors         : vettore ordinato degli id dei vicini del cliente (utilizzato per il CloserClarkWright)
+ *      - distances         : distanze ordinato delle distanze dei vicini del cliente
  */
 class Client
 {

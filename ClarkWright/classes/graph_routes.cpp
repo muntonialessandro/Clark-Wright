@@ -96,6 +96,12 @@ double GraphRoutes::get_total_cost()
     return cost;
 }
 
+/**
+ * @brief GraphRoutes::get_goods_route
+ *  Restituisce il numero di beni trasportato dal mezzo nella route passata come parametro
+ * @param rid
+ * @return
+ */
 int GraphRoutes::get_goods_route(route_id rid)
 {
     return routes[rid].get_goods();
@@ -143,7 +149,7 @@ bool GraphRoutes::remove_client_from_route(client_id client)
     clients[client].set_route(-1); //il client non sta più in nessuna route
     clients[client].set_position_in_route(-1); //il client non ha posizione in una route
     //aggiorno le posizioni dei client dal successore in poi, tranne il deposito alla fine
-    for (; i<routes[rid].get_route().size()-1; i++) {
+    for (i=1; i<routes[rid].get_route().size()-1; i++) {
         client = routes[rid].get_client(i); //id del client
         clients[client].set_position_in_route(i); //set della nuova posizione nella route
     }
@@ -185,53 +191,22 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
     clients[client].set_alone(false);
     index_client i;
     //partendo dal client inserito, aggiorno le posizioni dei clienti nella route, tranne il deposito
-    for (i=previous+1; i<routes[rid].get_route().size()-1; i++){
+    for (i=1; i<routes[rid].get_route().size()-1; i++){
         client = routes[rid].get_client(i); //id del client da aggiornare
         clients[client].set_position_in_route(i); //set della posizione
     }
     return res;
 }
 
-bool GraphRoutes::swap_clients(client_id c1, client_id c2)
-{
-    route_id rid1 = clients[c1].get_route();
-    route_id rid2 = clients[c2].get_route();
-    double cost1 = routes[rid1].get_cost();
-    double cost2 = routes[rid2].get_cost();
-    index_client ic1 = clients[c1].get_position_in_route();
-    index_client ic2 = clients[c2].get_position_in_route();
-    index_client ip1 = ic1 - 1;
-    index_client in1 = ic1 + 1;
-    index_client ip2 = ic2 - 1;
-    index_client in2 = ic2 + 1;
-    //Guadagno nell'inserire c2 in r1
-    double dc2 = clients[routes[rid1].get_client(ip1)].get_distance(clients[c2]); //distanza inserimento c2
-    dc2 += clients[c2].get_distance(clients[routes[rid1].get_client(in1)]);
-    dc2 -= clients[routes[rid1].get_client(ip1)].get_distance(clients[c1]); //distanza cancellazione c1
-    dc2 -= clients[c1].get_distance(clients[routes[rid1].get_client(in1)]);
-    //Guadagno nell'inserire c1 in r2
-    double dc1 = clients[routes[rid2].get_client(ip2)].get_distance(clients[c1]); //distanza inserimento c1
-    dc1 += clients[c1].get_distance(clients[routes[rid2].get_client(in2)]);
-    dc1 -= clients[routes[rid2].get_client(ip2)].get_distance(clients[c2]); //distanza cancellazione c2
-    dc2 -= clients[c2].get_distance(clients[routes[rid2].get_client(in2)]);
-    double new_cost1 = cost1 + dc2;
-    double new_cost2 = cost2 + dc1;
-    int new_goods1 = clients[c2].get_demand() - clients[c1].get_demand();
-    int new_goods2 = clients[c1].get_demand() - clients[c2].get_demand();
-    routes[rid1].set_client(ic1, c2);
-    routes[rid1].set_cost(new_cost1);
-    routes[rid1].add_goods(new_goods1);
-    clients[c2].set_route(rid1);
-    clients[c2].set_position_in_route(ic1);
-    routes[rid2].set_client(ic2, c1);
-    routes[rid2].set_cost(new_cost2);
-    routes[rid2].add_goods(new_goods2);
-    clients[c1].set_route(rid2);
-    clients[c1].set_position_in_route(ic2);
-    return true;
-}
-
-bool GraphRoutes::swap_consecutive_clients_in_route(client_id c1, client_id c2)
+/**
+ * @brief GraphRoutes::swap_clients_in_route
+ *  Scambia di posizione due client che stanno nella stessa route, aggiornando i costi e
+ *  i beni trasportati dal mezzo.
+ * @param c1
+ * @param c2
+ * @return
+ */
+bool GraphRoutes::swap_clients_in_route(client_id c1, client_id c2)
 {
     route_id rid = clients[c1].get_route();
     index_client ic1 = clients[c1].get_position_in_route();
@@ -241,7 +216,7 @@ bool GraphRoutes::swap_consecutive_clients_in_route(client_id c1, client_id c2)
     index_client ip2 = ic1 - 1;
     index_client in2 = ic2 + 1;
     double cost = routes[rid].get_cost();
-    if (in1 == ip2) {
+    if (in1 == ic2) {
         cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
                + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
         cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
@@ -266,11 +241,22 @@ bool GraphRoutes::swap_consecutive_clients_in_route(client_id c1, client_id c2)
 
 }
 
+/**
+ * @brief GraphRoutes::get_n_clients
+ *  Restituisce il numero di clienti totale
+ * @return
+ */
 int GraphRoutes::get_n_clients()
 {
     return this->n_clients;
 }
 
+/**
+ * @brief GraphRoutes::get_n_clients_in_route
+ *  Restituisce il numero di clienti presenti in una route
+ * @param rid
+ * @return
+ */
 int GraphRoutes::get_n_clients_in_route(route_id rid)
 {
     return routes[rid].get_n_nodes();
@@ -287,11 +273,22 @@ Client GraphRoutes::get_client(client_id cid)
     return clients[cid];
 }
 
+/**
+ * @brief GraphRoutes::get_clients
+ *  Restituisce l'array di clienti
+ * @return
+ */
 QVector<Client> GraphRoutes::get_clients()
 {
     return this->clients;
 }
 
+/**
+ * @brief GraphRoutes::get_total_goods
+ *  Restituisce i beni trasportati dal mezzo nella route passata come parametro
+ * @param rid
+ * @return
+ */
 int GraphRoutes::get_total_goods(route_id rid)
 {
     return routes[rid].get_goods();
@@ -348,6 +345,16 @@ double GraphRoutes::get_saving_client_in_route(route_id rid, client_id c_insert,
     return saving;
 }
 
+/**
+ * @brief GraphRoutes::get_saving_transfer_client
+ *  Restituisce il saving relativo all'eventuale trasferimento del client id dalla route from_route alla route to_route,
+ *  dopo il previous client
+ * @param id
+ * @param from_route
+ * @param to_route
+ * @param previous_client
+ * @return
+ */
 double GraphRoutes::get_saving_transfer_client(client_id id, route_id from_route, route_id to_route, client_id previous_client)
 {
     index_client cidf = clients[id].get_position_in_route();
@@ -372,34 +379,15 @@ double GraphRoutes::get_saving_transfer_client(client_id id, route_id from_route
     return d1 - d2;
 }
 
-double GraphRoutes::get_swap_saving(client_id c1, client_id c2)
-{
-    route_id rid1 = clients[c1].get_route();
-    route_id rid2 = clients[c2].get_route();
-    double cost1 = routes[rid1].get_cost();
-    double cost2 = routes[rid2].get_cost();
-    double d1 = cost1 + cost2;
-    index_client ic1 = clients[c1].get_position_in_route();
-    index_client ic2 = clients[c2].get_position_in_route();
-    index_client ip1 = ic1 - 1;
-    index_client in1 = ic1 + 1;
-    index_client ip2 = ic2 - 1;
-    index_client in2 = ic2 + 1;
-    //Guadagno nell'inserire c2 in r1
-    double dc2 = clients[routes[rid1].get_client(ip1)].get_distance(clients[c2]); //distanza inserimento c2
-    dc2 += clients[c2].get_distance(clients[routes[rid1].get_client(in1)]);
-    dc2 -= clients[routes[rid1].get_client(ip1)].get_distance(clients[c1]); //distanza cancellazione c1
-    dc2 -= clients[c1].get_distance(clients[routes[rid1].get_client(in1)]);
-    //Guadagno nell'inserire c1 in r2
-    double dc1 = clients[routes[rid2].get_client(ip2)].get_distance(clients[c1]); //distanza inserimento c1
-    dc1 += clients[c1].get_distance(clients[routes[rid2].get_client(in2)]);
-    dc1 -= clients[routes[rid2].get_client(ip2)].get_distance(clients[c2]); //distanza cancellazione c2
-    dc2 -= clients[c2].get_distance(clients[routes[rid2].get_client(in2)]);
-    double d2 = (cost1 + dc2) + (cost2 + dc1);
-    return d1 - d2;
-}
-
-double GraphRoutes::get_swap_saving_consecutive_in_route(client_id c1, client_id c2)
+/**
+ * @brief GraphRoutes::get_swap_saving_in_route
+ *  Restituisce il saving relativo allo scambio di posizione dei due client c1 e c2, appartenenti
+ *  alla stessa route
+ * @param c1
+ * @param c2
+ * @return
+ */
+double GraphRoutes::get_swap_saving_in_route(client_id c1, client_id c2)
 {
     route_id rid = clients[c1].get_route();
     index_client ic1 = clients[c1].get_position_in_route();
@@ -410,7 +398,7 @@ double GraphRoutes::get_swap_saving_consecutive_in_route(client_id c1, client_id
     index_client in2 = ic2 + 1;
     double old_cost = routes[rid].get_cost();
     double cost = routes[rid].get_cost();
-    if (in1 == ip2) {
+    if (in1 == ic2) {
         cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
                + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
         cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
@@ -495,6 +483,11 @@ QList< QList<QPoint> > GraphRoutes::get_list_edges()
     return list_routes;
 }
 
+/**
+ * @brief GraphRoutes::to_events_vector
+ *  Restituisce i clienti sottoforma di vettore di Eventi
+ * @return
+ */
 QVector<Event> GraphRoutes::to_events_vector()
 {
     QVector<Event> qe;
@@ -505,6 +498,12 @@ QVector<Event> GraphRoutes::to_events_vector()
     return qe;
 }
 
+/**
+ * @brief GraphRoutes::get_previous_client
+ *  Restituisce l'id del cliente precedente al client passato come parametro, nella sua route
+ * @param client
+ * @return
+ */
 client_id GraphRoutes::get_previous_client(client_id client)
 {
     index_client index = clients[client].get_position_in_route();
@@ -512,6 +511,12 @@ client_id GraphRoutes::get_previous_client(client_id client)
     return routes[rid].get_client(index-1);
 }
 
+/**
+ * @brief GraphRoutes::get_previous_client
+ *  Restituisce l'id del cliente successivo al client passato come parametro, nella sua route
+ * @param client
+ * @return
+ */
 client_id GraphRoutes::get_next_client(client_id client, route_id rid)
 {
     index_client index = clients[client].get_position_in_route();

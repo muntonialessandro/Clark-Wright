@@ -23,7 +23,6 @@ public:
     void delete_route(route_id rid);
     bool remove_client_from_route(client_id client);
     bool insert_client_in_route(route_id rid, client_id client, client_id previous_in_route);
-    bool swap_clients(client_id c1, client_id c2);
     bool swap_consecutive_clients_in_route(client_id c1, client_id c2);
     int get_n_clients();
     int get_n_clients_in_route(route_id rid);

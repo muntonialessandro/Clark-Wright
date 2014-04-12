@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "user_interface.h"
+#define FILE "vrpnc5.txt"
 
 
 /**
@@ -469,7 +470,7 @@ void MainWindow::handle_button1()
         #endif
 
         #ifdef __linux__
-            clients = read_file("vrpnc1.txt", &cap); // Ale
+            clients = read_file(FILE, &cap); // Ale
         #endif
 
         Timer timer("C&W Algorithm");
@@ -481,6 +482,7 @@ void MainWindow::handle_button1()
 
 
         GraphRoutes state = closer_cw(voronoi_points, savings, cap);
+        std::cout << state.to_string() << std::endl;
         timer.stop_and_print();
         G_draw_routes(state.get_list_edges());
         G_draw_nodes( state.get_list_point_label_pairs() );
@@ -505,7 +507,7 @@ void MainWindow::handle_button2()
     #endif
 
     #ifdef __linux__
-        clients = read_file("vrpnc1.txt", &cap); // Ale
+        clients = read_file(FILE, &cap); // Ale
     #endif
 
     Timer timer("C&W Algorithm");
@@ -516,9 +518,9 @@ void MainWindow::handle_button2()
     voronoi_points = voronoi( clients, &savings);
 
 
-    GraphRoutes state = second_closer_cw(voronoi_points, savings, cap);
-    //transfer_clients_post_processing(&state, cap);
-    //second_post_processing(&state);
+    GraphRoutes state = closer_cw(voronoi_points, savings, cap);
+    transfer_clients_post_processing(&state, cap);
+    second_post_processing(&state);
     timer.stop_and_print();
     G_draw_routes(state.get_list_edges());
     G_draw_nodes( state.get_list_point_label_pairs() );
@@ -547,7 +549,44 @@ void MainWindow::handle_button3()
     #endif
 
     #ifdef __linux__
-        clients = read_file("vrpnc11.txt", &cap); // Ale
+        clients = read_file(FILE, &cap); // Ale
+    #endif
+
+    Timer timer("C&W Algorithm");
+    timer.start();
+
+    QVector<Client> voronoi_points;
+    QVector<Saving> savings;
+    voronoi_points = voronoi( clients, &savings);
+
+
+    GraphRoutes state = second_closer_cw(voronoi_points, savings, cap);
+    timer.stop_and_print();
+    G_draw_routes(state.get_list_edges());
+    G_draw_nodes( state.get_list_point_label_pairs() );
+    std::cout << state.to_string() << std::endl;
+
+    G_move_graph_in_a_good_position();
+    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
+}
+
+/**
+ * @brief handleButtons
+ *  handle of buttons
+ */
+void MainWindow::handle_button4()
+{
+
+    ui->userInfo->setText("Voronoi in azione.. attendere!");
+
+    int cap;
+    QVector<Client> clients;
+    #ifdef TARGET_OS_MAC
+        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+    #endif
+
+    #ifdef __linux__
+        clients = read_file(FILE, &cap); // Ale
     #endif
 
     Timer timer("C&W Algorithm");
@@ -568,20 +607,6 @@ void MainWindow::handle_button3()
 
     G_move_graph_in_a_good_position();
     G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
-}
-
-/**
- * @brief handleButtons
- *  handle of buttons
- */
-void MainWindow::handle_button4()
-{
-
-    //info all'utente
-    ui->userInfo->setText("Button 4 premuto");
-
-    // aggiorna l'utente sullo stato finale
-    G_show_result( "Beh, qui abbiamo finito! 4" );
 
 }
 
@@ -592,11 +617,42 @@ void MainWindow::handle_button4()
 void MainWindow::handle_button5()
 {
 
-    //info all'utente
-    ui->userInfo->setText("Button 5 premuto");
+    ui->userInfo->setText("Voronoi in azione.. attendere!");
 
-    // aggiorna l'utente sullo stato finale
-    G_show_result( "Beh, qui abbiamo finito! 5" );
+    int cap;
+    QVector<Client> clients;
+    #ifdef TARGET_OS_MAC
+        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+    #endif
+
+    #ifdef __linux__
+        clients = read_file(FILE, &cap); // Ale
+    #endif
+
+    Timer timer("C&W Algorithm");
+    timer.start();
+
+    QVector<Client> voronoi_points;
+    QVector<Saving> savings;
+    voronoi_points = voronoi( clients, &savings);
+
+    GraphRoutes state;
+    GraphRoutes state1 = closer_cw(voronoi_points, savings, cap);
+    transfer_clients_post_processing(&state1, cap);
+    second_post_processing(&state1);
+    GraphRoutes state2 = closer_cw(voronoi_points, savings, cap);
+    transfer_clients_post_processing(&state2, cap);
+    second_post_processing(&state2);
+    if (state1.get_total_cost() < state2.get_total_cost()) state = state1;
+    else state = state2;
+
+    timer.stop_and_print();
+    G_draw_routes(state.get_list_edges());
+    G_draw_nodes( state.get_list_point_label_pairs() );
+    std::cout << state.to_string() << std::endl;
+
+    G_move_graph_in_a_good_position();
+    G_show_result( "Costo complessivo: " + QString::number( state1.get_total_cost() ) );
 
 }
 

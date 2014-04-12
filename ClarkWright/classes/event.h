@@ -35,6 +35,7 @@
  *          SE SITE EVENT: DA NON USARE
  *          SE CIRCLE EVENT:
  *              da usare in Q: contiene i site event che hanno generato il circle event
+ *      - overlying: vettore utilizzato nel caso in cui vi siano punti sovrapposti.
  */
 class Event
 {
