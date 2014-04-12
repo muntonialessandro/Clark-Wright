@@ -32,6 +32,9 @@ class Ui_Window
 
 public:
 
+    // Menu file
+//    QAction save_button;
+
     // Area SX - Tools
     QWidget *window;
     QWidget *zoomWidget;

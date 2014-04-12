@@ -237,12 +237,26 @@ bool GraphRoutes::swap_consecutive_clients_in_route(client_id c1, client_id c2)
     index_client ic1 = clients[c1].get_position_in_route();
     index_client ic2 = clients[c2].get_position_in_route();
     index_client ip1 = ic1 - 1;
+    index_client in1 = ic1 + 1;
+    index_client ip2 = ic1 - 1;
     index_client in2 = ic2 + 1;
     double cost = routes[rid].get_cost();
-    cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
-           + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
-    cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
-           + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
+    if (in1 == ip2) {
+        cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
+               + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
+        cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
+               + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
+    }
+    else {
+        cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
+               + clients[c1].get_distance(clients[routes[rid].get_client(in1)])
+               + clients[routes[rid].get_client(ip2)].get_distance(clients[c2])
+               + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
+        cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
+               + clients[c2].get_distance(clients[routes[rid].get_client(in1)])
+               + clients[routes[rid].get_client(ip2)].get_distance(clients[c1])
+               + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
+    }
     routes[rid].set_cost(cost);
     routes[rid].set_client(ic1, c2);
     clients[c2].set_position_in_route(ic1);
@@ -255,6 +269,11 @@ bool GraphRoutes::swap_consecutive_clients_in_route(client_id c1, client_id c2)
 int GraphRoutes::get_n_clients()
 {
     return this->n_clients;
+}
+
+int GraphRoutes::get_n_clients_in_route(route_id rid)
+{
+    return routes[rid].get_n_nodes();
 }
 
 /**
@@ -329,6 +348,30 @@ double GraphRoutes::get_saving_client_in_route(route_id rid, client_id c_insert,
     return saving;
 }
 
+double GraphRoutes::get_saving_transfer_client(client_id id, route_id from_route, route_id to_route, client_id previous_client)
+{
+    index_client cidf = clients[id].get_position_in_route();
+    index_client pidf = cidf - 1, nidf = cidf + 1;
+    client_id previous_client_from = routes[from_route].get_client(pidf);
+    client_id next_client_from = routes[from_route].get_client(nidf);
+    double d1 = routes[from_route].get_cost() + routes[to_route].get_cost();
+    double new_cost_from_route = routes[from_route].get_cost();
+    new_cost_from_route = new_cost_from_route -
+                  clients[previous_client_from].get_distance(clients[id]) -
+                  clients[id].get_distance(clients[next_client_from]) +
+                  clients[previous_client_from].get_distance(clients[next_client_from]);
+    index_client pidt = clients[previous_client].get_position_in_route();
+    index_client nidt = pidt +1;
+    client_id next_client_to = routes[to_route].get_client(nidt);
+    double new_cost_to_route = routes[to_route].get_cost();
+    new_cost_to_route = new_cost_to_route -
+                  clients[previous_client].get_distance(clients[next_client_to]) +
+                  clients[previous_client].get_distance(clients[id]) +
+                  clients[id].get_distance(clients[next_client_to]);
+    double d2 = new_cost_from_route + new_cost_to_route;
+    return d1 - d2;
+}
+
 double GraphRoutes::get_swap_saving(client_id c1, client_id c2)
 {
     route_id rid1 = clients[c1].get_route();
@@ -362,12 +405,28 @@ double GraphRoutes::get_swap_saving_consecutive_in_route(client_id c1, client_id
     index_client ic1 = clients[c1].get_position_in_route();
     index_client ic2 = clients[c2].get_position_in_route();
     index_client ip1 = ic1 - 1;
+    index_client in1 = ic1 + 1;
+    index_client ip2 = ic2 - 1;
     index_client in2 = ic2 + 1;
-    double saved =  clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
-                  + clients[c2].get_distance(clients[routes[rid].get_client(in2)]);
-    saved -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
-            + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
-    return saved;
+    double old_cost = routes[rid].get_cost();
+    double cost = routes[rid].get_cost();
+    if (in1 == ip2) {
+        cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
+               + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
+        cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
+               + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
+    }
+    else {
+        cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
+               + clients[c1].get_distance(clients[routes[rid].get_client(in1)])
+               + clients[routes[rid].get_client(ip2)].get_distance(clients[c2])
+               + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
+        cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
+               + clients[c2].get_distance(clients[routes[rid].get_client(in1)])
+               + clients[routes[rid].get_client(ip2)].get_distance(clients[c1])
+               + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
+    }
+    return old_cost - cost;
 }
 
 /**

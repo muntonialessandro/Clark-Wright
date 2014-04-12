@@ -69,7 +69,7 @@ int MainWindow::G_draw_interface( QApplication* a ) {
     reset.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     open_menu.addAction(&reset);
 
-    QAction save("&Save graph routes", &container);
+    QAction save("&Save", &container);
     save.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     open_menu.addAction(&save);
 

@@ -9,7 +9,9 @@ GraphRoutes lelle_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, in
 
 void update_savings(Client c_route, Client c_next, GraphRoutes &graph_route, QVector<Saving>* route_savings);
 
-void swap_post_processing(GraphRoutes *graph_routes, int cap);
+void transfer_clients_post_processing(GraphRoutes *graph_routes,  int cap);
+
+void update_savings_post_processing(Client c_route, Client c_next, GraphRoutes &graph_route, QVector<Saving>* route_savings, int cap);
 
 void second_post_processing(GraphRoutes *graph_routes);
 
