@@ -40,6 +40,8 @@ public:
     QVector<Event> to_events_vector();
     client_id get_previous_client(client_id client);
     client_id get_next_client(client_id client, route_id rid);
+    bool swap_clients_in_route(client_id c1, client_id c2);
+    double get_swap_saving_in_route(client_id c1, client_id c2);
 
 private:
     QVector<Client> clients;

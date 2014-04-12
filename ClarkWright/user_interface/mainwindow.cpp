@@ -405,6 +405,11 @@ void MainWindow::reset(void)
 
 //    ui->graphicsView->setMatrix(matrix);
 
+    GraphRoutes grempty;
+    this->groutes = grempty;
+    // TODO disabilitare il pulsante per salvare
+
+
 }
 
 
@@ -447,6 +452,7 @@ void MainWindow::handle_button0()
     GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
     G_draw_routes( state.get_list_edges() );
     G_draw_nodes( state.get_list_point_label_pairs() );
+    set_graph_routes_for_save( &state );
 
 
 
@@ -489,6 +495,7 @@ void MainWindow::handle_button1()
         std::cout << state.to_string() << std::endl;
 
         G_move_graph_in_a_good_position();
+        set_graph_routes_for_save( &state );
         G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 }
 
@@ -527,9 +534,7 @@ void MainWindow::handle_button2()
     std::cout << state.to_string() << std::endl;
 
     G_move_graph_in_a_good_position();
-
     set_graph_routes_for_save( &state );
-
     G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 }
 
@@ -567,6 +572,7 @@ void MainWindow::handle_button3()
     std::cout << state.to_string() << std::endl;
 
     G_move_graph_in_a_good_position();
+    set_graph_routes_for_save( &state );
     G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 }
 
@@ -606,6 +612,7 @@ void MainWindow::handle_button4()
     std::cout << state.to_string() << std::endl;
 
     G_move_graph_in_a_good_position();
+    set_graph_routes_for_save( &state );
     G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 
 }
@@ -652,6 +659,7 @@ void MainWindow::handle_button5()
     std::cout << state.to_string() << std::endl;
 
     G_move_graph_in_a_good_position();
+    set_graph_routes_for_save( &state );
     G_show_result( "Costo complessivo: " + QString::number( state1.get_total_cost() ) );
 
 }
@@ -769,5 +777,6 @@ void MainWindow::G_show_result( QString str )
  */
 void MainWindow::set_graph_routes_for_save(GraphRoutes *gr)
 {
+    //TODO abilitare il pulsante per salvare
     this->groutes = *gr;
 }
