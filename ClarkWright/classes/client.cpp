@@ -274,6 +274,11 @@ QPoint Client::to_QPoint()
     return p;
 }
 
+/**
+ * @brief Client::to_Event
+ *  Restituisce il cliente convertito in Event
+ * @return
+ */
 Event Client::to_Event()
 {
     bool dep;

@@ -15,6 +15,7 @@
  *      - enabled       : indica se la route è attiva o se è stata eliminata;
  *      - n_nodes       : numero di nodi presenti nella route, compreso il nodo 0 di partenza e il
  *                        nodo 0 di destinazione.
+ *      - goods         : totale dei beni trasportati dal mezzo nella route
  */
 class Route
 {

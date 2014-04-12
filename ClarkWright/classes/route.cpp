@@ -130,6 +130,12 @@ void Route::set_id(route_id id)
     this->id = id;
 }
 
+/**
+ * @brief Route::set_client
+ *  Setta il client in posizione i nella route
+ * @param i
+ * @param c
+ */
 void Route::set_client(index_client i, client_id c)
 {
     this->clients_route[i] = c;
@@ -173,11 +179,21 @@ bool Route::is_enabled()
     return this->enabled;
 }
 
+/**
+ * @brief Route::get_goods
+ *  Restituisce i beni trasportati dal mezzo nella route
+ * @return
+ */
 int Route::get_goods()
 {
     return this->goods;
 }
 
+/**
+ * @brief Route::add_goods
+ *  Aggiunge una quantità di beni da trasportare nella route
+ * @param demand
+ */
 void Route::add_goods(int demand)
 {
     this->goods += demand;

@@ -287,8 +287,8 @@ void second_post_processing(GraphRoutes *graph_routes){
             QVector<client_id> route = graph_routes->get_route(rid);
             for (int j = route.size()-2; j>1; j--){
                 for (int i=1; i<route.size()-j; i++){
-                    if (graph_routes->get_swap_saving_consecutive_in_route(route[i], route[i+j-1]) > 0){
-                        graph_routes->swap_consecutive_clients_in_route(route[i], route[i+j-1]);
+                    if (graph_routes->get_swap_saving_in_route(route[i], route[i+j-1]) > 0){
+                        graph_routes->swap_clients_in_route(route[i], route[i+j-1]);
                         route = graph_routes->get_route(rid);
                     }
                 }
