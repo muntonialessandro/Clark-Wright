@@ -86,6 +86,7 @@ private slots: // le varie funzioni che vengono chiamate quando si interagisce c
     void handle_button3();
     void handle_button4();
     void handle_button5();
+    void handle_button6();
     void zoomGraph( int i );
     void grid(bool on);
     void open_file();

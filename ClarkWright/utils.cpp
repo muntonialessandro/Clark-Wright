@@ -45,6 +45,51 @@ int search_insert_index_double(double n, int first, int last, QVector<double> & 
     return first;
 }
 
+/**
+ * @brief binary_search
+ *  Effettua una ricerca binaria di n sull'array ordinato v.
+ *  Restituisce -1 se n non è presente nell'array.
+ * @param n:        numero da cercare
+ * @param first:    indice del primo elemento dell'array
+ * @param last:     indice dell'ultimo elemento dell'array
+ * @param v:        array su cui effettuare la ricerca
+ * @return          l'indice di n nell'array.
+ *                  se n non è presente, restituisce -1.
+ */
+int binary_search_distance_client(QPair<int, double> n, int first, int last, QVector< QPair<int, double> > & v) {
+    int mid;
+    if (first <= last){
+        mid = (first + last) / 2;
+        if (v[mid].second < n.second) return (binary_search_distance_client (n, mid+1, last, v) );
+        if (v[mid].second == n.second) return mid;
+        if (v[mid].second > n.second) return (binary_search_distance_client (n, first, mid-1, v) );
+    }
+    return -1;
+}
+
+
+/**
+ * @brief search_insert_index
+ *  Effettua una ricerca binaria di n sull'array ordinato v,
+ *  e restituisce l'indice del primo elemento nell'array
+ *  >= a n.
+ * @param n:        numero da cercare
+ * @param first:    indice del primo elemento dell'array
+ * @param last:     indice dell'ultimo elemento dell'array
+ * @param v:        array su cui effettuare la ricerca
+ * @return          l'indice del primo elemento >= a n.
+ */
+int search_insert_index_distance_client(QPair<int, double> n, int first, int last, QVector< QPair<int, double> > &v) {
+    int mid;
+    if (first <= last){
+        mid = (first + last) / 2;
+        if (v[mid].second < n.second) return (search_insert_index_distance_client (n, mid+1, last, v) );
+        if (v[mid].second == n.second) return mid;
+        if (v[mid].second > n.second) return (search_insert_index_distance_client (n, first, mid-1, v) );
+    }
+    return first;
+}
+
 int binary_search_int(int n, int first, int last, QVector<int> &v)
 {
     int mid;

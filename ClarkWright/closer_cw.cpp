@@ -232,6 +232,86 @@ GraphRoutes lelle_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, in
     return graph_route;
 }
 
+GraphRoutes distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap) {
+
+    GraphRoutes graph_route(sites);
+    
+    QVector< QPair<int, double> > clients_by_distance;
+    
+    //ordino i clienti per distanza
+    for (int i = 1; i < sites.size(); i++) {
+        
+        double distance = sites[i].get_distance(graph_route.get_client(0));
+        QPair<int, double> pair(i, distance);
+        
+        int index = search_insert_index_distance_client(pair, 0, clients_by_distance.size() - 1, clients_by_distance);
+        
+        clients_by_distance.insert(index, pair);
+    }
+
+    // analizza tutti i savings
+    while (savings.size()) {
+        
+        client_id first_client = clients_by_distance.last().first;
+        clients_by_distance.pop_back();
+
+        // prendo l'id della route in cui è presente il primo nodo
+        route_id route = graph_route.get_client(first_client).get_route();
+
+        QVector<Saving> route_savings;
+        QVector<client_id> actual_route = graph_route.get_route(route);
+        for (int i = 0; i< actual_route.size()-1; i++){ //l'ultimo nodo 0 non si considera
+            Client c_route = graph_route.get_client(actual_route[i]);
+            Client c_route_next = graph_route.get_client(actual_route[i+1]);
+            update_savings(c_route, c_route_next, graph_route, &route_savings);
+        }
+        while (route_savings.size()){
+            Saving as = route_savings.last();
+            route_savings.pop_back();
+            Client c_alone = graph_route.get_client(as.getIdC2());
+            Client c_next = graph_route.get_client(graph_route.get_next_client(as.getIdC1(), route));
+            if (as.getValue() >= 0 && graph_route.get_total_goods(route) + c_alone.get_demand() <= cap && c_alone.is_alone()){
+                graph_route.delete_route(c_alone.get_route());
+                graph_route.insert_client_in_route(route, as.getIdC2(), as.getIdC1());
+                for (int i=0; i<route_savings.size(); i++) {
+                    if (route_savings[i].getIdC1() == as.getIdC1()) route_savings.remove(i);
+                }
+                //Vicini as.IdC1 + vicini c_alone
+                update_savings(graph_route.get_client(as.getIdC1()), c_alone, graph_route, &route_savings);
+                update_savings(c_alone, c_next, graph_route, &route_savings);
+            }
+            //std::cout << graph_route.to_string() << std::endl;
+        }
+
+        // Cancella dal vettore dei saving tutti i saving che includono i nodi della route.
+        for (int i = 0; i < savings.size(); i++) {
+
+            Client c1 = graph_route.get_client(savings[i].getIdC1());
+            Client c2 = graph_route.get_client(savings[i].getIdC2());
+
+            if (c1.get_route() == route || c2.get_route() == route) {
+
+                savings.remove(i);
+                i--;
+            }
+        }
+        
+        for (int i = 0; i < clients_by_distance.size(); i++) {
+            
+            Client c = graph_route.get_client(clients_by_distance[i].first);
+            
+            if (c.get_route() == route) {
+                
+                clients_by_distance.remove(i);
+                i--;
+            }
+        }
+
+    }
+
+    return graph_route;
+}
+
 void update_savings(Client c_route, Client c_next, GraphRoutes &graph_route, QVector<Saving>* route_savings){
     QVector<client_id> neighbors = c_route.get_neighbors();
     neighbors += c_next.get_neighbors(); // vicini del nodo attuale e del successivo ..
