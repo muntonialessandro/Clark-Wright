@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "user_interface.h"
 #define FILE "vrpnc5.txt"
+#define MACFILE "../../../vrpnc2.txt"
 
 
 /**
@@ -35,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect( ui->button[3], SIGNAL(released()), this, SLOT(handle_button3()) );
     QObject::connect( ui->button[4], SIGNAL(released()), this, SLOT(handle_button4()) );
     QObject::connect( ui->button[5], SIGNAL(released()), this, SLOT(handle_button5()) );
+    QObject::connect( ui->button[6], SIGNAL(released()), this, SLOT(handle_button6()) );
 
     QObject::connect( ui->zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomGraph(int)) );
     QObject::connect( ui->check1, SIGNAL(clicked(bool)), this, SLOT(grid(bool)) );
@@ -472,7 +474,7 @@ void MainWindow::handle_button1()
         int cap;
         QVector<Client> clients;
         #ifdef TARGET_OS_MAC
-            clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+            clients = read_file(MACFILE, &cap); // lelle
         #endif
 
         #ifdef __linux__
@@ -510,7 +512,7 @@ void MainWindow::handle_button2()
     int cap;
     QVector<Client> clients;
     #ifdef TARGET_OS_MAC
-        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+        clients = read_file(MACFILE, &cap); // lelle
     #endif
 
     #ifdef __linux__
@@ -550,7 +552,7 @@ void MainWindow::handle_button3()
     int cap;
     QVector<Client> clients;
     #ifdef TARGET_OS_MAC
-        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+        clients = read_file(MACFILE, &cap); // lelle
     #endif
 
     #ifdef __linux__
@@ -588,7 +590,7 @@ void MainWindow::handle_button4()
     int cap;
     QVector<Client> clients;
     #ifdef TARGET_OS_MAC
-        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+        clients = read_file(MACFILE, &cap); // lelle
     #endif
 
     #ifdef __linux__
@@ -629,7 +631,7 @@ void MainWindow::handle_button5()
     int cap;
     QVector<Client> clients;
     #ifdef TARGET_OS_MAC
-        clients = read_file("../../../vrpnc1.txt", &cap); // lelle
+        clients = read_file(MACFILE, &cap); // lelle
     #endif
 
     #ifdef __linux__
@@ -661,7 +663,41 @@ void MainWindow::handle_button5()
     G_move_graph_in_a_good_position();
     set_graph_routes_for_save( &state );
     G_show_result( "Costo complessivo: " + QString::number( state1.get_total_cost() ) );
+    
+}
 
+void MainWindow::handle_button6()
+{
+    ui->userInfo->setText("Voronoi in azione.. attendere!");
+
+    int cap;
+    QVector<Client> clients;
+    #ifdef TARGET_OS_MAC
+        clients = read_file(MACFILE, &cap); // lelle
+    #endif
+
+    #ifdef __linux__
+        clients = read_file(FILE, &cap); // Ale
+    #endif
+
+    Timer timer("C&W Algorithm");
+    timer.start();
+
+    QVector<Client> voronoi_points;
+    QVector<Saving> savings;
+    voronoi_points = voronoi( clients, &savings);
+
+
+    GraphRoutes state = distance_based_closer_cw(voronoi_points, savings, cap);
+    transfer_clients_post_processing(&state, cap);
+    second_post_processing(&state);
+    G_draw_routes(state.get_list_edges());
+    G_draw_nodes( state.get_list_point_label_pairs() );
+    std::cout << state.to_string() << std::endl;
+
+    G_move_graph_in_a_good_position();
+    set_graph_routes_for_save( &state );
+    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 }
 
 /**
