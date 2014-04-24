@@ -22,7 +22,7 @@
 #define MAX_X_GRAPHVIEW 600
 #define MAX_Y_GRAPHVIEW 600
 #define MAX_XY_LIKE_INFTY 9999
-#define N_ALL_BUTTONS 7
+#define N_ALL_BUTTONS 5
 
 QT_BEGIN_NAMESPACE
 
@@ -76,32 +76,42 @@ public:
         zoomWidget = new QWidget;
         zoomWidget->setLayout(zoomLayoutBox);
 
-        QString name;
-        for ( int i=0; i<N_ALL_BUTTONS; i++ ) {
-            name = "Button" + QString::number( i );
-            button.push_back( new QPushButton(name) );
+        // Buttons:
+        //    C&W standard; (quello sviluppato da Livio&Andre)
+        //    C&W Voronoi Savings; (closerv1)
+        //    C&W Voronoi Savings runtime; (closer v2)
+        //    C&W Voronoi Distances & Savings runtime (closer v3)
+        //    Best (un bottone che li lancia tutti (tranne il primo) e da in output la soluzione migliore)
+
+        QList<QString> name;
+        name << "C and W standard"
+             << "C and W Voronoi Savings"
+             << "C and W Voronoi Savings runtime"
+             << "C and W Voronoi Distances and Savings runtime"
+             << "Best (prendi il migliore)";
+
+        for ( int i=0; i<name.size() || i<N_ALL_BUTTONS ; i++ ) {
+            button.push_back( new QPushButton( name.value(i) ) );
             button.last()->setDefault( false );
             button.last()->setAutoDefault( false ) ;
+            button.last()->setStyleSheet("Text-align:left");
         }
 
 
         groupBox = new QGroupBox(QGroupBox::tr("Settings"));
         check1 = new QCheckBox(QCheckBox::tr("&Grid"));
-        check2 = new QCheckBox(QCheckBox::tr("C&ollisions_"));
-        check3 = new QCheckBox(QCheckBox::tr("Lap&s_"));
         check1->setChecked(true);
 
         vbox = new QVBoxLayout;
         vbox->addWidget(check1);
-        vbox->addWidget(check2);
-        vbox->addWidget(check3);
+        vbox->addWidget(zoomWidget);
+
         vbox->addStretch(1);
         groupBox->setLayout(vbox);
 
         userInfo = new QLabel;
         userInfo->setText("Info");
         rightToolsLayout = new QVBoxLayout;
-        rightToolsLayout->addWidget(zoomWidget);
         for ( int i=0; i<button.size(); i++ ) {
             rightToolsLayout->addWidget( (button[i]) );
         }

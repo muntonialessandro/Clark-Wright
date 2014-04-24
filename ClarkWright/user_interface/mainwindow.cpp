@@ -35,8 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect( ui->button[2], SIGNAL(released()), this, SLOT(handle_button2()) );
     QObject::connect( ui->button[3], SIGNAL(released()), this, SLOT(handle_button3()) );
     QObject::connect( ui->button[4], SIGNAL(released()), this, SLOT(handle_button4()) );
-    QObject::connect( ui->button[5], SIGNAL(released()), this, SLOT(handle_button5()) );
-    QObject::connect( ui->button[6], SIGNAL(released()), this, SLOT(handle_button6()) );
 
     QObject::connect( ui->zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomGraph(int)) );
     QObject::connect( ui->check1, SIGNAL(clicked(bool)), this, SLOT(grid(bool)) );
@@ -288,6 +286,26 @@ void MainWindow::addArrowTo(QPoint p1, QPoint p2, QColor arrowColor)
 }
 
 
+/**
+ * @brief
+ * @param
+ */
+QVector<Client> MainWindow::load_file_clients()
+{
+
+    // se non è ancora stato aperto alcun file ..
+    if ( this->currently_loaded_file == EMPTY_PATH ) {
+
+        // .. allora apri la finestra di dialogo per aprirne uno ..
+        return open_file();
+    }
+
+    // altrimenti carica i clienti dell'ultimo file caricato (aperto)
+    return read_file( this->currently_loaded_file, &(this->capacity) );
+
+}
+
+
 
 /**
  * @brief grid
@@ -332,22 +350,18 @@ void MainWindow::grid( bool on )
  * @param nome descrizione
  * @return valoreRestituito descizione
  */
-void MainWindow::open_file()
+QVector<Client> MainWindow::open_file()
 {
 
 
     QString filename = QFileDialog::getOpenFileName( NULL, "Apri il file con nodi e quantita'", "./" , "RO points (*.*)");
-//    QString filename = "../../../vrpnc1.txt";     //LELLE
 
     if (!filename.isNull())
     {
 
-        //TODO da sistemare........cap non deve essere fisso
-        int cap = 99;
-        nodes_list = read_file(filename, &cap);
+        nodes_list = read_file(filename, &(this->capacity) );
 
-        //TODO aggiungere controllo del file
-
+        // carica i clienti per disegnarli con la relativa etichetta
         QList< QPair<QPoint,QString> > client;
         for(int i=0; i<nodes_list.size(); i++){
             client.append( QPair<QPoint,QString>(
@@ -355,14 +369,20 @@ void MainWindow::open_file()
                                QString::number( nodes_list[i].get_id() ) + "(" + QString::number ( nodes_list[i].get_demand() ) + ")" ) );
         }
 
-
-
+        // disegna i clienti
         G_draw_nodes(client);
 
-    }else{
+    }else{ // se non ha caricato alcun file
+
+        this->currently_loaded_file = EMPTY_PATH;
         qDebug("The file is NULL.");
+
+        QVector<Client> empty_client;
+        return empty_client;
     }
 
+    this->currently_loaded_file = filename;
+    return nodes_list;
 
 }
 
@@ -412,6 +432,8 @@ void MainWindow::reset(void)
     // TODO disabilitare il pulsante per salvare
 
 
+    this->capacity = 0;
+    this->currently_loaded_file = EMPTY_PATH;
 }
 
 
@@ -427,278 +449,206 @@ void MainWindow::save(void)
 }
 
 /**
- * @brief handleButtons
- *  handle of buttons
+ * @brief C&W standard
+ *  C&W standard
  */
 void MainWindow::handle_button0()
 {
-    qDebug("Compute()");
+    ui->userInfo->setText("C&W standard");
 
-    ui->userInfo->setText("Questa è una prova di visualizzazione.");
-    //Prova GraphRoute
-    QVector<Client> clients;
-    Client d( 0, 20, 20, 0);
-    Client c1(1, 30, 30, 13);
-    Client c2(2, 10, 30, 20);
-    Client c3(3, 0, 10, 25);
-    Client c4(4, 20, 0, 5);
-    Client c5(5, 30, 10, 40);
-    clients.push_back(d);
-    clients.push_back(c1);
-    clients.push_back(c2);
-    clients.push_back(c3);
-    clients.push_back(c4);
-    clients.push_back(c5);
+//    QVector<Client> clients;
+//    clients = load_file_clients();
+//    if ( clients.isEmpty() ) {
+//        G_show_result( "No input file.");
+//        return;
+//    }
 
-    qDebug( "Size %d",clients.size() );
-    GraphRoutes state(clients); //inizializzo lo stato dell'algoritmo
-    G_draw_routes( state.get_list_edges() );
-    G_draw_nodes( state.get_list_point_label_pairs() );
-    set_graph_routes_for_save( &state );
+//    Timer timer("C&W Algorithm");
+//    timer.start();
+//    QVector<Client> voronoi_points;
+//    QVector<Saving> savings;
 
+//    /* PROCESSING BEGIN */
+//    voronoi_points = voronoi( clients, &savings);               // voronoi
+//    GraphRoutes state = ?standard_cw?(voronoi_points, savings, this->capacity);
+//    /* PROCESSING END */
 
+//    timer.stop_and_print();
 
+//    // Send all in terminal console and User Interface
+//    G_draw_routes(state.get_list_edges());
+//    G_draw_nodes( state.get_list_point_label_pairs() );
+//    std::cout << state.to_string() << std::endl;
+//    G_move_graph_in_a_good_position();
+//    set_graph_routes_for_save( &state );
+//    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 
 }
 
-
 /**
- * @brief handleButtons
- *  handle of buttons
+ * @brief C&W Voronoi Savings
+ *  C&W Voronoi Savings (closerv1)
  */
 void MainWindow::handle_button1()
 {
 
-        ui->userInfo->setText("Voronoi in azione.. attendere!");
+    ui->userInfo->setText("C&W Voronoi Savings");
 
-        int cap;
-        QVector<Client> clients;
-        #ifdef TARGET_OS_MAC
-            clients = read_file(MACFILE, &cap); // lelle
-        #endif
-
-        #ifdef __linux__
-            clients = read_file(FILE, &cap); // Ale
-        #endif
-
-        Timer timer("C&W Algorithm");
-        timer.start();
-
-        QVector<Client> voronoi_points;
-        QVector<Saving> savings;
-        voronoi_points = voronoi( clients, &savings);
-
-
-        GraphRoutes state = closer_cw(voronoi_points, savings, cap);
-        std::cout << state.to_string() << std::endl;
-        timer.stop_and_print();
-        G_draw_routes(state.get_list_edges());
-        G_draw_nodes( state.get_list_point_label_pairs() );
-        std::cout << state.to_string() << std::endl;
-
-        G_move_graph_in_a_good_position();
-        set_graph_routes_for_save( &state );
-        G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
-}
-
-/**
- * @brief handleButtons
- *  handle of buttons
- */
-void MainWindow::handle_button2()
-{
-    ui->userInfo->setText("Voronoi in azione.. attendere!");
-
-    int cap;
     QVector<Client> clients;
-    #ifdef TARGET_OS_MAC
-        clients = read_file(MACFILE, &cap); // lelle
-    #endif
-
-    #ifdef __linux__
-        clients = read_file(FILE, &cap); // Ale
-    #endif
+    clients = load_file_clients();
+    if ( clients.isEmpty() ) {
+        G_show_result( "No input file.");
+        return;
+    }
 
     Timer timer("C&W Algorithm");
     timer.start();
-
     QVector<Client> voronoi_points;
     QVector<Saving> savings;
-    voronoi_points = voronoi( clients, &savings);
 
+    /* PROCESSING BEGIN */
+    voronoi_points = voronoi( clients, &savings);               // voronoi
+    GraphRoutes state = closer_cw(voronoi_points, savings, this->capacity);
+    transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+    second_post_processing(&state);                             // post-processing 2
+    /* PROCESSING END */
 
-    GraphRoutes state = closer_cw(voronoi_points, savings, cap);
-    transfer_clients_post_processing(&state, cap);
-    second_post_processing(&state);
     timer.stop_and_print();
+
+    // Send all in terminal console and User Interface
     G_draw_routes(state.get_list_edges());
     G_draw_nodes( state.get_list_point_label_pairs() );
     std::cout << state.to_string() << std::endl;
+    G_move_graph_in_a_good_position();
+    set_graph_routes_for_save( &state );
+    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 
+}
+
+/**
+ * @brief C&W Voronoi Savings runtime
+ *  C&W Voronoi Savings runtime; (closer v2)
+ */
+void MainWindow::handle_button2()
+{
+    ui->userInfo->setText("C&W Voronoi Savings runtime");
+
+    QVector<Client> clients;
+    clients = load_file_clients();
+    if ( clients.isEmpty() ) {
+        G_show_result( "No input file.");
+        return;
+    }
+
+    Timer timer("C&W Algorithm");
+    timer.start();
+    QVector<Client> voronoi_points;
+    QVector<Saving> savings;
+
+    /* PROCESSING BEGIN */
+    voronoi_points = voronoi( clients, &savings);               // voronoi
+    GraphRoutes state = second_closer_cw(voronoi_points, savings, this->capacity);
+    transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+    second_post_processing(&state);                             // post-processing 2
+    /* PROCESSING END */
+
+    timer.stop_and_print();
+
+    // Send all in terminal console and User Interface
+    G_draw_routes(state.get_list_edges());
+    G_draw_nodes( state.get_list_point_label_pairs() );
+    std::cout << state.to_string() << std::endl;
     G_move_graph_in_a_good_position();
     set_graph_routes_for_save( &state );
     G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 }
 
 /**
- * @brief handleButtons
- *  handle of buttons
+ * @brief C&W Voronoi Distances & Savings runtime
+ *  C&W Voronoi Distances & Savings runtime (closer v3)
  */
 void MainWindow::handle_button3()
 {
 
-    ui->userInfo->setText("Voronoi in azione.. attendere!");
+    ui->userInfo->setText("C&W Voronoi Distances & Savings runtime");
 
-    int cap;
     QVector<Client> clients;
-    #ifdef TARGET_OS_MAC
-        clients = read_file(MACFILE, &cap); // lelle
-    #endif
-
-    #ifdef __linux__
-        clients = read_file(FILE, &cap); // Ale
-    #endif
+    clients = load_file_clients();
+    if ( clients.isEmpty() ) {
+        G_show_result( "No input file.");
+        return;
+    }
 
     Timer timer("C&W Algorithm");
     timer.start();
-
     QVector<Client> voronoi_points;
     QVector<Saving> savings;
-    voronoi_points = voronoi( clients, &savings);
 
+    /* PROCESSING BEGIN */
+    voronoi_points = voronoi( clients, &savings);               // voronoi
+    GraphRoutes state = distance_based_closer_cw(voronoi_points, savings, this->capacity);
+    transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+    second_post_processing(&state);                             // post-processing 2
+    /* PROCESSING END */
 
-    GraphRoutes state = second_closer_cw(voronoi_points, savings, cap);
     timer.stop_and_print();
+
+    // Send all in terminal console and User Interface
     G_draw_routes(state.get_list_edges());
     G_draw_nodes( state.get_list_point_label_pairs() );
     std::cout << state.to_string() << std::endl;
-
     G_move_graph_in_a_good_position();
     set_graph_routes_for_save( &state );
     G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 }
 
 /**
- * @brief handleButtons
- *  handle of buttons
+ * @brief C&W Voronoi Distances & Savings runtime
+ *  C&W Voronoi Distances & Savings runtime (closer v3)
  */
 void MainWindow::handle_button4()
 {
 
-    ui->userInfo->setText("Voronoi in azione.. attendere!");
+    ui->userInfo->setText("C&W Voronoi Distances & Savings runtime");
 
-    int cap;
     QVector<Client> clients;
-    #ifdef TARGET_OS_MAC
-        clients = read_file(MACFILE, &cap); // lelle
-    #endif
+    clients = load_file_clients();
+    if ( clients.isEmpty() ) {
+        G_show_result( "No input file.");
+        return;
+    }
 
-    #ifdef __linux__
-        clients = read_file(FILE, &cap); // Ale
-    #endif
+//    Timer timer("C&W Algorithm");
+//    timer.start();
+//    QVector<Client> voronoi_points;
+//    QVector<Saving> savings;
 
-    Timer timer("C&W Algorithm");
-    timer.start();
-
-    QVector<Client> voronoi_points;
-    QVector<Saving> savings;
-    voronoi_points = voronoi( clients, &savings);
+//    /* PROCESSING BEGIN */
 
 
-    GraphRoutes state = second_closer_cw(voronoi_points, savings, cap);
-    transfer_clients_post_processing(&state, cap);
-    second_post_processing(&state);
-    timer.stop_and_print();
-    G_draw_routes(state.get_list_edges());
-    G_draw_nodes( state.get_list_point_label_pairs() );
-    std::cout << state.to_string() << std::endl;
 
-    G_move_graph_in_a_good_position();
-    set_graph_routes_for_save( &state );
-    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
+//    voronoi_points = voronoi( clients, &savings);               // voronoi
+
+//    GraphRoutes state = closer_cw(voronoi_points, savings, this->capacity);
+//    transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+//    second_post_processing(&state);                             // post-processing 2
+
+//    if ( state.get_total_cost() < prev_total_cost ) best = i;
+
+//    /* PROCESSING END */
+
+//    timer.stop_and_print();
+
+//    // Send all in terminal console and User Interface
+//    G_draw_routes(state.get_list_edges());
+//    G_draw_nodes( state.get_list_point_label_pairs() );
+//    std::cout << state.to_string() << std::endl;
+//    G_move_graph_in_a_good_position();
+//    set_graph_routes_for_save( &state );
+//    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 
 }
 
-/**
- * @brief handleButtons
- *  handle of buttons
- */
-void MainWindow::handle_button5()
-{
-
-    ui->userInfo->setText("Voronoi in azione.. attendere!");
-
-    int cap;
-    QVector<Client> clients;
-    #ifdef TARGET_OS_MAC
-        clients = read_file(MACFILE, &cap); // lelle
-    #endif
-
-    #ifdef __linux__
-        clients = read_file(FILE, &cap); // Ale
-    #endif
-
-    Timer timer("C&W Algorithm");
-    timer.start();
-
-    QVector<Client> voronoi_points;
-    QVector<Saving> savings;
-    voronoi_points = voronoi( clients, &savings);
-
-    GraphRoutes state;
-    GraphRoutes state1 = closer_cw(voronoi_points, savings, cap);
-    transfer_clients_post_processing(&state1, cap);
-    second_post_processing(&state1);
-    GraphRoutes state2 = closer_cw(voronoi_points, savings, cap);
-    transfer_clients_post_processing(&state2, cap);
-    second_post_processing(&state2);
-    if (state1.get_total_cost() < state2.get_total_cost()) state = state1;
-    else state = state2;
-
-    timer.stop_and_print();
-    G_draw_routes(state.get_list_edges());
-    G_draw_nodes( state.get_list_point_label_pairs() );
-    std::cout << state.to_string() << std::endl;
-
-    G_move_graph_in_a_good_position();
-    set_graph_routes_for_save( &state );
-    G_show_result( "Costo complessivo: " + QString::number( state1.get_total_cost() ) );
-    
-}
-
-void MainWindow::handle_button6()
-{
-    ui->userInfo->setText("Voronoi in azione.. attendere!");
-
-    int cap;
-    QVector<Client> clients;
-    #ifdef TARGET_OS_MAC
-        clients = read_file(MACFILE, &cap); // lelle
-    #endif
-
-    #ifdef __linux__
-        clients = read_file(FILE, &cap); // Ale
-    #endif
-
-    Timer timer("C&W Algorithm");
-    timer.start();
-
-    QVector<Client> voronoi_points;
-    QVector<Saving> savings;
-    voronoi_points = voronoi( clients, &savings);
-
-
-    GraphRoutes state = distance_based_closer_cw(voronoi_points, savings, cap);
-    transfer_clients_post_processing(&state, cap);
-    second_post_processing(&state);
-    G_draw_routes(state.get_list_edges());
-    G_draw_nodes( state.get_list_point_label_pairs() );
-    std::cout << state.to_string() << std::endl;
-
-    G_move_graph_in_a_good_position();
-    set_graph_routes_for_save( &state );
-    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
-}
 
 /**
  * @brief zoomOutGraphButton

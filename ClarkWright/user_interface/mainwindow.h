@@ -32,6 +32,8 @@
 #include <QTime>
 #include "voronoi.h"
 
+#define EMPTY_PATH ""
+
 namespace Ui {
 class MainWindow;
 }
@@ -47,6 +49,9 @@ public:
 
     QString APPNAME;
     QString APP_VERSION;
+
+    int capacity;
+    QString currently_loaded_file;
 
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -79,17 +84,18 @@ private:
     void addNode(QPoint p, QString name);
     void addArrowTo(QPoint p1, QPoint p2, QColor arrowColor);
 
+    //altre funzioni
+    QVector<Client> load_file_clients();
+
 private slots: // le varie funzioni che vengono chiamate quando si interagisce con l'interfaccia
     void handle_button0();
     void handle_button1();
     void handle_button2();
     void handle_button3();
     void handle_button4();
-    void handle_button5();
-    void handle_button6();
     void zoomGraph( int i );
     void grid(bool on);
-    void open_file();
+    QVector<Client> open_file();
     void reset(void);
     void save(void);  // ATTENZIONE: PRIMA DI UTILIZZARLA è NECESSARIO SETTARE L'ATTRIBUTO groutes DELLA CLASSE
     void zoomInGraphButton();
