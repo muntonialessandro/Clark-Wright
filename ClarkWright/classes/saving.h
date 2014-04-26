@@ -28,6 +28,11 @@ public:
     void setId(idSaving id);
     std::string toString();
 
+    static bool sortSavings(const Saving &s1, const Saving &s2);
+    void setEnable(bool value);
+    void swapClients();
+
+
 private:
     idSaving idActual;  // id Saving
     idSaving idTwin;    // id del Saving "simmetrico" rispetto a quello considerato

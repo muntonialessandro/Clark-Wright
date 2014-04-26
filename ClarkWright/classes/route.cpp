@@ -219,3 +219,16 @@ std::string Route::to_string()
     std::string s = ss.str();
     return s;
 }
+
+
+void Route::set_visitated(){
+    this->visitated = true;
+}
+
+bool Route::get_visitated(){
+    return this->visitated;
+}
+
+int Route::get_id(){
+    return this->id;
+}

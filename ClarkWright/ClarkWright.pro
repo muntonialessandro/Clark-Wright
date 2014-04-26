@@ -18,7 +18,8 @@ HEADERS += \
     voronoi.h \
     io_file.h \
     classes/saving.h \
-    closer_cw.h
+    closer_cw.h \
+    farthest_cw.h
 
 SOURCES += \
     utils.cpp \
@@ -31,4 +32,5 @@ SOURCES += \
     voronoi.cpp \
     io_file.cpp \
     classes/saving.cpp \
-    closer_cw.cpp
+    closer_cw.cpp \
+    farthest_cw.cpp

@@ -449,39 +449,37 @@ void MainWindow::save(void)
 }
 
 /**
- * @brief C&W standard
- *  C&W standard
+ * @brief C&W standard (Farthest CW)
+ *  C&W standard (Farthest CW)
  */
 void MainWindow::handle_button0()
 {
     ui->userInfo->setText("C&W standard");
 
-//    QVector<Client> clients;
-//    clients = load_file_clients();
-//    if ( clients.isEmpty() ) {
-//        G_show_result( "No input file.");
-//        return;
-//    }
+    QVector<Client> clients;
+    clients = load_file_clients();
+    if ( clients.isEmpty() ) {
+        G_show_result( "No input file.");
+        return;
+    }
 
-//    Timer timer("C&W Algorithm");
-//    timer.start();
-//    QVector<Client> voronoi_points;
-//    QVector<Saving> savings;
+    Timer timer("C&W Algorithm");
+    timer.start();
+    QVector<Saving> savings;
 
-//    /* PROCESSING BEGIN */
-//    voronoi_points = voronoi( clients, &savings);               // voronoi
-//    GraphRoutes state = ?standard_cw?(voronoi_points, savings, this->capacity);
-//    /* PROCESSING END */
+    /* PROCESSING BEGIN */
+    GraphRoutes state = FarthestCW(clients, savings, this->capacity);
+    /* PROCESSING END */
 
-//    timer.stop_and_print();
+    timer.stop_and_print();
 
-//    // Send all in terminal console and User Interface
-//    G_draw_routes(state.get_list_edges());
-//    G_draw_nodes( state.get_list_point_label_pairs() );
-//    std::cout << state.to_string() << std::endl;
-//    G_move_graph_in_a_good_position();
-//    set_graph_routes_for_save( &state );
-//    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
+    // Send all in terminal console and User Interface
+    G_draw_routes(state.get_list_edges());
+    G_draw_nodes( state.get_list_point_label_pairs() );
+    std::cout << state.to_string() << std::endl;
+    G_move_graph_in_a_good_position();
+    set_graph_routes_for_save( &state );
+    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
 
 }
 
@@ -766,3 +764,6 @@ void MainWindow::set_graph_routes_for_save(GraphRoutes *gr)
     //TODO abilitare il pulsante per salvare
     this->groutes = *gr;
 }
+
+
+

@@ -523,3 +523,31 @@ client_id GraphRoutes::get_next_client(client_id client, route_id rid)
     return routes[rid].get_client(index+1);
 }
 
+
+
+void GraphRoutes::set_client_alone(client_id c, bool state){
+
+    this->clients[c].set_alone(state);
+
+}
+
+void GraphRoutes::set_visitated_route(route_id rid){
+    this->routes[rid].set_visitated();
+}
+
+/**
+ * @brief GraphRoutes::get_route
+ *  Restituisce il QVector contenente i clienti visitati nella route rid;
+ * @param rid
+ * @return
+ */
+QVector<client_id> GraphRoutes::get_clients_in_route(route_id rid)
+{
+    return routes[rid].get_route();
+}
+
+Route GraphRoutes::get_route_from_state(route_id id){
+
+    return this->routes[id];
+
+}

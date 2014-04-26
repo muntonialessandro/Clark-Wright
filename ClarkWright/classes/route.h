@@ -37,7 +37,9 @@ public:
     int get_goods();
     void add_goods(int demand);
     std::string to_string();
-
+    void set_visitated();
+    bool get_visitated();
+    int get_id();
 
 
 private:
@@ -47,6 +49,8 @@ private:
     bool enabled;
     int n_nodes;
     int goods;
+    bool visitated;                         // Indica se la rotta e' stata considerata dall'algoritmo, diversamente e' una route banale.
+
 };
 
 #endif // ROUTE_H

@@ -103,3 +103,19 @@ void Saving::setTwinSaving_id(int idTwin){
     this->idTwin = idTwin;
 }
 
+bool Saving::sortSavings(const Saving &s1, const Saving &s2){
+    Saving ss1 = s1;
+    Saving ss2 = s2;
+    return ss1.getValue() > ss2.getValue(); // Ordinamento in senso decrescente.
+}
+
+
+void Saving::setEnable(bool value){
+    this->enable = value;
+}
+
+void Saving::swapClients(){
+    int temp_id = this->getIdC2();
+    this->idc2 = this->getIdC1();
+    this->idc1 = temp_id;
+}
