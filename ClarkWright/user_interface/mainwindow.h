@@ -34,6 +34,9 @@
 #include "voronoi.h"
 
 #define EMPTY_PATH ""
+#define APPNAME "Graph Visualizator with C&W computation"
+#define APP_VERSION "1.0b"
+
 
 namespace Ui {
 class MainWindow;
@@ -50,9 +53,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-
-    QString APPNAME;
-    QString APP_VERSION;
 
     int capacity;
     QString currently_loaded_file;

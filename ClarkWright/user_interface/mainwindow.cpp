@@ -15,9 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
 
-    APPNAME = "Graph Visualizator" ;
-    APP_VERSION = "1.0a";
-
     // set the scene
     ui->setupUi(parent);
     firstAperture = true;
@@ -62,13 +59,9 @@ int MainWindow::G_draw_interface( QApplication* a ) {
     QMenuBar open_menu_bar(&container);
     QMenu open_menu("&File", &container);
 
-    QAction open("&Open", &container);
+    QAction open("&Open (points quantity)", &container);
     open.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     open_menu.addAction(&open);
-
-    QAction reset("&Reset", &container);
-    reset.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-    open_menu.addAction(&reset);
 
     QAction save("&Save graph routes", &container);
     save.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
@@ -76,11 +69,11 @@ int MainWindow::G_draw_interface( QApplication* a ) {
 
 
     /**** MENU COMPUTATION ****/
-    QMenu computation("Computation", &container);
+    QMenu computation("Opzioni", &container);
 
-    QAction calc("&Computation", &container);
-    calc.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
-    computation.addAction(&calc);
+    QAction reset("&Reset", &container);
+    reset.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    computation.addAction(&reset);
 
     QAction zoomIn("&Zoom +", &container);
     zoomIn.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
@@ -112,27 +105,33 @@ int MainWindow::G_draw_interface( QApplication* a ) {
     container.showMaximized();
 
 
+    // Help menu
     QDialog instructions( NULL );
     instructions.setFixedSize(300,180);
     instructions.setWindowTitle("Help");
-    QLabel instr_text("\nCtrl+ - Zoom+ \nCtrl- - Zoom- \n", &instructions);
+    QLabel instr_text(
+                "\n Ctrl va sostituito con Cmd su Macintosh:"
+                "\n Ctrl+  Zoom+ "
+                "\n Ctrl-  Zoom- \n"
+                , &instructions);
     instr_text.setTextFormat(Qt::AutoText);
     instr_text.setWordWrap(true);
     instructions.hide();
 
     QDialog credits( NULL );
-    credits.setFixedSize(300,100);
+    credits.setFixedSize(350,100);
     credits.setWindowTitle("Credits");
     QString txt;
-    txt.append( "\t" );
-    txt.append( window.APPNAME );
     txt.append( " " );
-    txt.append( window.APP_VERSION );
-    txt.append( "\n\nA cura di BluBluSky.\n" );
+    txt.append( APPNAME );
+    txt.append( "\n Versione " );
+    txt.append( APP_VERSION );
+    txt.append( "\n\n Realizzato dal gruppo Blue Blue Sky"
+                "\n in Aprile 2014 ");
     QLabel cred_text(txt, &credits);
 
     cred_text.setTextFormat(Qt::AutoText);
-    cred_text.setAlignment(Qt::AlignCenter);
+    cred_text.setAlignment(Qt::AlignLeft);
     cred_text.setWordWrap(true);
     credits.hide();
 
@@ -144,12 +143,12 @@ int MainWindow::G_draw_interface( QApplication* a ) {
     QObject::connect( &save, SIGNAL(triggered()), &window, SLOT(save()) );
     QObject::connect( &help, SIGNAL(triggered()), &instructions, SLOT(show()) );
     QObject::connect( &about, SIGNAL(triggered()), &credits, SLOT(show()) );
-    QObject::connect( &calc, SIGNAL(triggered()), &window, SLOT(handle_button2()) );
     QObject::connect( &zoomIn, SIGNAL(triggered()), &window, SLOT(zoomInGraphButton()) );
     QObject::connect( &zoomOut, SIGNAL(triggered()), &window, SLOT(zoomOutGraphButton()) );
 
 
-    window.setWindowTitle( window.APPNAME );
+
+    window.setWindowTitle( APPNAME );
     window.setFocus();
 
 //    QList< QPair<QPoint,QString> > pointList;
