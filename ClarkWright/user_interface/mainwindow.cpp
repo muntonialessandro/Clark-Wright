@@ -175,7 +175,7 @@ MainWindow::~MainWindow()
  */
 void MainWindow::zoomGraph(int i)
 {
-    ui->userInfo->setText( "Zoom: " + QString::number(i) );
+    ui->zoomLabel->setText( QString::number(i) + "x" );
     QMatrix matrix;
     matrix.scale( i/10., i/10.); // zoom factor ( example: 1.1 is 110%)
 
@@ -382,6 +382,8 @@ QVector<Client> MainWindow::open_file()
     }
 
     this->currently_loaded_file = filename;
+    ui->fileLoaded->setText( "File: ..." + filename.right(40) );
+
     return nodes_list;
 
 }
@@ -434,6 +436,8 @@ void MainWindow::reset(void)
 
     this->capacity = 0;
     this->currently_loaded_file = EMPTY_PATH;
+    ui->fileLoaded->setText( "File caricato: -nessuno-" );
+
 }
 
 
@@ -445,7 +449,10 @@ void MainWindow::reset(void)
  */
 void MainWindow::save(void)
 {
-    write_results_in_file( &(this->groutes) );
+    if ( write_results_in_file( &(this->groutes) ) )
+        G_add_info_for_user( "Salvato su file." );
+    else
+        G_add_info_for_user( "Non salvato." );
 }
 
 /**
@@ -454,33 +461,7 @@ void MainWindow::save(void)
  */
 void MainWindow::handle_button0()
 {
-    ui->userInfo->setText("C&W standard");
-
-    QVector<Client> clients;
-    clients = load_file_clients();
-    if ( clients.isEmpty() ) {
-        G_show_result( "No input file.");
-        return;
-    }
-
-    Timer timer("C&W Algorithm");
-    timer.start();
-    QVector<Saving> savings;
-
-    /* PROCESSING BEGIN */
-    GraphRoutes state = FarthestCW(clients, savings, this->capacity);
-    /* PROCESSING END */
-
-    timer.stop_and_print();
-
-    // Send all in terminal console and User Interface
-    G_draw_routes(state.get_list_edges());
-    G_draw_nodes( state.get_list_point_label_pairs() );
-    std::cout << state.to_string() << std::endl;
-    G_move_graph_in_a_good_position();
-    set_graph_routes_for_save( &state );
-    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
-
+    cw_method(CW_STANDARD);
 }
 
 /**
@@ -489,38 +470,7 @@ void MainWindow::handle_button0()
  */
 void MainWindow::handle_button1()
 {
-
-    ui->userInfo->setText("C&W Voronoi Savings");
-
-    QVector<Client> clients;
-    clients = load_file_clients();
-    if ( clients.isEmpty() ) {
-        G_show_result( "No input file.");
-        return;
-    }
-
-    Timer timer("C&W Algorithm");
-    timer.start();
-    QVector<Client> voronoi_points;
-    QVector<Saving> savings;
-
-    /* PROCESSING BEGIN */
-    voronoi_points = voronoi( clients, &savings);               // voronoi
-    GraphRoutes state = closer_cw(voronoi_points, savings, this->capacity);
-    transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
-    second_post_processing(&state);                             // post-processing 2
-    /* PROCESSING END */
-
-    timer.stop_and_print();
-
-    // Send all in terminal console and User Interface
-    G_draw_routes(state.get_list_edges());
-    G_draw_nodes( state.get_list_point_label_pairs() );
-    std::cout << state.to_string() << std::endl;
-    G_move_graph_in_a_good_position();
-    set_graph_routes_for_save( &state );
-    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
-
+    cw_method(CW_CLOSER_V1);
 }
 
 /**
@@ -529,36 +479,7 @@ void MainWindow::handle_button1()
  */
 void MainWindow::handle_button2()
 {
-    ui->userInfo->setText("C&W Voronoi Savings runtime");
-
-    QVector<Client> clients;
-    clients = load_file_clients();
-    if ( clients.isEmpty() ) {
-        G_show_result( "No input file.");
-        return;
-    }
-
-    Timer timer("C&W Algorithm");
-    timer.start();
-    QVector<Client> voronoi_points;
-    QVector<Saving> savings;
-
-    /* PROCESSING BEGIN */
-    voronoi_points = voronoi( clients, &savings);               // voronoi
-    GraphRoutes state = second_closer_cw(voronoi_points, savings, this->capacity);
-    transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
-    second_post_processing(&state);                             // post-processing 2
-    /* PROCESSING END */
-
-    timer.stop_and_print();
-
-    // Send all in terminal console and User Interface
-    G_draw_routes(state.get_list_edges());
-    G_draw_nodes( state.get_list_point_label_pairs() );
-    std::cout << state.to_string() << std::endl;
-    G_move_graph_in_a_good_position();
-    set_graph_routes_for_save( &state );
-    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
+    cw_method(CW_CLOSER_V2);
 }
 
 /**
@@ -567,84 +488,16 @@ void MainWindow::handle_button2()
  */
 void MainWindow::handle_button3()
 {
-
-    ui->userInfo->setText("C&W Voronoi Distances & Savings runtime");
-
-    QVector<Client> clients;
-    clients = load_file_clients();
-    if ( clients.isEmpty() ) {
-        G_show_result( "No input file.");
-        return;
-    }
-
-    Timer timer("C&W Algorithm");
-    timer.start();
-    QVector<Client> voronoi_points;
-    QVector<Saving> savings;
-
-    /* PROCESSING BEGIN */
-    voronoi_points = voronoi( clients, &savings);               // voronoi
-    GraphRoutes state = distance_based_closer_cw(voronoi_points, savings, this->capacity);
-    transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
-    second_post_processing(&state);                             // post-processing 2
-    /* PROCESSING END */
-
-    timer.stop_and_print();
-
-    // Send all in terminal console and User Interface
-    G_draw_routes(state.get_list_edges());
-    G_draw_nodes( state.get_list_point_label_pairs() );
-    std::cout << state.to_string() << std::endl;
-    G_move_graph_in_a_good_position();
-    set_graph_routes_for_save( &state );
-    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
+    cw_method(CW_CLOSER_V3);
 }
 
 /**
- * @brief C&W Voronoi Distances & Savings runtime
- *  C&W Voronoi Distances & Savings runtime (closer v3)
+ * @brief C&W Best
+ *  C&W Best
  */
 void MainWindow::handle_button4()
 {
-
-    ui->userInfo->setText("C&W Voronoi Distances & Savings runtime");
-
-    QVector<Client> clients;
-    clients = load_file_clients();
-    if ( clients.isEmpty() ) {
-        G_show_result( "No input file.");
-        return;
-    }
-
-//    Timer timer("C&W Algorithm");
-//    timer.start();
-//    QVector<Client> voronoi_points;
-//    QVector<Saving> savings;
-
-//    /* PROCESSING BEGIN */
-
-
-
-//    voronoi_points = voronoi( clients, &savings);               // voronoi
-
-//    GraphRoutes state = closer_cw(voronoi_points, savings, this->capacity);
-//    transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
-//    second_post_processing(&state);                             // post-processing 2
-
-//    if ( state.get_total_cost() < prev_total_cost ) best = i;
-
-//    /* PROCESSING END */
-
-//    timer.stop_and_print();
-
-//    // Send all in terminal console and User Interface
-//    G_draw_routes(state.get_list_edges());
-//    G_draw_nodes( state.get_list_point_label_pairs() );
-//    std::cout << state.to_string() << std::endl;
-//    G_move_graph_in_a_good_position();
-//    set_graph_routes_for_save( &state );
-//    G_show_result( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
-
+    cw_method(CW_BEST);
 }
 
 
@@ -748,9 +601,9 @@ void MainWindow::G_move_graph_in_a_good_position(void)
  *  Sposta il grafico per migliorare la visualizzazione
  * @param str è la stringa che conterrà il risultato da mostrare all'utente
  */
-void MainWindow::G_show_result( QString str )
+void MainWindow::G_add_info_for_user( QString str )
 {
-    ui->userInfo->setText( str );
+    ui->userInfo->setText( ui->userInfo->toPlainText() + "\n" + str );
 }
 
 
@@ -767,3 +620,119 @@ void MainWindow::set_graph_routes_for_save(GraphRoutes *gr)
 
 
 
+
+GraphRoutes MainWindow::cw_method(int method) {
+
+    QVector<Saving> savings;
+    GraphRoutes state;
+    GraphRoutes actual_state;
+    QVector<Client> voronoi_points;
+    QVector<Client> clients;
+
+    // open file and load clients
+    clients = load_file_clients();
+    if ( clients.isEmpty() ) {
+        G_add_info_for_user( "No input file.");
+        return state;
+    }
+
+    Timer timer("C&W Algorithm");
+    timer.start();
+
+    /* PROCESSING BEGIN */
+    switch (method) {
+
+        case CW_STANDARD:
+            ui->userInfo->setText("C&W standard");
+
+            state = FarthestCW(clients, savings, this->capacity);
+
+            break;
+
+        case CW_CLOSER_V1:
+            ui->userInfo->setText("C&W Voronoi Savings");
+
+            voronoi_points = voronoi( clients, &savings);               // voronoi
+            state = closer_cw(voronoi_points, savings, this->capacity);
+            transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+            second_post_processing(&state);                             // post-processing 2
+
+            break;
+
+        case CW_CLOSER_V2:
+            ui->userInfo->setText("C&W Voronoi Savings runtime");
+
+            voronoi_points = voronoi( clients, &savings);               // voronoi
+            state = second_closer_cw(voronoi_points, savings, this->capacity);
+            transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+            second_post_processing(&state);                             // post-processing 2
+
+            break;
+
+        case CW_CLOSER_V3:
+            ui->userInfo->setText("C&W Voronoi Distances & Savings runtime");
+
+            voronoi_points = voronoi( clients, &savings);               // voronoi
+            state = distance_based_closer_cw(voronoi_points, savings, this->capacity);
+            transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+            second_post_processing(&state);                             // post-processing 2
+
+            break;
+
+
+        default:
+            ui->userInfo->setText("C&W best of all");
+            G_add_info_for_user(".. potrebbe richiedere molto tempo!");
+
+            int best_total_cost = 999999;
+            int numero_del_migliore = CW_STANDARD;
+
+            // scegli il migliore
+            for( int i=CW_STANDARD; i<CW_BEST; i++ ) {
+
+                actual_state = cw_method(i);        // memorizza il risultato attuale
+
+                if ( actual_state.get_total_cost() < best_total_cost ) {
+                    state = actual_state;
+                    best_total_cost = state.get_total_cost();
+                    numero_del_migliore = i;
+                }
+            }
+
+            ui->userInfo->setText( "Algoritmo migliore: " + algorithm_name( numero_del_migliore ) );
+
+            // pulisci il grafico
+            scene = new QGraphicsScene;
+            ui->graphicsView->setScene(scene);
+
+            break;
+
+    }
+    /* PROCESSING END */
+
+    timer.stop_and_print();
+
+    // Send all in terminal console and User Interface
+    G_draw_routes(state.get_list_edges());
+    G_draw_nodes( state.get_list_point_label_pairs() );
+    std::cout << state.to_string() << std::endl;
+    G_move_graph_in_a_good_position();
+    set_graph_routes_for_save( &state );
+    G_add_info_for_user( "Costo complessivo: " + QString::number( state.get_total_cost() ) );
+
+    return state;
+
+}
+
+
+QString MainWindow::algorithm_name( int id_algorithm ){
+
+    switch (id_algorithm) {
+        case CW_STANDARD:   return "CW standard";
+        case CW_CLOSER_V1:  return "CW Voronoi Savings";
+        case CW_CLOSER_V2:  return "CW Voronoi Savings runtime";
+        case CW_CLOSER_V3:  return "CW Voronoi Distances & Savings";
+        default:            return "Best";
+    }
+
+}

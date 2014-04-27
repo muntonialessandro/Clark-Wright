@@ -18,6 +18,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QTextEdit>
 
 #define MAX_X_GRAPHVIEW 600
 #define MAX_Y_GRAPHVIEW 600
@@ -48,8 +49,9 @@ public:
     QVBoxLayout *vbox;
     QVBoxLayout *rightToolsLayout;
     QWidget *rightTools;
-    QLabel *userInfo;
+    QTextEdit *userInfo;
     QLabel *zoomLabel;
+    QLabel *fileLoaded;
 
     // Graph Area
     QGraphicsView *graphicsView;
@@ -71,8 +73,11 @@ public:
         zoomSlider = new QSlider(Qt::Horizontal);
         zoomSlider->setRange(5,80);
         zoomSlider->setValue( 25 );
+        zoomLabel->setText( QString::number( zoomSlider->value() ) + "x" );
+        zoomLabel->setFont( QFont("Helvetica", 12) );
         zoomLayoutBox = new QHBoxLayout;
         zoomLayoutBox->addWidget(zoomSlider);
+        zoomLayoutBox->addWidget(zoomLabel);
         zoomWidget = new QWidget;
         zoomWidget->setLayout(zoomLayoutBox);
 
@@ -98,18 +103,26 @@ public:
         }
 
 
+        // setting area
         groupBox = new QGroupBox(QGroupBox::tr("Settings"));
         check1 = new QCheckBox(QCheckBox::tr("&Grid"));
         check1->setChecked(true);
 
+
+        fileLoaded = new QLabel;
+        fileLoaded->setText( "File caricato: -nessuno-" );
+        fileLoaded->setFont( QFont("Helvetica", 11) );
         vbox = new QVBoxLayout;
         vbox->addWidget(check1);
         vbox->addWidget(zoomWidget);
+        vbox->addWidget(fileLoaded);
 
         vbox->addStretch(1);
         groupBox->setLayout(vbox);
 
-        userInfo = new QLabel;
+        // user info
+        userInfo = new QTextEdit;
+        userInfo->setReadOnly(true);
         userInfo->setText("Info");
         rightToolsLayout = new QVBoxLayout;
         for ( int i=0; i<button.size(); i++ ) {

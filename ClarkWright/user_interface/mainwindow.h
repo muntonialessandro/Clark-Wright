@@ -39,6 +39,9 @@ namespace Ui {
 class MainWindow;
 }
 
+// algoritmi C&W
+enum { CW_STANDARD, CW_CLOSER_V1, CW_CLOSER_V2, CW_CLOSER_V3, CW_BEST };
+
 typedef QList<QPoint> G_arrows_points_path;
 typedef QPair <QPoint,QString> G_node_and_label;
 
@@ -60,7 +63,7 @@ public:
     void G_draw_nodes( QList< QPair<QPoint,QString> > pointsList );
     int G_draw_interface(QApplication *a);
     void G_move_graph_in_a_good_position( void );
-    void G_show_result(QString str);
+    void G_add_info_for_user(QString str);
     void set_graph_routes_for_save( GraphRoutes *gr );
 
 private:
@@ -87,6 +90,7 @@ private:
 
     //altre funzioni
     QVector<Client> load_file_clients();
+    QString algorithm_name( int id_algorithm );
 
 private slots: // le varie funzioni che vengono chiamate quando si interagisce con l'interfaccia
     void handle_button0();
@@ -102,6 +106,7 @@ private slots: // le varie funzioni che vengono chiamate quando si interagisce c
     void zoomInGraphButton();
     void zoomOutGraphButton();
     void draw_route( QList<QPoint> route );
+    GraphRoutes cw_method(int method);
 
 };
 
