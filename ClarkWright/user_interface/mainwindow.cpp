@@ -710,6 +710,8 @@ GraphRoutes MainWindow::cw_method(int method) {
     /* PROCESSING END */
 
     timer.stop_and_print();
+    G_add_info_for_user("Time: " + QString::number( timer.delay() ) + "s");
+
 
     // Send all in terminal console and User Interface
     G_draw_routes(state.get_list_edges());
