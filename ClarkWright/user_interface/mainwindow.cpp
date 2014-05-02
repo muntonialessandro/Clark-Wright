@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect( ui->button[2], SIGNAL(released()), this, SLOT(handle_button2()) );
     QObject::connect( ui->button[3], SIGNAL(released()), this, SLOT(handle_button3()) );
     QObject::connect( ui->button[4], SIGNAL(released()), this, SLOT(handle_button4()) );
+    QObject::connect( ui->button[5], SIGNAL(released()), this, SLOT(handle_button5()) );
 
     QObject::connect( ui->zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomGraph(int)) );
     QObject::connect( ui->check1, SIGNAL(clicked(bool)), this, SLOT(grid(bool)) );
@@ -491,10 +492,19 @@ void MainWindow::handle_button3()
 }
 
 /**
+ * @brief C&W Voronoi Distances & Savings runtime
+ *  C&W Voronoi Distances & Savings runtime (closer v4)
+ */
+void MainWindow::handle_button4()
+{
+    cw_method(CW_CLOSER_V4);
+}
+
+/**
  * @brief C&W Best
  *  C&W Best
  */
-void MainWindow::handle_button4()
+void MainWindow::handle_button5()
 {
     cw_method(CW_BEST);
 }
@@ -619,7 +629,11 @@ void MainWindow::set_graph_routes_for_save(GraphRoutes *gr)
 
 
 
-
+/**
+ * @brief
+ *
+ * @param method indica l'algoritmo da utilizzare
+ */
 GraphRoutes MainWindow::cw_method(int method) {
 
     QVector<Saving> savings;
@@ -642,14 +656,14 @@ GraphRoutes MainWindow::cw_method(int method) {
     switch (method) {
 
         case CW_STANDARD:
-            ui->userInfo->setText("C&W standard");
+            ui->userInfo->setText( algorithm_name( CW_STANDARD ) );
 
             state = FarthestCW(clients, savings, this->capacity);
 
             break;
 
         case CW_CLOSER_V1:
-            ui->userInfo->setText("C&W Voronoi Savings");
+            ui->userInfo->setText( algorithm_name( CW_CLOSER_V1 ) );
 
             voronoi_points = voronoi( clients, &savings);               // voronoi
             state = closer_cw(voronoi_points, savings, this->capacity);
@@ -659,7 +673,7 @@ GraphRoutes MainWindow::cw_method(int method) {
             break;
 
         case CW_CLOSER_V2:
-            ui->userInfo->setText("C&W Voronoi Savings runtime");
+            ui->userInfo->setText( algorithm_name( CW_CLOSER_V2 ) );
 
             voronoi_points = voronoi( clients, &savings);               // voronoi
             state = second_closer_cw(voronoi_points, savings, this->capacity);
@@ -669,7 +683,7 @@ GraphRoutes MainWindow::cw_method(int method) {
             break;
 
         case CW_CLOSER_V3:
-            ui->userInfo->setText("C&W Voronoi Distances & Savings runtime");
+            ui->userInfo->setText( algorithm_name( CW_CLOSER_V3 ) );
 
             voronoi_points = voronoi( clients, &savings);               // voronoi
             state = distance_based_closer_cw(voronoi_points, savings, this->capacity);
@@ -679,8 +693,39 @@ GraphRoutes MainWindow::cw_method(int method) {
             break;
 
 
+        case CW_CLOSER_V4:
+            ui->userInfo->setText( algorithm_name( CW_CLOSER_V4 ) );
+
+            /** ###################################### **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###################################### **/
+
+//      ALE QUESTO PUOI ELIMINARLO... E' SOLO DI ESEMPIO PER TE!
+//            voronoi_points = voronoi( clients, &savings);               // voronoi
+//            state = distance_based_closer_cw(voronoi_points, savings, this->capacity);
+//            transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+//            second_post_processing(&state);                             // post-processing 2
+
+            /** ###################################### **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###     ALE METTI QUI IL CODICE     ## **/
+            /** ###################################### **/
+
+
+
+
+            break;
+
+
         default:
-            ui->userInfo->setText("C&W best of all");
+            ui->userInfo->setText( algorithm_name( CW_BEST ) );
             G_add_info_for_user(".. potrebbe richiedere molto tempo!");
 
             int best_total_cost = 999999;
@@ -728,12 +773,6 @@ GraphRoutes MainWindow::cw_method(int method) {
 
 QString MainWindow::algorithm_name( int id_algorithm ){
 
-    switch (id_algorithm) {
-        case CW_STANDARD:   return "CW standard";
-        case CW_CLOSER_V1:  return "CW Voronoi Savings";
-        case CW_CLOSER_V2:  return "CW Voronoi Savings runtime";
-        case CW_CLOSER_V3:  return "CW Voronoi Distances & Savings";
-        default:            return "Best";
-    }
+    return ui->alg_button_names.value( id_algorithm );
 
 }

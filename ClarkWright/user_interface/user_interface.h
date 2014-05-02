@@ -23,7 +23,7 @@
 #define MAX_X_GRAPHVIEW 600
 #define MAX_Y_GRAPHVIEW 600
 #define MAX_XY_LIKE_INFTY 9999
-#define N_ALL_BUTTONS 5
+#define N_ALL_BUTTONS 6
 
 QT_BEGIN_NAMESPACE
 
@@ -60,6 +60,7 @@ public:
     QWidget *graphWidget;
     QHBoxLayout *horizontalLayout;
 
+    QList<QString> alg_button_names;
 
     void setupUi(QWidget *widget)
     {
@@ -88,15 +89,15 @@ public:
         //    C&W Voronoi Distances & Savings runtime (closer v3)
         //    Best (un bottone che li lancia tutti (tranne il primo) e da in output la soluzione migliore)
 
-        QList<QString> name;
-        name << "C and W standard"
+        alg_button_names << "C and W standard"
              << "C and W Voronoi Savings"
              << "C and W Voronoi Savings runtime"
-             << "C and W Voronoi Distances and Savings runtime"
+             << "C and W Voronoi Distances and Savings runtime A"
+             << "C and W Voronoi Distances and Savings runtime B"
              << "Best (prendi il migliore)";
 
-        for ( int i=0; i<name.size() || i<N_ALL_BUTTONS ; i++ ) {
-            button.push_back( new QPushButton( name.value(i) ) );
+        for ( int i=0; i<alg_button_names.size() || i<N_ALL_BUTTONS ; i++ ) {
+            button.push_back( new QPushButton( alg_button_names.value(i) ) );
             button.last()->setDefault( false );
             button.last()->setAutoDefault( false ) ;
             button.last()->setStyleSheet("Text-align:left");

@@ -43,7 +43,7 @@ class MainWindow;
 }
 
 // algoritmi C&W
-enum { CW_STANDARD, CW_CLOSER_V1, CW_CLOSER_V2, CW_CLOSER_V3, CW_BEST };
+enum { CW_STANDARD, CW_CLOSER_V1, CW_CLOSER_V2, CW_CLOSER_V3, CW_CLOSER_V4, CW_BEST };
 
 typedef QList<QPoint> G_arrows_points_path;
 typedef QPair <QPoint,QString> G_node_and_label;
@@ -98,6 +98,7 @@ private slots: // le varie funzioni che vengono chiamate quando si interagisce c
     void handle_button2();
     void handle_button3();
     void handle_button4();
+    void handle_button5();
     void zoomGraph( int i );
     void grid(bool on);
     QVector<Client> open_file();
