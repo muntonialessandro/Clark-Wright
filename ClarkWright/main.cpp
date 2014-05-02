@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
         QVector<Saving> savings;
         clients = voronoi(clients, &savings);
 
-        GraphRoutes graph_route = distance_based_closer_cw(clients, savings, cap);
+        GraphRoutes graph_route = last_distance_based_closer_cw(clients, savings, cap);
         
         std::cout << graph_route.to_string();
 

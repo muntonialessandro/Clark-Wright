@@ -425,13 +425,13 @@ double GraphRoutes::get_swap_saving_in_route(client_id c1, client_id c2)
 std::string GraphRoutes::to_string()
 {
     int i;
-    std::string s = "GraphRoutes:\n Clients:\n";
+    /*std::string s = "GraphRoutes:\n Clients:\n";
     for (i=0; i<clients.size(); i++){
         s += "\t";
         s += clients[i].to_string();
         s += "\n";
-    }
-    s += " Routes:\n";
+    }*/
+    std::string s = " Routes:\n";
     for (i=0; i<routes.size(); i++){
         if (routes[i].is_enabled()){
             s += "\t";

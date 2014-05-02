@@ -739,12 +739,16 @@ QVector<Event> merge_events(QVector<Event> &v1, QVector<Event> &v2){
                 }
                 else { // altrimenti
                     if (v1[i].get_y() == v2[j].get_y()){
-                        if (v1[i].get_x() >= v2[j].get_x()){
+                        if (v1[i].get_x() == v2[j].get_x()){
+                            QVector<int> overlying = v2[j].get_overlying();
+                            for (int l=0; l<overlying.size(); l++) v1[i].add_overlying(overlying[l]);
+                            v1[i].add_overlying(v2[j].get_client_id());
                             merge.push_back(v1[i]); // inserisco v1[i] nell'array merge
-                            if (v1[i].get_x() == v2[j].get_x()) {
-                                merge[merge.size()-1].add_overlying(v2[j].get_client_id());
-                                j++;
-                            }
+                            i++;
+                            j++;
+                        }
+                        else if (v1[i].get_x() > v2[j].get_x()){
+                            merge.push_back(v1[i]); // inserisco v1[i] nell'array merge
                             i++; // incremento i
                         }
                         else {

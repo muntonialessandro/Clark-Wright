@@ -686,7 +686,7 @@ GraphRoutes MainWindow::cw_method(int method) {
             ui->userInfo->setText( algorithm_name( CW_CLOSER_V3 ) );
 
             voronoi_points = voronoi( clients, &savings);               // voronoi
-            state = distance_based_closer_cw(voronoi_points, savings, this->capacity);
+            state = last_distance_based_closer_cw(voronoi_points, savings, this->capacity);
             transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
             second_post_processing(&state);                             // post-processing 2
 
@@ -696,30 +696,10 @@ GraphRoutes MainWindow::cw_method(int method) {
         case CW_CLOSER_V4:
             ui->userInfo->setText( algorithm_name( CW_CLOSER_V4 ) );
 
-            /** ###################################### **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###################################### **/
-
-//      ALE QUESTO PUOI ELIMINARLO... E' SOLO DI ESEMPIO PER TE!
-//            voronoi_points = voronoi( clients, &savings);               // voronoi
-//            state = distance_based_closer_cw(voronoi_points, savings, this->capacity);
-//            transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
-//            second_post_processing(&state);                             // post-processing 2
-
-            /** ###################################### **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###     ALE METTI QUI IL CODICE     ## **/
-            /** ###################################### **/
-
-
-
+            voronoi_points = voronoi( clients, &savings);               // voronoi
+            state = first_distance_based_closer_cw(voronoi_points, savings, this->capacity);
+            transfer_clients_post_processing(&state, this->capacity);   // post-processing 1
+            second_post_processing(&state);                             // post-processing 2
 
             break;
 
@@ -729,10 +709,10 @@ GraphRoutes MainWindow::cw_method(int method) {
             G_add_info_for_user(".. potrebbe richiedere molto tempo!");
 
             int best_total_cost = 999999;
-            int numero_del_migliore = CW_STANDARD;
+            int numero_del_migliore = CW_CLOSER_V1;
 
             // scegli il migliore
-            for( int i=CW_STANDARD; i<CW_BEST; i++ ) {
+            for( int i=CW_CLOSER_V1; i<CW_BEST; i++ ) {
 
                 actual_state = cw_method(i);        // memorizza il risultato attuale
 
