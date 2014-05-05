@@ -1,15 +1,13 @@
 #include "classes/graph_routes.h"
 #include "classes/saving.h"
 
-GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap);
+GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap);
 
-GraphRoutes second_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap);
+GraphRoutes second_closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap);
 
-GraphRoutes lelle_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap);
+GraphRoutes last_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap);
 
-GraphRoutes last_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap);
-
-GraphRoutes first_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap);
+GraphRoutes first_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap);
 
 void update_savings(Client c_route, Client c_next, GraphRoutes &graph_route, QVector<Saving>* route_savings);
 

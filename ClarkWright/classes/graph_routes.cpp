@@ -213,7 +213,7 @@ bool GraphRoutes::swap_clients_in_route(client_id c1, client_id c2)
     index_client ic2 = clients[c2].get_position_in_route();
     index_client ip1 = ic1 - 1;
     index_client in1 = ic1 + 1;
-    index_client ip2 = ic1 - 1;
+    index_client ip2 = ic2 - 1;
     index_client in2 = ic2 + 1;
     double cost = routes[rid].get_cost();
     if (in1 == ic2) {

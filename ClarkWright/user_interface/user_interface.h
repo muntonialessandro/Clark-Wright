@@ -92,8 +92,8 @@ public:
         alg_button_names << "C and W standard"
              << "C and W Voronoi Savings"
              << "C and W Voronoi Savings runtime"
-             << "C and W Voronoi Distances and Savings runtime A"
-             << "C and W Voronoi Distances and Savings runtime B"
+             << "C and W Voronoi Distances and Savings runtime f"
+             << "C and W Voronoi Distances and Savings runtime n"
              << "Best (prendi il migliore)";
 
         for ( int i=0; i<alg_button_names.size() || i<N_ALL_BUTTONS ; i++ ) {

@@ -1,6 +1,6 @@
 #include "closer_cw.h"
 
-GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap) {
+GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap) {
     
     GraphRoutes graph_route(sites);
     
@@ -44,6 +44,7 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                         route_id r_c2 = graph_route.get_client(c2.get_id()).get_route();
                         graph_route.delete_route(r_c2);
                         graph_route.insert_client_in_route(c1.get_route(), c2.get_id(), c1.get_id());
+                        i=1;
                     }
                 } else if (saving_previous >= saving_next && saving_previous > 0) {
                     
@@ -53,6 +54,7 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                         route_id r_c2 = graph_route.get_client(c2.get_id()).get_route();
                         graph_route.delete_route(r_c2);
                         graph_route.insert_client_in_route(c1.get_route(), c2.get_id(), previous_client);
+                        i=1;
                     }
                 }
             }
@@ -69,6 +71,7 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                         route_id r_c1 = graph_route.get_client(c1.get_id()).get_route();
                         graph_route.delete_route(r_c1);
                         graph_route.insert_client_in_route(c2.get_route(), c1.get_id(), c2.get_id());
+                        i=1;
                     }
                 } else if (saving_previous >= saving_next && saving_previous > 0) {
                     
@@ -78,6 +81,7 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
                         route_id r_c1 = graph_route.get_client(c1.get_id()).get_route();
                         graph_route.delete_route(r_c1);
                         graph_route.insert_client_in_route(c2.get_route(), c1.get_id(), previous_client);
+                        i=1;
                     }
                 }
             }
@@ -101,7 +105,7 @@ GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap)
     return graph_route;
 }
 
-GraphRoutes second_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap) {
+GraphRoutes second_closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap) {
 
     GraphRoutes graph_route(sites);
 
@@ -166,7 +170,7 @@ GraphRoutes second_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, i
     return graph_route;
 }
 
-GraphRoutes last_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap) {
+GraphRoutes last_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap) {
 
     GraphRoutes graph_route(sites);
     
@@ -269,7 +273,7 @@ GraphRoutes last_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving
     return graph_route;
 }
 
-GraphRoutes first_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> &savings, int cap) {
+GraphRoutes first_distance_based_closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap) {
 
     GraphRoutes graph_route(sites);
 
@@ -490,11 +494,13 @@ void second_post_processing(GraphRoutes *graph_routes){
         tot_cost = new_cost;
         for (rid=graph_routes->get_first_route_id(); rid!=-1; rid=graph_routes->get_next_route_id(rid)){
             QVector<client_id> route = graph_routes->get_route(rid);
-            for (int j = route.size()-2; j>1; j--){
+            for (int j = route.size()-2; j>0; j--){
                 for (int i=1; i<route.size()-j; i++){
                     if (graph_routes->get_swap_saving_in_route(route[i], route[i+j-1]) > 0){
                         graph_routes->swap_clients_in_route(route[i], route[i+j-1]);
                         route = graph_routes->get_route(rid);
+                        i=1;
+                        j = route.size()-2;
                     }
                 }
             }
