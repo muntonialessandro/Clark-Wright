@@ -367,7 +367,9 @@ double GraphRoutes::get_saving_transfer_client(client_id id, route_id from_route
                   clients[previous_client_from].get_distance(clients[id]) -
                   clients[id].get_distance(clients[next_client_from]) +
                   clients[previous_client_from].get_distance(clients[next_client_from]);
-    index_client pidt = clients[previous_client].get_position_in_route();
+    index_client pidt;
+    if (previous_client == 0) pidt = 0;
+    else pidt = clients[previous_client].get_position_in_route();
     index_client nidt = pidt +1;
     client_id next_client_to = routes[to_route].get_client(nidt);
     double new_cost_to_route = routes[to_route].get_cost();

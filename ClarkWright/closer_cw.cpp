@@ -515,6 +515,14 @@ void second_post_processing(GraphRoutes *graph_routes){
                     }
                 }
             }
+            if (graph_routes->get_saving_transfer_client(route[route.size()-2], rid, rid, 0) > 0){
+                graph_routes->remove_client_from_route(route[route.size()-2]);
+                graph_routes->insert_client_in_route(rid, route[route.size()-2], 0);
+            }
+            if (route.size() > 3 && graph_routes->get_saving_transfer_client(route[1], rid, rid, route[route.size()-2]) > 0){
+                graph_routes->remove_client_from_route(route[1]);
+                graph_routes->insert_client_in_route(rid, route[1], route[route.size()-2]);
+            }
         }
         new_cost = graph_routes->get_total_cost();
     } while (tot_cost != new_cost);
