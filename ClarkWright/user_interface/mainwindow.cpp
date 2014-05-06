@@ -748,6 +748,17 @@ GraphRoutes MainWindow::cw_method(int method) {
                 numero_del_migliore = CW_CLOSER_V3;
             }
 
+            ///V4
+            actual_state = first_distance_based_closer_cw(voronoi_points, savings, this->capacity);
+            transfer_clients_post_processing(&actual_state, this->capacity);   // post-processing 1
+            second_post_processing(&actual_state);                             // post-processing 2
+
+            if ( actual_state.get_total_cost() < best_total_cost ) {
+                state = actual_state;
+                best_total_cost = state.get_total_cost();
+                numero_del_migliore = CW_CLOSER_V4;
+            }
+
             ui->userInfo->setText( "Algoritmo migliore: " + algorithm_name( numero_del_migliore ) );
 
             // pulisci il grafico
