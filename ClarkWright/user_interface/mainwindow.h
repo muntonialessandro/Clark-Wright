@@ -7,7 +7,7 @@
 #include "classes/saving.h"
 #include "timer.h"
 #include "closer_cw.h"
-#include "farthest_cw.h"
+#include "classic_cw.h"
 #include <QWheelEvent>
 #include <QFileDialog>
 #include <QStackedLayout>

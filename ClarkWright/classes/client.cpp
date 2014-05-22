@@ -220,6 +220,10 @@ void Client::add_neighbor(client_id neighbor, double distance)
     this->neighbors.insert(index, neighbor);
 }
 
+/**
+ * @brief Client::get_neighbors
+ * @return l'array di vicini del cliente
+ */
 QVector<client_id> Client::get_neighbors()
 {
     return this->neighbors;

@@ -1,6 +1,10 @@
 #include "classes/graph_routes.h"
 #include "classes/saving.h"
 
+/**
+ * Funzioni relative agli algoritmi di risoluzione del problema VRP
+ */
+
 GraphRoutes closer_cw(QVector<Client> &sites, QVector<Saving> savings, int cap);
 
 GraphRoutes create_route(GraphRoutes graph_route, QVector<Saving> &savings, client_id first_client, client_id second_client, int cap);

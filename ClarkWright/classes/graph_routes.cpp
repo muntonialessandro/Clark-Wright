@@ -45,7 +45,7 @@ route_id GraphRoutes::get_first_route_id()
     if (routes.isEmpty()) return -1;
 
     int i=0;
-    while (!routes[i].is_enabled()) { //quando trovo ula prossima route enabled, mi fermo
+    while (!routes[i].is_enabled()) { //quando trovo la prossima route enabled, mi fermo
         i++;
         if (i == routes.size()) return -1; //se i va out of bound, non ci sono altre route attive
     }
@@ -90,8 +90,8 @@ double GraphRoutes::get_total_cost()
 {
     int i;
     double cost = 0;
-    for (i=0; i<routes.size(); i++){
-        if (routes[i].is_enabled()) cost += routes[i].get_cost();
+    for (i=0; i<routes.size(); i++){ //per ogni route
+        if (routes[i].is_enabled()) cost += routes[i].get_cost(); //sommo il loro costo
     }
     return cost;
 }
@@ -209,34 +209,34 @@ bool GraphRoutes::insert_client_in_route(route_id rid, client_id client, client_
 bool GraphRoutes::swap_clients_in_route(client_id c1, client_id c2)
 {
     route_id rid = clients[c1].get_route();
-    index_client ic1 = clients[c1].get_position_in_route();
-    index_client ic2 = clients[c2].get_position_in_route();
-    index_client ip1 = ic1 - 1;
-    index_client in1 = ic1 + 1;
-    index_client ip2 = ic2 - 1;
-    index_client in2 = ic2 + 1;
-    double cost = routes[rid].get_cost();
-    if (in1 == ic2) {
-        cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
+    index_client ic1 = clients[c1].get_position_in_route(); // posizione c1
+    index_client ic2 = clients[c2].get_position_in_route(); // posizione c2
+    index_client ip1 = ic1 - 1; // posizione predecessore c1
+    index_client in1 = ic1 + 1; // posizione successore c1
+    index_client ip2 = ic2 - 1; // posizione predecessore c2
+    index_client in2 = ic2 + 1; // posizione successore c2
+    double cost = routes[rid].get_cost(); //costo prima dello scambio
+    if (in1 == ic2) { // se c2 è successore di c1 nella route
+        cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])   //sottraggo i costi degli archi rimossi
                + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
-        cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
+        cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])   //aggiungo i costi degli archi inseriti
                + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
     }
     else {
-        cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])
+        cost -= (clients[routes[rid].get_client(ip1)].get_distance(clients[c1])   //sottraggo i costi degli archi rimossi
                + clients[c1].get_distance(clients[routes[rid].get_client(in1)])
                + clients[routes[rid].get_client(ip2)].get_distance(clients[c2])
                + clients[c2].get_distance(clients[routes[rid].get_client(in2)]));
-        cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])
+        cost += (clients[routes[rid].get_client(ip1)].get_distance(clients[c2])   //aggiungo i costi degli archi inseriti
                + clients[c2].get_distance(clients[routes[rid].get_client(in1)])
                + clients[routes[rid].get_client(ip2)].get_distance(clients[c1])
                + clients[c1].get_distance(clients[routes[rid].get_client(in2)]));
     }
-    routes[rid].set_cost(cost);
-    routes[rid].set_client(ic1, c2);
-    clients[c2].set_position_in_route(ic1);
-    routes[rid].set_client(ic2, c1);
-    clients[c1].set_position_in_route(ic2);
+    routes[rid].set_cost(cost); // aggiorno il costo della route
+    routes[rid].set_client(ic1, c2); // c2 viene inserito nella posizione di c1
+    clients[c2].set_position_in_route(ic1); // aggiorno la posizione di c2
+    routes[rid].set_client(ic2, c1); // c1 viene inserito nella posizione di c2
+    clients[c1].set_position_in_route(ic2); // aggiorno la posizione di c1
     return true;
 
 }
@@ -323,7 +323,6 @@ double GraphRoutes::get_standard_saving(client_id c1, client_id c2)
  */
 double GraphRoutes::get_saving_client_in_route(route_id rid, client_id c_insert, client_id previous_client)
 {
-//    route_id route = clients[previous_client].get_route(); //route in cui si farà l'inserimento
     if (!routes[rid].is_enabled()) return -1; //se la route non è attiva
     //costo della route + costo della route banale del client c_insert
     double d1 = (this->clients[c_insert].get_distance(clients[0]) * 2.0) + this->routes[rid].get_cost();
@@ -357,8 +356,8 @@ double GraphRoutes::get_saving_client_in_route(route_id rid, client_id c_insert,
  */
 double GraphRoutes::get_saving_transfer_client(client_id id, route_id from_route, route_id to_route, client_id previous_client)
 {
-    index_client cidf = clients[id].get_position_in_route();
-    index_client pidf = cidf - 1, nidf = cidf + 1;
+    index_client cidf = clients[id].get_position_in_route(); // posizione del client
+    index_client pidf = cidf - 1, nidf = cidf + 1; // predecessore e successore del client
     client_id previous_client_from = routes[from_route].get_client(pidf);
     client_id next_client_from = routes[from_route].get_client(nidf);
     double d1 = routes[from_route].get_cost() + routes[to_route].get_cost();
@@ -525,16 +524,25 @@ client_id GraphRoutes::get_next_client(client_id client, route_id rid)
     return routes[rid].get_client(index+1);
 }
 
-
-
+/**
+ * @brief GraphRoutes::set_client_alone
+ *  setta il cliente c come alone
+ * @param c
+ * @param state
+ */
 void GraphRoutes::set_client_alone(client_id c, bool state){
 
     this->clients[c].set_alone(state);
 
 }
 
-void GraphRoutes::set_visitated_route(route_id rid){
-    this->routes[rid].set_visitated();
+/**
+ * @brief GraphRoutes::set_visitated_route
+ *  setta la route come visitata
+ * @param rid
+ */
+void GraphRoutes::set_visited_route(route_id rid){
+    this->routes[rid].set_visited();
 }
 
 /**
@@ -546,10 +554,4 @@ void GraphRoutes::set_visitated_route(route_id rid){
 QVector<client_id> GraphRoutes::get_clients_in_route(route_id rid)
 {
     return routes[rid].get_route();
-}
-
-Route GraphRoutes::get_route_from_state(route_id id){
-
-    return this->routes[id];
-
 }

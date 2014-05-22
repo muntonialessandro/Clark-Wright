@@ -658,7 +658,7 @@ GraphRoutes MainWindow::cw_method(int method) {
         case CW_STANDARD:
             ui->userInfo->setText( algorithm_name( CW_STANDARD ) );
 
-            state = FarthestCW(clients, savings, this->capacity);
+            state = classic_cw(clients, savings, this->capacity);
 
             break;
 

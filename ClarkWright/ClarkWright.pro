@@ -19,7 +19,7 @@ HEADERS += \
     io_file.h \
     classes/saving.h \
     closer_cw.h \
-    farthest_cw.h
+    classic_cw.h
 
 SOURCES += \
     utils.cpp \
@@ -33,4 +33,4 @@ SOURCES += \
     io_file.cpp \
     classes/saving.cpp \
     closer_cw.cpp \
-    farthest_cw.cpp
+    classic_cw.cpp

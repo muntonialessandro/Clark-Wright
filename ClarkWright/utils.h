@@ -9,6 +9,10 @@
 #include <QVector>
 #include <QPair>
 
+/**
+ * Funzioni utili utilizzate in diverse parti del progetto
+ */
+
 int binary_search_double(double n, int first, int last, QVector<double> &v);
 
 int search_insert_index_double(double n, int first, int last, QVector<double> &v);

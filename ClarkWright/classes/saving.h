@@ -6,7 +6,17 @@
 
 typedef int idSaving;
 
-
+/**
+ * @brief The Saving class
+ * Modella un saving, ossia un guadagno nel fondere due nodi in una route.
+ * assumendo che il saving è relativo a due nodi generici x, y, il saving è composto da:
+ *  - idActual: id del saving relativo ai nodi x, y
+ *  - idTwin  : id del saving relativo ai nodi y, x (non utilizzato nei problemi simmetrici)
+ *  - idc1    : id del nodo x
+ *  - idc2    : id del nodo y
+ *  - value   : entità del guadagno dell'inserimento
+ *  - enable  : variabile booleana che indica se il saving viene ancora utilizzato o meno
+ */
 class Saving
 {
 public:

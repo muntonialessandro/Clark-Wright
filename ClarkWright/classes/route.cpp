@@ -221,7 +221,7 @@ std::string Route::to_string()
 }
 
 
-void Route::set_visitated(){
+void Route::set_visited(){
     this->visitated = true;
 }
 

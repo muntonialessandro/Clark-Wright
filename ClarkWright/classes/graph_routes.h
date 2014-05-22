@@ -42,11 +42,10 @@ public:
     client_id get_next_client(client_id client, route_id rid);
     bool swap_clients_in_route(client_id c1, client_id c2);
     double get_swap_saving_in_route(client_id c1, client_id c2);
-
-    void set_client_alone(client_id c, bool state);   // Funzione per disabilitare il client
-    void set_visitated_route(route_id rid);
-    QVector<client_id> get_clients_in_route(route_id rid); //TODO ripetizione della funzione?
-    Route get_route_from_state(route_id id);
+    void set_client_alone(client_id c, bool state);
+    void set_visited_route(route_id rid);
+    QVector<client_id> get_clients_in_route(route_id rid);
+    //Route get_route_from_state(route_id id);
 
 private:
     QVector<Client> clients;

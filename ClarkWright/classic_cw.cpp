@@ -1,6 +1,6 @@
-#include "farthest_cw.h"
+#include "classic_cw.h"
 
-GraphRoutes FarthestCW(QVector<Client> &clients, QVector<Saving> &savings, int vehicle_capacity) {
+GraphRoutes classic_cw(QVector<Client> &clients, QVector<Saving> &savings, int vehicle_capacity) {
 
     // 0. Inizializzazione strutture dati di supporto.
     int i=0, j=0, dim, idSaving=0, savingAttuale, result;
@@ -37,13 +37,13 @@ GraphRoutes FarthestCW(QVector<Client> &clients, QVector<Saving> &savings, int v
 
 
     // 4. Ordinamento decrescente dei savings. Verranno considerati in senso decrescente.
-    sort(savings.begin(), savings.end(), Saving::sortSavings);
+    std::sort(savings.begin(), savings.end(), Saving::sortSavings);
 
 
     // 5. Inizializzazione della prima route.
-    savingAttuale = cercaSavingTrue(savings);                           // Indica il saving attualmente analizzato.
+    savingAttuale = find_true_saving(savings);                           // Indica il saving attualmente analizzato.
     routeAttuale = (savings[savingAttuale].getIdC1() -1);               // Recupera la prima route valida da analizzare.
-    state.set_visitated_route(routeAttuale);                            // Setta la Route come visitata.
+    state.set_visited_route(routeAttuale);                            // Setta la Route come visitata.
     state.set_client_alone(savings[savingAttuale].getIdC1(), false);    // Disabilita il client della route che si sta costruendo.
     savingAttuale -= 1;
 
@@ -58,7 +58,7 @@ GraphRoutes FarthestCW(QVector<Client> &clients, QVector<Saving> &savings, int v
             int lastClientInRouteId = clients_in_route.size()-2;         // Recupera l'ultimo cliente in lista.
 
             // 6. Verifica la possibilità di consumare il saving attuale.
-            result = (verificaInserimento(clients_in_route, savings, savingAttuale, lastClientInRouteId, state));
+            result = (check_insert(clients_in_route, savings, savingAttuale, lastClientInRouteId, state));
             switch (result){
 
             case 1:
@@ -144,7 +144,7 @@ GraphRoutes FarthestCW(QVector<Client> &clients, QVector<Saving> &savings, int v
                         // 11. Calcolo del prossimo saving.
                         tempStampaSaving = savingAttuale;
                         savings[savingAttuale].setEnable(false);
-                        savingAttuale = cercaSavingTrue(savings);
+                        savingAttuale = find_true_saving(savings);
 
                         if(savingAttuale == -2){                    // Caso in cui non esista un prossimo saving.
                             savingAttuale = savings.size()-1;
@@ -169,7 +169,7 @@ GraphRoutes FarthestCW(QVector<Client> &clients, QVector<Saving> &savings, int v
 
             // 12. Controlla se il saving e' l'ultimo.
             if(savingAttuale == savings.size()-1){
-                savingAttuale = cercaSavingTrue(savings);
+                savingAttuale = find_true_saving(savings);
 
                 // 13. Sono state create tutte le route necessarie, termina.
                 if(savingAttuale == -2){
@@ -177,7 +177,7 @@ GraphRoutes FarthestCW(QVector<Client> &clients, QVector<Saving> &savings, int v
                 }
                 else{                                                                   // E' possibile creare una nuova route.
                     routeAttuale = (savings[savingAttuale].getIdC1() -1);               // Recupera la prima route valida da analizzare.
-                    state.set_visitated_route(routeAttuale);                            // Setta la Route come visitata.
+                    state.set_visited_route(routeAttuale);                            // Setta la Route come visitata.
                     state.set_client_alone(savings[savingAttuale].getIdC1(), false);    // Disabilita il client della route che si sta costruendo.
                     savingAttuale -= 1;
                 }
@@ -230,8 +230,18 @@ GraphRoutes FarthestCW(QVector<Client> &clients, QVector<Saving> &savings, int v
 }
 
 
-
-int verificaInserimento(QVector<client_id> clients_in_route, QVector<Saving> &savings, int savingAttuale, int lastClientInRouteId, GraphRoutes state){
+/**
+ * @brief check_insert
+ *  Verifica se è possibile inserire il savingAttuale nella routeAttuale
+ *  oppure i client del saving e della route non sono compatibili.
+ * @param clients_in_route
+ * @param savings
+ * @param savingAttuale
+ * @param lastClientInRouteId
+ * @param state
+ * @return
+ */
+int check_insert(QVector<client_id> clients_in_route, QVector<Saving> &savings, int savingAttuale, int lastClientInRouteId, GraphRoutes state){
 
     if( clients_in_route[1]
             == savings[savingAttuale].getIdC2() ){                          // Caso 1: inserimento in testa.
@@ -267,9 +277,13 @@ int verificaInserimento(QVector<client_id> clients_in_route, QVector<Saving> &sa
     return -2;      // Almeno uno dei due client del saving e' enable ma non e' di confine nella rotta considerata.
 }
 
-
-
-int cercaSavingTrue(QVector<Saving> sav){
+/**
+ * @brief find_true_saving
+ *  Verifica se ci sono ancora saving da processare.
+ * @param sav
+ * @return
+ */
+int find_true_saving(QVector<Saving> sav){
     for(int i=0; i<sav.size(); i++){
         if(sav[i].getEnable() == true)
             return i;

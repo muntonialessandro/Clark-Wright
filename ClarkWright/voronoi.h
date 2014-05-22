@@ -10,6 +10,10 @@
 #include <QMatrix3x3>
 #include <cmath>
 
+/**
+ * Funzioni utilizzate per il calcolo del diagramma di Voronoi
+ */
+
 QVector<Client> voronoi (QVector<Client> &sites, QVector<Saving> *savings);
 
 void handle_site_event(QLinkedList<Event>::iterator ie, QLinkedList<Event>* Q, QVector<Event>* T, QVector<Client> *sites, int *id_circle, Event &deposit, QVector<Saving>* savings);

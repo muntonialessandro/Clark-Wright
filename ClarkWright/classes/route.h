@@ -37,7 +37,7 @@ public:
     int get_goods();
     void add_goods(int demand);
     std::string to_string();
-    void set_visitated();
+    void set_visited();
     bool get_visitated();
     int get_id();
 
