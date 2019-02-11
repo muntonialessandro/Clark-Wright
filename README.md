@@ -7,5 +7,5 @@ Implementation of a Clark and Wright algorithm for Vehicle-Routing-Problems base
 
 # Download
 ```bash
-git clone --recursive https://github.com/muntonialessandro/Clark-Wright.git
+git clone --recursive https://github.com/muntonialessandro/Clarke-Wright.git
 ```
