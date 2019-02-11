@@ -1,4 +1,4 @@
-# Voronoi based Clark and Wroght Algorithm
+# Voronoi based Clark and Wright Algorithm
 
 [Simone Barbieri](http://barbierisimone.com/), Andrea Loddo, Emanuele Mameli, [Alessandro Muntoni](http://vcg.isti.cnr.it/~muntoni/), [Livio Pompianu](http://tcs.unica.it/members/livio-pompianu)
 
